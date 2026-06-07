@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { OWNER_ID } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -97,9 +98,8 @@ export function LeadsTable() {
 
   async function loadLeads() {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
+      const user = { id: OWNER_ID };
+    const { data } = await supabase
         .from("leads")
         .select("*")
         .eq("user_id", user.id)
@@ -422,9 +422,7 @@ function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead }: LeadF
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
+    const user = { id: OWNER_ID };
     const payload = {
       user_id: user.id,
       name,

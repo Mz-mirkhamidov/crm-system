@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { OWNER_ID } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -67,9 +68,8 @@ export function ClientsTable() {
 
   async function loadClients() {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
+      const user = { id: OWNER_ID };
+    const { data } = await supabase
         .from("clients").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
       setClients((data as Client[]) || []);
     } catch (e) {
@@ -224,8 +224,7 @@ function ClientFormModal({ open, onClose, onSuccess, client }: { open: boolean; 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    const user = { id: OWNER_ID };
     const payload = { user_id: user.id, name, phone, address: address || null, comment: comment || null };
     if (client) { await supabase.from("clients").update(payload).eq("id", client.id); }
     else { await supabase.from("clients").insert(payload); }

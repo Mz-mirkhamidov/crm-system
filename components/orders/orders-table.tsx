@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { OWNER_ID } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -57,9 +58,8 @@ export function OrdersTable() {
 
   async function loadOrders() {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
+      const user = { id: OWNER_ID };
+    const { data } = await supabase
         .from("orders").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
       setOrders((data as Order[]) || []);
     } catch (e) {

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
+import { OWNER_ID } from "@/lib/auth";
 import type { SourceType } from "@/types";
 import { Loader2 } from "lucide-react";
 
@@ -43,10 +44,7 @@ export function FollowUpModal({
     if (!scheduledAt) return;
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+    const user = { id: OWNER_ID };
 
     await supabase.from("follow_ups").insert({
       user_id: user.id,

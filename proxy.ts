@@ -1,47 +1,22 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE, SESSION_VALUE } from "@/lib/auth";
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { pathname } = request.nextUrl;
+  const session = request.cookies.get(SESSION_COOKIE);
+  const isAuth = session?.value === SESSION_VALUE;
 
-  // Redirect to login if not authenticated
-  if (!user && !pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  // Redirect to dashboard if already logged in
-  if (user && pathname === "/login") {
+  // Login sahifasida authenticated bo'lsa → dashboard
+  if (isAuth && pathname === "/login") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  return supabaseResponse;
+  // Dashboard sahifalarida auth yo'q → login
+  if (!isAuth && !pathname.startsWith("/login")) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

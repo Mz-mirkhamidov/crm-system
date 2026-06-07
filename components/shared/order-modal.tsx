@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
+import { OWNER_ID } from "@/lib/auth";
 import { PRODUCTS, type SourceType, type ProductType, type OrderType } from "@/types";
 import { Loader2 } from "lucide-react";
 
@@ -51,10 +52,7 @@ export function OrderModal({
     if (!price) return;
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+    const user = { id: OWNER_ID };
 
     const payload: any = {
       user_id: user.id,
