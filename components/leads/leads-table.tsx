@@ -422,21 +422,22 @@ function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead }: LeadF
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const user = { id: OWNER_ID };
     const payload = {
-      user_id: user.id,
+      user_id: OWNER_ID,
       name,
       phone,
       address: address || null,
-      tag: tag || null,
+      tag: tag === "none" ? null : tag || null,
       status,
       comment: comment || null,
     };
 
     if (lead) {
-      await supabase.from("leads").update(payload).eq("id", lead.id);
+      const { error } = await supabase.from("leads").update(payload).eq("id", lead.id);
+      if (error) { alert("Xato: " + error.message); setLoading(false); return; }
     } else {
-      await supabase.from("leads").insert(payload);
+      const { error } = await supabase.from("leads").insert(payload);
+      if (error) { alert("Xato: " + error.message); setLoading(false); return; }
     }
 
     setLoading(false);
