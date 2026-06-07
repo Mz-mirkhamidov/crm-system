@@ -1,6 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
 
 export function createClient() {
+  // Build vaqtda env var bo'lmasa ham crash qilmasin
   const url =
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
     "https://placeholder.supabase.co";

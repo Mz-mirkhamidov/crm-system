@@ -66,12 +66,17 @@ export function ClientsTable() {
   }, [search, clients]);
 
   async function loadClients() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data } = await supabase
-      .from("clients").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
-    setClients((data as Client[]) || []);
-    setLoading(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("clients").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+      setClients((data as Client[]) || []);
+    } catch (e) {
+      console.error("loadClients error:", e);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function loadClientOrders(clientId: string) {

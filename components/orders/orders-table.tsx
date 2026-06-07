@@ -56,12 +56,17 @@ export function OrdersTable() {
   }, [orders, search, filterProduct, filterType]);
 
   async function loadOrders() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data } = await supabase
-      .from("orders").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
-    setOrders((data as Order[]) || []);
-    setLoading(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("orders").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+      setOrders((data as Order[]) || []);
+    } catch (e) {
+      console.error("loadOrders error:", e);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function deleteOrder(id: string) {

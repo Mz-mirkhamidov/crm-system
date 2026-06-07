@@ -96,15 +96,20 @@ export function LeadsTable() {
   }, [search, filterStatus, filterTag, leads]);
 
   async function loadLeads() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data } = await supabase
-      .from("leads")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-    setLeads((data as Lead[]) || []);
-    setLoading(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("leads")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      setLeads((data as Lead[]) || []);
+    } catch (e) {
+      console.error("loadLeads error:", e);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function loadLeadOrders(leadId: string) {

@@ -35,12 +35,17 @@ export function FollowUpsTable() {
   useEffect(() => { loadFollowUps(); }, []);
 
   async function loadFollowUps() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data } = await supabase
-      .from("follow_ups").select("*").eq("user_id", user.id).order("scheduled_at", { ascending: true });
-    setFollowUps((data as FollowUp[]) || []);
-    setLoading(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("follow_ups").select("*").eq("user_id", user.id).order("scheduled_at", { ascending: true });
+      setFollowUps((data as FollowUp[]) || []);
+    } catch (e) {
+      console.error("loadFollowUps error:", e);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function markDone(id: string) {
