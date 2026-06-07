@@ -9,10 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createClient } from "@/lib/supabase/client";
 import { useOperator } from "@/lib/useOperator";
 import { PRODUCTS, type SourceType, type ProductType, type OrderType } from "@/types";
-import { Loader2, CheckSquare, Square } from "lucide-react";
+import { Loader2, CheckSquare, Square, Minus, Plus, ShoppingBag } from "lucide-react";
 import { cn, getProductColor } from "@/lib/utils";
 
-interface SelectedProduct { product: ProductType; price: string; }
+interface SelectedItem { product: ProductType; qty: number; }
 
 interface OrderModalProps {
   open: boolean; onClose: () => void;
@@ -21,43 +21,55 @@ interface OrderModalProps {
 }
 
 export function OrderModal({ open, onClose, sourceId, sourceName, sourceType, onSuccess }: OrderModalProps) {
-  const [selected, setSelected] = useState<SelectedProduct[]>([]);
+  const [items, setItems] = useState<SelectedItem[]>([]);
+  const [totalPrice, setTotalPrice] = useState("");
   const [orderType, setOrderType] = useState<OrderType>("Hozirgi");
   const [scheduledAt, setScheduledAt] = useState("");
   const [comment, setComment] = useState("");
+  const [step, setStep] = useState<"products" | "price">("products");
   const [loading, setLoading] = useState(false);
   const operator = useOperator();
   const operatorId = operator?.id || "";
   const supabase = createClient();
 
   function toggleProduct(product: ProductType) {
-    setSelected((prev) => {
+    setItems((prev) => {
       const exists = prev.find((p) => p.product === product);
       if (exists) return prev.filter((p) => p.product !== product);
-      return [...prev, { product, price: "" }];
+      return [...prev, { product, qty: 1 }];
     });
   }
 
-  function setPrice(product: ProductType, price: string) {
-    setSelected((prev) => prev.map((p) => p.product === product ? { ...p, price } : p));
+  function setQty(product: ProductType, delta: number) {
+    setItems((prev) => prev.map((p) => p.product === product
+      ? { ...p, qty: Math.max(1, p.qty + delta) }
+      : p
+    ));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function getProductSummary() {
+    return items.map((i) => `${i.product} (${i.qty} ta)`).join(", ");
+  }
+
+  async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    if (selected.length === 0) { alert("Kamida 1 ta mahsulot tanlang"); return; }
-    if (selected.some((p) => !p.price)) { alert("Barcha tanlangan mahsulotlar narxini kiriting"); return; }
+    if (!totalPrice) return;
     setLoading(true);
 
-    for (const item of selected) {
-      const { error } = await supabase.from("orders").insert({
-        user_id: operatorId, operator_id: operatorId,
-        source_type: sourceType, source_id: sourceId, source_name: sourceName,
-        product: item.product, price: parseFloat(item.price),
-        order_type: orderType, comment: comment || null,
-        scheduled_at: orderType === "Keyinroqi" && scheduledAt ? scheduledAt : null,
-      });
-      if (error) { alert("Xato: " + error.message); setLoading(false); return; }
-    }
+    const productStr = getProductSummary();
+    const totalQty = items.reduce((s, i) => s + i.qty, 0);
+
+    const { error } = await supabase.from("orders").insert({
+      user_id: operatorId, operator_id: operatorId,
+      source_type: sourceType, source_id: sourceId, source_name: sourceName,
+      product: productStr,
+      price: parseFloat(totalPrice),
+      quantity: totalQty,
+      order_type: orderType, comment: comment || null,
+      scheduled_at: orderType === "Keyinroqi" && scheduledAt ? scheduledAt : null,
+    });
+
+    if (error) { alert("Xato: " + error.message); setLoading(false); return; }
 
     if (sourceType === "lead") {
       await supabase.from("leads").update({ status: "Buyurtma berilgan" }).eq("id", sourceId);
@@ -67,78 +79,128 @@ export function OrderModal({ open, onClose, sourceId, sourceName, sourceType, on
   }
 
   function resetForm() {
-    setSelected([]); setOrderType("Hozirgi"); setScheduledAt(""); setComment("");
+    setItems([]); setTotalPrice(""); setOrderType("Hozirgi");
+    setScheduledAt(""); setComment(""); setStep("products");
   }
-
-  const total = selected.reduce((s, p) => s + (parseFloat(p.price) || 0), 0);
 
   return (
     <Dialog open={open} onOpenChange={() => { resetForm(); onClose(); }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Yangi zakaz — {sourceName}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <ShoppingBag className="w-4 h-4 text-primary" />
+            Yangi zakaz — {sourceName}
+          </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label>Mahsulotlar <span className="text-muted-foreground font-normal text-xs">(bir nechta tanlash mumkin)</span></Label>
-            <div className="space-y-2">
-              {PRODUCTS.map((product) => {
-                const isSelected = selected.some((p) => p.product === product);
-                const item = selected.find((p) => p.product === product);
-                return (
-                  <div key={product} className={cn("rounded-lg border transition-all", isSelected ? "border-primary/40 bg-primary/5" : "border-border bg-secondary/30")}>
-                    <button type="button" className="w-full flex items-center gap-3 px-3 py-2.5 text-left" onClick={() => toggleProduct(product)}>
-                      {isSelected ? <CheckSquare className="w-4 h-4 text-primary flex-shrink-0" /> : <Square className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
-                      <span className={cn("text-sm px-2 py-0.5 rounded-full", getProductColor(product))}>{product}</span>
+
+        {step === "products" ? (
+          // STEP 1: Select products + quantities
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">Mahsulot va miqdorini tanlang:</p>
+            {PRODUCTS.map((product) => {
+              const item = items.find((i) => i.product === product);
+              const isSelected = !!item;
+              return (
+                <div key={product} className={cn("rounded-xl border transition-all", isSelected ? "border-primary/40 bg-primary/5" : "border-border")}>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <button type="button" onClick={() => toggleProduct(product)} className="flex-shrink-0">
+                      {isSelected ? <CheckSquare className="w-4 h-4 text-primary" /> : <Square className="w-4 h-4 text-muted-foreground" />}
                     </button>
+                    <span className={cn("text-sm px-2.5 py-0.5 rounded-full flex-1", getProductColor(product))}>{product}</span>
                     {isSelected && (
-                      <div className="px-3 pb-3">
-                        <Input type="number" placeholder="Narx (so'm)" value={item?.price || ""}
-                          onChange={(e) => setPrice(product, e.target.value)} className="h-8 text-sm" />
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button type="button" onClick={() => setQty(product, -1)}
+                          className="w-6 h-6 rounded-full bg-secondary border border-border flex items-center justify-center hover:bg-accent transition-colors">
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-6 text-center text-sm font-bold text-foreground">{item.qty}</span>
+                        <button type="button" onClick={() => setQty(product, 1)}
+                          className="w-6 h-6 rounded-full bg-secondary border border-border flex items-center justify-center hover:bg-accent transition-colors">
+                          <Plus className="w-3 h-3" />
+                        </button>
+                        <span className="text-xs text-muted-foreground w-6">ta</span>
                       </div>
                     )}
                   </div>
-                );
-              })}
-            </div>
-            {total > 0 && (
-              <p className="text-xs text-right text-primary font-semibold">
-                Jami: {new Intl.NumberFormat("uz-UZ").format(total)} so'm
-                {selected.length > 1 && ` · ${selected.length} ta mahsulot`}
-              </p>
+                </div>
+              );
+            })}
+
+            {items.length > 0 && (
+              <div className="bg-primary/10 border border-primary/20 rounded-xl px-4 py-3 text-xs text-primary">
+                ✓ {getProductSummary()}
+              </div>
             )}
-          </div>
 
-          <div className="space-y-1.5">
-            <Label>Zakaz turi</Label>
-            <Select value={orderType} onValueChange={(v) => setOrderType(v as OrderType)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Hozirgi">Hozirgi</SelectItem>
-                <SelectItem value="Keyinroqi">Keyinroqi</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {orderType === "Keyinroqi" && (
-            <div className="space-y-1.5">
-              <Label>Rejalashtirilgan sana</Label>
-              <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} required />
+            <div className="flex gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => { resetForm(); onClose(); }} className="flex-1">Bekor</Button>
+              <Button type="button" disabled={items.length === 0} onClick={() => setStep("price")} className="flex-1">
+                Narx belgilash →
+              </Button>
             </div>
-          )}
-
-          <div className="space-y-1.5">
-            <Label>Kommentariya (ixtiyoriy)</Label>
-            <Input placeholder="Qo'shimcha ma'lumot..." value={comment} onChange={(e) => setComment(e.target.value)} />
           </div>
+        ) : (
+          // STEP 2: Set total price + order type
+          <form onSubmit={handleSave} className="space-y-4">
+            {/* Summary */}
+            <div className="bg-secondary/50 border border-border rounded-xl px-4 py-3">
+              <p className="text-xs text-muted-foreground mb-1">Tanlangan mahsulotlar:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {items.map((i) => (
+                  <span key={i.product} className={cn("text-xs px-2.5 py-1 rounded-full", getProductColor(i.product))}>
+                    {i.product} × {i.qty}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => { resetForm(); onClose(); }} className="flex-1">Bekor</Button>
-            <Button type="submit" disabled={loading || selected.length === 0} className="flex-1">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : `Saqlash${selected.length > 1 ? ` (${selected.length})` : ""}`}
-            </Button>
-          </div>
-        </form>
+            {/* Total price */}
+            <div className="space-y-1.5">
+              <Label>Umumiy narx (so'm) *</Label>
+              <Input
+                type="number" placeholder="Masalan: 450000"
+                value={totalPrice} onChange={(e) => setTotalPrice(e.target.value)}
+                required autoFocus className="text-lg font-semibold"
+              />
+              {totalPrice && (
+                <p className="text-xs text-right text-primary font-semibold">
+                  {new Intl.NumberFormat("uz-UZ").format(parseFloat(totalPrice))} so'm
+                </p>
+              )}
+            </div>
+
+            {/* Order type */}
+            <div className="space-y-1.5">
+              <Label>Zakaz turi</Label>
+              <Select value={orderType} onValueChange={(v) => setOrderType(v as OrderType)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Hozirgi">Hozirgi</SelectItem>
+                  <SelectItem value="Keyinroqi">Keyinroqi</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {orderType === "Keyinroqi" && (
+              <div className="space-y-1.5">
+                <Label>Rejalashtirilgan sana</Label>
+                <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} required />
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label>Kommentariya (ixtiyoriy)</Label>
+              <Input placeholder="Qo'shimcha ma'lumot..." value={comment} onChange={(e) => setComment(e.target.value)} />
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setStep("products")} className="flex-1">← Orqaga</Button>
+              <Button type="submit" disabled={loading} className="flex-1">
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Saqlash"}
+              </Button>
+            </div>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

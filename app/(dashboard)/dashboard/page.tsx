@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useOperator } from "@/lib/useOperator";
 import { StatsCards } from "@/components/dashboard/stats-cards";
+import { WelcomeWidget } from "@/components/dashboard/welcome-widget";
 import { LeadsChart } from "@/components/dashboard/leads-chart";
 import { TodayFollowUps, TodayOrders } from "@/components/dashboard/today-list";
 import type { FollowUp, Order } from "@/types";
@@ -72,6 +73,7 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-0.5">{format(new Date(), "dd.MM.yyyy")} — Bugungi ish holati</p>
       </div>
+      <WelcomeWidget />
       <StatsCards todayLeads={todayLeads} totalOrders={totalOrders} totalAmount={totalAmount} todayCalls={todayFollowUps.length} todayDeadlines={todayOrders.length} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2"><LeadsChart data={chartData} /></div>
