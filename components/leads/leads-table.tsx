@@ -14,6 +14,7 @@ import { FollowUpModal } from "@/components/shared/follow-up-modal";
 import { PersonDetailModal } from "@/components/shared/detail-modal";
 import { Plus, Search, Pencil, Trash2, ShoppingCart, Bell, Loader2, ChevronDown, ChevronUp, Phone, MapPin, MessageSquare, Package, Clock, AlertCircle } from "lucide-react";
 import { cn, formatDate, formatPrice, getStatusColor, getProductColor, formatPhoneForCall } from "@/lib/utils";
+import { LocationSelect } from "@/components/shared/location-select";
 import type { Lead, LeadStatus } from "@/types";
 import { LEAD_STATUSES, DEFAULT_TAGS } from "@/types";
 
@@ -50,7 +51,7 @@ export function LeadsTable() {
   const operatorId = operator?.id || "";
   const supabase = createClient();
 
-  useEffect(() => { loadLeads(); }, []);
+  useEffect(() => { if (operatorId) loadLeads(); }, [operatorId]);
 
   useEffect(() => {
     let f = leads;
@@ -74,6 +75,7 @@ export function LeadsTable() {
 
   async function loadLeads() {
     try {
+      if (!operatorId) return;
       const { data } = await supabase.from("leads").select("*").eq("user_id", operatorId).order("created_at", { ascending: false });
       const list = (data as Lead[]) || [];
       setLeads(list);
@@ -385,7 +387,6 @@ function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead, operato
   const [tag, setTag] = useState(lead?.tag || "none");
   const [status, setStatus] = useState<LeadStatus>(lead?.status || "Yangi");
   const [comment, setComment] = useState(lead?.comment || "");
-  const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(false);
   const [duplicate, setDuplicate] = useState<{ name: string; type: string } | null>(null);
   const supabase = createClient();
@@ -419,11 +420,7 @@ function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead, operato
     setLoading(false); onSuccess(); onClose();
   }
 
-  function handleAddTag() {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      onAddTag(newTag.trim()); setTag(newTag.trim()); setNewTag("");
-    }
-  }
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -453,10 +450,7 @@ function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead, operato
               )}
             </div>
           </div>
-          <div className="space-y-1.5">
-            <Label>Manzil</Label>
-            <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Shahar / tuman" />
-          </div>
+          <LocationSelect value={address} onChange={setAddress} />
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Teg</Label>
@@ -467,12 +461,7 @@ function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead, operato
                   {tags.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <div className="flex gap-1 mt-1">
-                <Input placeholder="+ Yangi teg" value={newTag} onChange={(e) => setNewTag(e.target.value)} className="h-7 text-xs" />
-                <Button type="button" size="sm" variant="outline" className="h-7 px-2" onClick={handleAddTag}>
-                  <Plus className="w-3 h-3" />
-                </Button>
-              </div>
+
             </div>
             <div className="space-y-1.5">
               <Label>Holat</Label>

@@ -40,6 +40,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { cn, formatDate, formatPrice, getProductColor, formatPhoneForCall } from "@/lib/utils";
+import { LocationSelect } from "@/components/shared/location-select";
 import type { Client } from "@/types";
 
 export function ClientsTable() {
@@ -60,7 +61,7 @@ export function ClientsTable() {
   const operatorId = operator?.id || "";
   const supabase = createClient();
 
-  useEffect(() => { loadClients(); }, []);
+  useEffect(() => { if (operatorId) loadClients(); }, [operatorId]);
   useEffect(() => {
     const q = search.toLowerCase();
     setFiltered(
@@ -261,10 +262,7 @@ function ClientFormModal({ open, onClose, onSuccess, client, operatorId }: { ope
               <Input value={phone} onChange={(e) => setPhone(e.target.value)} required placeholder="+998..." />
             </div>
           </div>
-          <div className="space-y-1.5">
-            <Label>Manzil</Label>
-            <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Shahar / tuman" />
-          </div>
+          <LocationSelect value={address} onChange={setAddress} />
           <div className="space-y-1.5">
             <Label>Kommentariya</Label>
             <textarea className="flex w-full rounded-md border border-input bg-input px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none min-h-[70px]" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Tarix, eslatma..." />

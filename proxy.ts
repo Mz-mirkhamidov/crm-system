@@ -13,7 +13,7 @@ export async function proxy(request: NextRequest) {
 
   // Not logged in → login
   if (!session) {
-    if (pathname === "/login") return NextResponse.next();
+    if (pathname === "/login" || pathname === "/register") return NextResponse.next();
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

@@ -74,6 +74,12 @@ export default function OperatorsPage() {
       ) : (
         <div className="rounded-xl border border-border overflow-hidden">
           <table className="w-full text-sm">
+            {/* Pending approvals alert */}
+            {operators.filter(o => o.is_active === false || (o as any).status === 'pending').length > 0 && (
+              <div className="mb-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl text-sm text-orange-400">
+                ⏳ Tasdiqlash kutayotganlar bor — jadvalda ko'ring
+              </div>
+            )}
             <thead>
               <tr className="border-b border-border bg-secondary/50">
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Ism</th>

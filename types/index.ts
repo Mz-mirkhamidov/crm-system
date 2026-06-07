@@ -76,7 +76,7 @@ export const PRODUCTS: ProductType[] = [
   "Estet",
 ];
 
-export const DEFAULT_TAGS = ["AJR", "Estet", "Excel"];
+export const DEFAULT_TAGS = ["Sayt", "Excel", "Estet", "Primoy"];
 
 export const LEAD_STATUSES: LeadStatus[] = [
   "Yangi",
