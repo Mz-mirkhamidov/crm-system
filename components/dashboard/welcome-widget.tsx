@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getClientSession } from "@/lib/session";
+import { useOperator } from "@/lib/useOperator";
 import { Sparkles, TrendingUp, Target, Sun, Moon, Sunset } from "lucide-react";
 
 const MOTIVATIONAL_QUOTES = [
@@ -23,20 +23,20 @@ function getGreeting(hour: number) {
 }
 
 export function WelcomeWidget() {
-  const [name, setName] = useState("");
+  const operator = useOperator();
   const [quote, setQuote] = useState("");
   const [hour, setHour] = useState(0);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const session = getClientSession();
-    if (session) setName(session.name);
     const now = new Date();
     setHour(now.getHours());
     setQuote(MOTIVATIONAL_QUOTES[now.getDay() % MOTIVATIONAL_QUOTES.length]);
     // Animate in
     setTimeout(() => setVisible(true), 100);
   }, []);
+
+  const name = operator?.name ?? "";
 
   const greeting = getGreeting(hour);
   const Icon = greeting.icon;

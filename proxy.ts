@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, decodeSession } from "@/lib/session";
+import { SESSION_COOKIE, verifySession } from "@/lib/session";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const cookieVal = request.cookies.get(SESSION_COOKIE)?.value;
-  const session = cookieVal ? decodeSession(cookieVal) : null;
+  const session = cookieVal ? await verifySession(cookieVal) : null;
 
   // Static & assets
   if (pathname.startsWith("/_next") || pathname.includes(".")) {

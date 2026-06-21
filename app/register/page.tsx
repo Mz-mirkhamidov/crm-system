@@ -1,14 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Zap, Loader2, AlertCircle, CheckCircle2, Phone, Lock, User } from "lucide-react";
-import { hashPassword } from "@/lib/session";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -17,20 +14,24 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const supabase = createClient();
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 6) { setError("Parol kamida 6 ta belgidan iborat bo'lishi kerak"); return; }
     setLoading(true); setError("");
     try {
-      const hash = await hashPassword(password);
-      const { data, error: rpcError } = await supabase.rpc("register_operator", {
-        p_phone: phone.trim(), p_name: name.trim(), p_password_hash: hash,
+      // Submit the RAW credentials over HTTPS to the server register route. The server
+      // forwards the raw password to the `register_operator` RPC, which stores a bcrypt
+      // hash with a per-user salt. The browser no longer hashes the password.
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone.trim(), name: name.trim(), password }),
       });
-      if (rpcError) { setError("Tizim xatosi. Qaytadan urinib ko'ring."); setLoading(false); return; }
+      const data = await res.json().catch(() => null);
       if (!data?.success) {
         if (data?.reason === "exists") setError("Bu telefon raqam allaqachon ro'yxatdan o'tgan.");
+        else if (data?.reason === "error") setError("Tizim xatosi. Qaytadan urinib ko'ring.");
         else setError("Ro'yxatdan o'tishda xatolik.");
         setLoading(false); return;
       }

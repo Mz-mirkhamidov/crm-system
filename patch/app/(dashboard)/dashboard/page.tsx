@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { OWNER_ID } from "@/lib/auth";
+import { OWNER_ID } from "@/lib/config";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { LeadsChart } from "@/components/dashboard/leads-chart";
 import { TodayFollowUps, TodayOrders } from "@/components/dashboard/today-list";

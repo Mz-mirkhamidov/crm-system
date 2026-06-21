@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, LogOut, Zap, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SESSION_COOKIE, getClientSession } from "@/lib/session";
+import { type Operator } from "@/lib/session";
 
 const adminNav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -17,19 +17,35 @@ const adminNav = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [session, setSession] = useState<Operator | null>(null);
 
   useEffect(() => {
-    const s = getClientSession();
-    if (!s || s.role !== "admin") router.push("/login");
-  }, []);
+    let active = true;
+    // Identity comes from the server-verified session (`/api/auth/me` → `verifySession`),
+    // never a client-decoded cookie. `proxy.ts` already gates this route; this is a
+    // defense-in-depth client guard that redirects non-admins once the server responds.
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: Operator | null) => {
+        if (!active) return;
+        setSession(data);
+        if (!data || data.role !== "admin") router.push("/login");
+      })
+      .catch(() => {
+        if (!active) return;
+        router.push("/login");
+      });
+    return () => {
+      active = false;
+    };
+  }, [router]);
 
-  function handleLogout() {
-    document.cookie = `${SESSION_COOKIE}=; path=/; max-age=0`;
+  async function handleLogout() {
+    // Clear the HttpOnly session cookie on the server, then route to /login.
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     router.push("/login");
     router.refresh();
   }
-
-  const session = getClientSession();
 
   return (
     <div className="flex min-h-screen bg-background">

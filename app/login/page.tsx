@@ -3,11 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, AlertCircle } from "lucide-react";
-import { SESSION_COOKIE, hashPassword, encodeSession } from "@/lib/session";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
@@ -15,25 +13,27 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const supabase = createClient();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true); setError("");
     try {
-      const hash = await hashPassword(password);
-      const { data, error: rpcError } = await supabase.rpc("check_login", {
-        p_phone: phone.trim(), p_password_hash: hash,
+      // Submit the raw credentials over HTTPS to the server login route. The server
+      // validates them, signs the session, and sets the HttpOnly `crm_op_session` cookie.
+      // The browser no longer hashes the password or writes the session cookie itself.
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone.trim(), password }),
       });
-      if (rpcError) { setError("Tizim xatosi. Qaytadan urinib ko'ring."); setLoading(false); return; }
+      const data = await res.json().catch(() => null);
       if (!data?.success) {
         if (data?.reason === "pending") setError("Hisobingiz tasdiqlanmagan. Admin bilan bog'laning.");
         else if (data?.reason === "blocked") setError("Hisob bloklangan.");
+        else if (data?.reason === "error") setError("Tizim xatosi. Qaytadan urinib ko'ring.");
         else setError("Noto'g'ri raqam yoki parol");
         setLoading(false); return;
       }
-      const session = { id: data.id, name: data.name, phone: data.phone, role: data.role };
-      document.cookie = `${SESSION_COOKIE}=${encodeSession(session)}; path=/; max-age=2592000; SameSite=Lax`;
       router.push(data.role === "admin" ? "/admin" : "/dashboard");
       router.refresh();
     } catch { setError("Xatolik yuz berdi."); setLoading(false); }

@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
-import { OWNER_ID } from "@/lib/auth";
+import { OWNER_ID } from "@/lib/config";
 import { PRODUCTS, type SourceType, type ProductType, type OrderType } from "@/types";
 import { Loader2 } from "lucide-react";
 

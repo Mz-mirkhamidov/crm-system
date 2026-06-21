@@ -4,8 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, Users, UserCheck, ShoppingCart, Bell, LogOut, Zap, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SESSION_COOKIE, getClientSession } from "@/lib/session";
-import { useEffect, useState } from "react";
+import { useOperator } from "@/lib/useOperator";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -19,16 +18,15 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [opName, setOpName] = useState("");
-  const [opRole, setOpRole] = useState("");
+  // Identity comes from the server-verified session (`/api/auth/me` → `verifySession`),
+  // never a client-decoded cookie (the `crm_op_session` cookie is HttpOnly).
+  const operator = useOperator();
+  const opName = operator?.name ?? "";
+  const opRole = operator?.role ?? "";
 
-  useEffect(() => {
-    const s = getClientSession();
-    if (s) { setOpName(s.name); setOpRole(s.role); }
-  }, []);
-
-  function handleLogout() {
-    document.cookie = `${SESSION_COOKIE}=; path=/; max-age=0`;
+  async function handleLogout() {
+    // Clear the HttpOnly session cookie on the server, then route to /login.
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     router.push("/login");
     router.refresh();
   }

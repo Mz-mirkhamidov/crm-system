@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { hashPassword } from "@/lib/session";
 import { Plus, Loader2, ShieldOff, ShieldCheck, Trash2, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -62,13 +61,24 @@ export default function OperatorsPage() {
   async function addOperator(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true); setError("");
-    const hash = await hashPassword(form.password);
-    const { error: err } = await supabase.from("operators").insert({
-      phone: form.phone.trim(), name: form.name.trim(),
-      password: hash, role: form.role,
-      is_active: true, status: "active",
+    // Submit the RAW password over HTTPS to the server route, which verifies the admin
+    // session and stores a bcrypt hash (per-user salt) via the `admin_create_operator`
+    // RPC. No password is hashed in the browser.
+    const res = await fetch("/api/operators", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: form.phone.trim(),
+        name: form.name.trim(),
+        password: form.password,
+        role: form.role,
+      }),
     });
-    if (err) { setError(err.message); setSaving(false); return; }
+    const data = await res.json().catch(() => null);
+    if (!data?.success) {
+      setError(data?.reason === "exists" ? "Bu telefon raqam allaqachon mavjud." : (data?.reason || "Xatolik yuz berdi."));
+      setSaving(false); return;
+    }
     setSaving(false);
     setForm({ phone: "", name: "", password: "", role: "operator" });
     setAddOpen(false);
