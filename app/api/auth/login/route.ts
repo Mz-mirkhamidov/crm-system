@@ -65,15 +65,29 @@ export async function POST(request: Request) {
     role: data.role,
   };
 
-  const token = await signSession(operator);
+  // Session issuance can fail for server/config reasons — most notably a missing
+  // SESSION_SECRET, which makes `signSession` throw. Wrap signing + cookie set in a
+  // try/catch so such a failure returns a clear JSON error (reason "error", which the
+  // client maps to "Tizim xatosi. Qaytadan urinib ko'ring.") instead of an unhandled 500
+  // that the client misreports as wrong credentials ("Noto'g'ri raqam yoki parol").
+  //
+  // NOTE: this does NOT itself fix login — the operator must set SESSION_SECRET in the
+  // environment. It only makes the failure message honest about the real cause.
+  try {
+    const token = await signSession(operator);
 
-  const response = NextResponse.json({ success: true, role: operator.role });
-  response.cookies.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_MAX_AGE_SECONDS,
-  });
-  return response;
+    const response = NextResponse.json({ success: true, role: operator.role });
+    response.cookies.set(SESSION_COOKIE, token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE_SECONDS,
+    });
+    return response;
+  } catch (e) {
+    // Log server-side for diagnosis (no secrets in the log).
+    console.error("login: failed to issue session", e);
+    return NextResponse.json({ success: false, reason: "error" }, { status: 500 });
+  }
 }
