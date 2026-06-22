@@ -49,6 +49,20 @@ function stringToBase64Url(value: string): string {
   return bytesToBase64Url(new TextEncoder().encode(value));
 }
 
+/**
+ * Copy a (possibly `ArrayBufferLike`/`SharedArrayBuffer`-backed) `Uint8Array` view into a
+ * freshly-allocated, plain `ArrayBuffer`. Under Next.js 16 / strict lib.dom typings the
+ * Web Crypto `BufferSource` parameters require an `ArrayBufferView<ArrayBuffer>`, which a
+ * `Uint8Array<ArrayBufferLike>` (e.g. the output of `TextEncoder.encode` or our base64url
+ * decoder) does not satisfy. Passing the returned `ArrayBuffer` keeps behavior identical
+ * (the bytes are copied verbatim) while satisfying the type checker on Edge + Node.
+ */
+function toArrayBuffer(view: Uint8Array): ArrayBuffer {
+  const ab = new ArrayBuffer(view.byteLength);
+  new Uint8Array(ab).set(view);
+  return ab;
+}
+
 function base64UrlToString(value: string): string {
   return new TextDecoder().decode(base64UrlToBytes(value));
 }
@@ -71,7 +85,7 @@ function getSessionSecret(): string {
 async function importHmacKey(secret: string): Promise<CryptoKey> {
   return crypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(secret),
+    toArrayBuffer(new TextEncoder().encode(secret)),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign", "verify"]
@@ -104,7 +118,7 @@ export async function signSession(
 
   const data = stringToBase64Url(JSON.stringify(payload));
   const key = await importHmacKey(secret);
-  const sigBuffer = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(data));
+  const sigBuffer = await crypto.subtle.sign("HMAC", key, toArrayBuffer(new TextEncoder().encode(data)));
   const sig = bytesToBase64Url(new Uint8Array(sigBuffer));
   return `${data}.${sig}`;
 }
@@ -139,8 +153,8 @@ export async function verifySession(token: string): Promise<Operator | null> {
     isValid = await crypto.subtle.verify(
       "HMAC",
       key,
-      signatureBytes,
-      new TextEncoder().encode(data)
+      toArrayBuffer(signatureBytes),
+      toArrayBuffer(new TextEncoder().encode(data))
     );
   } catch {
     return null;
