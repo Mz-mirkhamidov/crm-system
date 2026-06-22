@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useState, Fragment } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import { useOperator } from "@/lib/useOperator";
+import { useLeads } from "@/lib/data/use-leads";
+import { insertLead, updateLead, type DuplicateMatch } from "@/lib/data/repository";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,101 +14,55 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { OrderModal } from "@/components/shared/order-modal";
 import { FollowUpModal } from "@/components/shared/follow-up-modal";
 import { PersonDetailModal } from "@/components/shared/detail-modal";
-import { Plus, Search, Pencil, Trash2, ShoppingCart, Bell, Loader2, ChevronDown, ChevronUp, Phone, MapPin, MessageSquare, Package, Clock, AlertCircle } from "lucide-react";
-import { cn, formatDate, formatPrice, getStatusColor, getProductColor, formatPhoneForCall } from "@/lib/utils";
+import { AsyncContent } from "@/components/shared/async-content";
+import { Plus, Search, Pencil, Trash2, ShoppingCart, Bell, Loader2, ChevronDown, ChevronUp, Phone, MapPin, MessageSquare, Package, Clock, AlertCircle, Users } from "lucide-react";
+import { cn, formatPrice, getStatusColor, getProductColor, formatPhoneForCall, applyFilters, getInitials, getLeadAge } from "@/lib/utils";
 import { LocationSelect } from "@/components/shared/location-select";
-import type { Lead, LeadStatus } from "@/types";
+import type { Lead, LeadStatus, Order } from "@/types";
 import { LEAD_STATUSES, DEFAULT_TAGS } from "@/types";
 
-// Lid yoshi hisoblash
-function getLeadAge(createdAt: string) {
-  const days = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000);
-  if (days === 0) return { days, label: "Bugun", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" };
-  if (days === 1) return { days, label: "Kecha", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" };
-  if (days <= 4) return { days, label: `${days}k`, color: "text-blue-400 bg-blue-500/10 border-blue-500/30" };
-  if (days <= 9) return { days, label: `${days}k`, color: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30" };
-  return { days, label: `${days}k`, color: "text-red-400 bg-red-500/10 border-red-500/30" };
-}
-
 export function LeadsTable() {
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [filtered, setFiltered] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: leads, loading, error, refetch, remove, loadLeadOrders, checkDuplicate, orderCounts } = useLeads();
+  const operator = useOperator();
+  const operatorId = operator?.id || "";
+
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterTag, setFilterTag] = useState("all");
   const [filterAge, setFilterAge] = useState("all"); // sovib qolgan filter
   const [tags, setTags] = useState<string[]>(DEFAULT_TAGS);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [leadOrders, setLeadOrders] = useState<Record<string, any[]>>({});
-  const [orderCounts, setOrderCounts] = useState<Record<string, number>>({});
+  const [leadOrders, setLeadOrders] = useState<Record<string, Order[]>>({});
   const [detailLead, setDetailLead] = useState<Lead | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editLead, setEditLead] = useState<Lead | null>(null);
   const [orderLead, setOrderLead] = useState<Lead | null>(null);
   const [followUpLead, setFollowUpLead] = useState<Lead | null>(null);
 
-  const operator = useOperator();
-  const operatorId = operator?.id || "";
-  const supabase = createClient();
+  const filtered = applyFilters(leads, {
+    search,
+    status: filterStatus,
+    tag: filterTag,
+    age: filterAge,
+  });
 
-  useEffect(() => { if (operatorId) loadLeads(); }, [operatorId]);
-
-  useEffect(() => {
-    let f = leads;
-    if (search) {
-      const q = search.toLowerCase();
-      f = f.filter((l) => l.name.toLowerCase().includes(q) || l.phone.toLowerCase().includes(q));
-    }
-    if (filterStatus !== "all") f = f.filter((l) => l.status === filterStatus);
-    if (filterTag !== "all") f = f.filter((l) => l.tag === filterTag);
-    // Sovib qolgan filter
-    if (filterAge !== "all") {
-      const days = parseInt(filterAge);
-      f = f.filter((l) => {
-        const age = Math.floor((Date.now() - new Date(l.created_at).getTime()) / 86400000);
-        const notClosed = l.status !== "Buyurtma berilgan" && l.status !== "Rad etildi";
-        return age >= days && notClosed;
-      });
-    }
-    setFiltered(f);
-  }, [search, filterStatus, filterTag, filterAge, leads]);
-
-  async function loadLeads() {
-    try {
-      if (!operatorId) return;
-      const { data } = await supabase.from("leads").select("*").eq("user_id", operatorId).order("created_at", { ascending: false });
-      const list = (data as Lead[]) || [];
-      setLeads(list);
-      if (list.length > 0) {
-        const { data: orders } = await supabase.from("orders").select("source_id").eq("user_id", operatorId).eq("source_type", "lead");
-        const counts: Record<string, number> = {};
-        orders?.forEach((o) => { counts[o.source_id] = (counts[o.source_id] || 0) + 1; });
-        setOrderCounts(counts);
-      }
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
-  }
-
-  async function loadLeadOrders(leadId: string) {
+  async function loadOrdersFor(leadId: string) {
     if (leadOrders[leadId]) return;
-    const { data } = await supabase.from("orders").select("*").eq("source_id", leadId).eq("source_type", "lead").order("created_at", { ascending: false });
-    setLeadOrders((prev) => ({ ...prev, [leadId]: data || [] }));
+    const orders = await loadLeadOrders(leadId);
+    setLeadOrders((prev) => ({ ...prev, [leadId]: orders }));
   }
 
-  async function deleteLead(id: string) {
-    await supabase.from("leads").delete().eq("id", id);
-    setLeads((prev) => prev.filter((l) => l.id !== id));
+  async function handleDelete(id: string) {
+    setDeletingId(id);
+    await remove(id);
+    setDeletingId(null);
   }
 
   function toggleExpand(id: string) {
     if (expandedId === id) setExpandedId(null);
-    else { setExpandedId(id); loadLeadOrders(id); }
-  }
-
-  function getInitials(name: string) {
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    else { setExpandedId(id); loadOrdersFor(id); }
   }
 
   const avatarColors = [
@@ -185,190 +141,193 @@ export function LeadsTable() {
       </div>
 
       {/* Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16 text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin mr-2" /> Yuklanmoqda...
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground text-sm">Lidlar topilmadi</div>
-      ) : (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/50">
-                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Mijoz</th>
-                <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden md:table-cell">Teg</th>
-                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Holat</th>
-                <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden lg:table-cell">Yoshi</th>
-                <th className="px-4 py-3 text-right text-muted-foreground font-medium">Harakatlar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((lead, idx) => {
-                const age = getLeadAge(lead.created_at);
-                return (
-                  <>
-                    <tr key={lead.id} className="border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer"
-                      onClick={() => setDetailLead(lead)}>
+      <AsyncContent
+        loading={loading}
+        error={error}
+        data={filtered}
+        onRetry={refetch}
+        empty={{ icon: Users, title: "Lidlar topilmadi" }}
+      >
+        {(rows) => (
+          <div className="rounded-xl border border-border overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-secondary/50">
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Mijoz</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden md:table-cell">Teg</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Holat</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden lg:table-cell">Yoshi</th>
+                  <th className="px-4 py-3 text-right text-muted-foreground font-medium">Harakatlar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((lead, idx) => {
+                  const age = getLeadAge(lead.created_at);
+                  const isDeleting = deletingId === lead.id;
+                  return (
+                    <Fragment key={lead.id}>
+                      <tr className="border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer"
+                        onClick={() => setDetailLead(lead)}>
 
-                      {/* Avatar + Info */}
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0", avatarColors[idx % avatarColors.length])}>
-                            {getInitials(lead.name)}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-foreground leading-tight">{lead.name}</p>
-                            <a href={`tel:${formatPhoneForCall(lead.phone)}`} onClick={(e) => e.stopPropagation()}
-                              className="text-xs text-muted-foreground hover:text-primary font-mono flex items-center gap-1 mt-0.5">
-                              <Phone className="w-3 h-3" />{lead.phone}
-                            </a>
-                          </div>
-                          {orderCounts[lead.id] > 0 && (
-                            <span className="flex items-center gap-1 text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full px-2 py-0.5">
-                              <Package className="w-3 h-3" />{orderCounts[lead.id]}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        {lead.tag && <span className="text-xs bg-secondary border border-border rounded-full px-2.5 py-1">{lead.tag}</span>}
-                      </td>
-
-                      <td className="px-4 py-3">
-                        <span className={cn("text-xs px-2.5 py-1 rounded-full border font-medium", getStatusColor(lead.status))}>
-                          {lead.status}
-                        </span>
-                      </td>
-
-                      {/* Lid yoshi */}
-                      <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className={cn("text-xs px-2 py-0.5 rounded-full border font-mono font-semibold", age.color)}>
-                          {age.label}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-1 justify-end">
-                          <Button size="sm" variant="ghost"
-                            className="h-8 px-2 text-xs text-emerald-400 hover:bg-emerald-500/10 gap-1"
-                            onClick={() => setOrderLead(lead)}>
-                            <ShoppingCart className="w-3.5 h-3.5" />
-                            <span className="hidden xl:inline">Zakaz</span>
-                          </Button>
-                          <Button size="sm" variant="ghost"
-                            className="h-8 px-2 text-xs text-blue-400 hover:bg-blue-500/10 gap-1"
-                            onClick={() => setFollowUpLead(lead)}>
-                            <Bell className="w-3.5 h-3.5" />
-                            <span className="hidden xl:inline">Eslatma</span>
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setEditLead(lead)}>
-                            <Pencil className="w-3.5 h-3.5" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="icon" variant="ghost" className="h-8 w-8 text-red-400 hover:bg-red-500/10">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Lidni o'chirish</AlertDialogTitle>
-                                <AlertDialogDescription>{lead.name} ni o'chirmoqchimisiz?</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Bekor</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteLead(lead.id)}>O'chirish</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                          <button className="p-1 text-muted-foreground ml-1">
-                            {expandedId === lead.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-
-                    {/* Expanded */}
-                    {expandedId === lead.id && (
-                      <tr key={`${lead.id}-exp`} className="bg-secondary/10 border-b border-border">
-                        <td colSpan={5} className="px-4 py-4">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Ma'lumotlar</p>
-                              {lead.address && (
-                                <div className="flex items-start gap-2 text-xs text-foreground">
-                                  <MapPin className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />{lead.address}
-                                </div>
-                              )}
-                              {lead.comment && (
-                                <div className="flex items-start gap-2 text-xs text-foreground">
-                                  <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                                  <span className="whitespace-pre-wrap">{lead.comment}</span>
-                                </div>
-                              )}
-                              {!lead.address && !lead.comment && <p className="text-xs text-muted-foreground">Qo'shimcha ma'lumot yo'q</p>}
-                            </div>
-                            <div className="space-y-2">
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tez harakatlar</p>
-                              <div className="flex flex-col gap-2">
-                                <Button size="sm" variant="outline" className="justify-start gap-2 text-xs border-green-500/30 text-green-400 hover:bg-green-500/10"
-                                  onClick={() => { setExpandedId(null); setOrderLead(lead); }}>
-                                  <ShoppingCart className="w-3.5 h-3.5" /> Zakaz qo'shish
-                                </Button>
-                                <Button size="sm" variant="outline" className="justify-start gap-2 text-xs border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
-                                  onClick={() => { setExpandedId(null); setFollowUpLead(lead); }}>
-                                  <Bell className="w-3.5 h-3.5" /> Eslatma belgilash
-                                </Button>
-                                <a href={`tel:${formatPhoneForCall(lead.phone)}`}>
-                                  <Button size="sm" variant="outline" className="justify-start gap-2 text-xs w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
-                                    <Phone className="w-3.5 h-3.5" /> Qo'ng'iroq qilish
-                                  </Button>
-                                </a>
-                              </div>
+                        {/* Avatar + Info */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0", avatarColors[idx % avatarColors.length])}>
+                              {getInitials(lead.name)}
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Zakaz tarixi</p>
-                              {leadOrders[lead.id] === undefined ? (
-                                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                              ) : leadOrders[lead.id].length === 0 ? (
-                                <p className="text-xs text-muted-foreground">Zakazlar yo'q</p>
-                              ) : (
-                                <div className="space-y-2">
-                                  {leadOrders[lead.id].map((o: any) => (
-                                    <div key={o.id} className="flex items-center gap-2 bg-secondary/50 rounded-lg px-3 py-2">
-                                      <span className={cn("text-xs px-2 py-0.5 rounded-full", getProductColor(o.product))}>{o.product}</span>
-                                      <span className="text-xs font-semibold text-foreground ml-auto">{formatPrice(o.price)}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
+                              <p className="font-semibold text-foreground leading-tight">{lead.name}</p>
+                              <a href={`tel:${formatPhoneForCall(lead.phone)}`} onClick={(e) => e.stopPropagation()}
+                                className="text-xs text-muted-foreground hover:text-primary font-mono flex items-center gap-1 mt-0.5">
+                                <Phone className="w-3 h-3" />{lead.phone}
+                              </a>
                             </div>
+                            {orderCounts[lead.id] > 0 && (
+                              <span className="flex items-center gap-1 text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full px-2 py-0.5">
+                                <Package className="w-3 h-3" />{orderCounts[lead.id]}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-3 hidden md:table-cell">
+                          {lead.tag && <span className="text-xs bg-secondary border border-border rounded-full px-2.5 py-1">{lead.tag}</span>}
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <span className={cn("text-xs px-2.5 py-1 rounded-full border font-medium", getStatusColor(lead.status))}>
+                            {lead.status}
+                          </span>
+                        </td>
+
+                        {/* Lid yoshi */}
+                        <td className="px-4 py-3 hidden lg:table-cell">
+                          <span className={cn("text-xs px-2 py-0.5 rounded-full border font-mono font-semibold", age.color)}>
+                            {age.label}
+                          </span>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center gap-1 justify-end">
+                            <Button size="sm" variant="ghost" disabled={isDeleting}
+                              className="h-8 px-2 text-xs text-emerald-400 hover:bg-emerald-500/10 gap-1"
+                              onClick={() => setOrderLead(lead)}>
+                              <ShoppingCart className="w-3.5 h-3.5" />
+                              <span className="hidden xl:inline">Zakaz</span>
+                            </Button>
+                            <Button size="sm" variant="ghost" disabled={isDeleting}
+                              className="h-8 px-2 text-xs text-blue-400 hover:bg-blue-500/10 gap-1"
+                              onClick={() => setFollowUpLead(lead)}>
+                              <Bell className="w-3.5 h-3.5" />
+                              <span className="hidden xl:inline">Eslatma</span>
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8" disabled={isDeleting} onClick={() => setEditLead(lead)}>
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="icon" variant="ghost" className="h-8 w-8 text-red-400 hover:bg-red-500/10" disabled={isDeleting}>
+                                  {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Lidni o'chirish</AlertDialogTitle>
+                                  <AlertDialogDescription>{lead.name} ni o'chirmoqchimisiz?</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Bekor</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete(lead.id)}>O'chirish</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                            <button className="p-1 text-muted-foreground ml-1" onClick={() => toggleExpand(lead.id)}>
+                              {expandedId === lead.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                            </button>
                           </div>
                         </td>
                       </tr>
-                    )}
-                  </>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+
+                      {/* Expanded */}
+                      {expandedId === lead.id && (
+                        <tr className="bg-secondary/10 border-b border-border">
+                          <td colSpan={5} className="px-4 py-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="space-y-2">
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Ma'lumotlar</p>
+                                {lead.address && (
+                                  <div className="flex items-start gap-2 text-xs text-foreground">
+                                    <MapPin className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />{lead.address}
+                                  </div>
+                                )}
+                                {lead.comment && (
+                                  <div className="flex items-start gap-2 text-xs text-foreground">
+                                    <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                                    <span className="whitespace-pre-wrap">{lead.comment}</span>
+                                  </div>
+                                )}
+                                {!lead.address && !lead.comment && <p className="text-xs text-muted-foreground">Qo'shimcha ma'lumot yo'q</p>}
+                              </div>
+                              <div className="space-y-2">
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tez harakatlar</p>
+                                <div className="flex flex-col gap-2">
+                                  <Button size="sm" variant="outline" className="justify-start gap-2 text-xs border-green-500/30 text-green-400 hover:bg-green-500/10"
+                                    onClick={() => { setExpandedId(null); setOrderLead(lead); }}>
+                                    <ShoppingCart className="w-3.5 h-3.5" /> Zakaz qo'shish
+                                  </Button>
+                                  <Button size="sm" variant="outline" className="justify-start gap-2 text-xs border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+                                    onClick={() => { setExpandedId(null); setFollowUpLead(lead); }}>
+                                    <Bell className="w-3.5 h-3.5" /> Eslatma belgilash
+                                  </Button>
+                                  <a href={`tel:${formatPhoneForCall(lead.phone)}`}>
+                                    <Button size="sm" variant="outline" className="justify-start gap-2 text-xs w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
+                                      <Phone className="w-3.5 h-3.5" /> Qo'ng'iroq qilish
+                                    </Button>
+                                  </a>
+                                </div>
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Zakaz tarixi</p>
+                                {leadOrders[lead.id] === undefined ? (
+                                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                                ) : leadOrders[lead.id].length === 0 ? (
+                                  <p className="text-xs text-muted-foreground">Zakazlar yo'q</p>
+                                ) : (
+                                  <div className="space-y-2">
+                                    {leadOrders[lead.id].map((o) => (
+                                      <div key={o.id} className="flex items-center gap-2 bg-secondary/50 rounded-lg px-3 py-2">
+                                        <span className={cn("text-xs px-2 py-0.5 rounded-full", getProductColor(o.product))}>{o.product}</span>
+                                        <span className="text-xs font-semibold text-foreground ml-auto">{formatPrice(o.price)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </AsyncContent>
 
       {/* Modals */}
-      <LeadFormModal open={addOpen} onClose={() => setAddOpen(false)} onSuccess={loadLeads} tags={tags} onAddTag={(t) => setTags((p) => p.includes(t) ? p : [...p, t])} operatorId={operatorId} />
-      {editLead && <LeadFormModal open={!!editLead} onClose={() => setEditLead(null)} onSuccess={loadLeads} tags={tags} onAddTag={(t) => setTags((p) => p.includes(t) ? p : [...p, t])} lead={editLead} operatorId={operatorId} />}
-      {orderLead && <OrderModal open={!!orderLead} onClose={() => setOrderLead(null)} sourceId={orderLead.id} sourceName={orderLead.name} sourceType="lead" onSuccess={loadLeads} />}
+      <LeadFormModal open={addOpen} onClose={() => setAddOpen(false)} onSuccess={refetch} tags={tags} onAddTag={(t) => setTags((p) => p.includes(t) ? p : [...p, t])} operatorId={operatorId} checkDuplicate={checkDuplicate} />
+      {editLead && <LeadFormModal open={!!editLead} onClose={() => setEditLead(null)} onSuccess={refetch} tags={tags} onAddTag={(t) => setTags((p) => p.includes(t) ? p : [...p, t])} lead={editLead} operatorId={operatorId} checkDuplicate={checkDuplicate} />}
+      {orderLead && <OrderModal open={!!orderLead} onClose={() => setOrderLead(null)} sourceId={orderLead.id} sourceName={orderLead.name} sourceType="lead" onSuccess={refetch} />}
       {followUpLead && <FollowUpModal open={!!followUpLead} onClose={() => setFollowUpLead(null)} sourceId={followUpLead.id} sourceName={followUpLead.name} sourcePhone={followUpLead.phone} sourceType="lead" onSuccess={() => {}} />}
       <PersonDetailModal
         open={!!detailLead}
         onClose={() => setDetailLead(null)}
         person={detailLead}
         sourceType="lead"
-        onRefresh={loadLeads}
+        onRefresh={refetch}
       />
     </div>
   );
@@ -378,49 +337,50 @@ export function LeadsTable() {
 interface LeadFormModalProps {
   open: boolean; onClose: () => void; onSuccess: () => void;
   tags: string[]; onAddTag: (tag: string) => void; lead?: Lead; operatorId: string;
+  checkDuplicate: (phone: string, excludeId?: string) => Promise<DuplicateMatch | null>;
 }
 
-function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead, operatorId }: LeadFormModalProps) {
+function LeadFormModal({ open, onClose, onSuccess, tags, lead, operatorId, checkDuplicate }: LeadFormModalProps) {
   const [name, setName] = useState(lead?.name || "");
   const [phone, setPhone] = useState(lead?.phone || "");
   const [address, setAddress] = useState(lead?.address || "");
   const [tag, setTag] = useState(lead?.tag || "none");
   const [status, setStatus] = useState<LeadStatus>(lead?.status || "Yangi");
   const [comment, setComment] = useState(lead?.comment || "");
-  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [duplicate, setDuplicate] = useState<{ name: string; type: string } | null>(null);
-  const supabase = createClient();
+  const toast = useToast();
 
   // Dublikat tekshiruv
-  async function checkDuplicate(p: string) {
+  async function runDuplicateCheck(p: string) {
     if (p.length < 9) { setDuplicate(null); return; }
-    const { data: l } = await supabase.from("leads").select("name").eq("phone", p).eq("user_id", operatorId).neq("id", lead?.id || "00000000-0000-0000-0000-000000000000").limit(1);
-    if (l && l.length > 0) { setDuplicate({ name: l[0].name, type: "lid" }); return; }
-    const { data: c } = await supabase.from("clients").select("name").eq("phone", p).eq("user_id", operatorId).limit(1);
-    if (c && c.length > 0) { setDuplicate({ name: c[0].name, type: "mijoz" }); return; }
-    setDuplicate(null);
+    const match = await checkDuplicate(p, lead?.id);
+    setDuplicate(match);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
     const payload = {
-      user_id: operatorId, name, phone,
+      name,
+      phone,
       address: address || null,
       tag: tag === "none" ? null : tag || null,
-      status, comment: comment || null,
+      status,
+      comment: comment || null,
     };
-    if (lead) {
-      const { error } = await supabase.from("leads").update(payload).eq("id", lead.id);
-      if (error) { alert("Xato: " + error.message); setLoading(false); return; }
-    } else {
-      const { error } = await supabase.from("leads").insert(payload);
-      if (error) { alert("Xato: " + error.message); setLoading(false); return; }
+    const result = lead
+      ? await updateLead(lead.id, payload)
+      : await insertLead(operatorId, payload);
+    setSaving(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
     }
-    setLoading(false); onSuccess(); onClose();
+    toast.success(lead ? "Lid yangilandi" : "Lid qo'shildi");
+    onSuccess();
+    onClose();
   }
-
-
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -432,13 +392,13 @@ function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead, operato
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Ism *</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="To'liq ism" required />
+              <Input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="To'liq ism" required />
             </div>
             <div className="space-y-1.5">
               <Label>Telefon *</Label>
               <Input
                 value={phone}
-                onChange={(e) => { setPhone(e.target.value); checkDuplicate(e.target.value); }}
+                onChange={(e) => { setPhone(e.target.value); runDuplicateCheck(e.target.value); }}
                 placeholder="+998901234567" required
               />
               {/* Dublikat ogohlantirish */}
@@ -482,8 +442,8 @@ function LeadFormModal({ open, onClose, onSuccess, tags, onAddTag, lead, operato
           </div>
           <div className="flex gap-2 pt-2">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">Bekor</Button>
-            <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : lead ? "Yangilash" : "Qo'shish"}
+            <Button type="submit" disabled={saving} className="flex-1">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : lead ? "Yangilash" : "Qo'shish"}
             </Button>
           </div>
         </form>

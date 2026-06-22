@@ -10,7 +10,13 @@ interface LeadsChartProps {
   data: { date: string; count: number }[];
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: { value: number }[];
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: ChartTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-card/90 backdrop-blur-sm border border-primary/20 rounded-xl px-4 py-3 shadow-xl">

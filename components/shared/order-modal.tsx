@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createClient } from "@/lib/supabase/client";
 import { useOperator } from "@/lib/useOperator";
+import { useToast } from "@/components/ui/use-toast";
+import { insertOrder, updateLead } from "@/lib/data/repository";
 import { PRODUCTS, type SourceType, type ProductType, type OrderType } from "@/types";
 import { Loader2, CheckSquare, Square, Minus, Plus, ShoppingBag } from "lucide-react";
 import { cn, getProductColor } from "@/lib/utils";
@@ -30,7 +31,7 @@ export function OrderModal({ open, onClose, sourceId, sourceName, sourceType, on
   const [loading, setLoading] = useState(false);
   const operator = useOperator();
   const operatorId = operator?.id || "";
-  const supabase = createClient();
+  const toast = useToast();
 
   function toggleProduct(product: ProductType) {
     setItems((prev) => {
@@ -59,23 +60,35 @@ export function OrderModal({ open, onClose, sourceId, sourceName, sourceType, on
     const productStr = getProductSummary();
     const totalQty = items.reduce((s, i) => s + i.qty, 0);
 
-    const { error } = await supabase.from("orders").insert({
-      user_id: operatorId, operator_id: operatorId,
-      source_type: sourceType, source_id: sourceId, source_name: sourceName,
+    const result = await insertOrder(operatorId, {
+      source_type: sourceType,
+      source_id: sourceId,
+      source_name: sourceName,
       product: productStr,
       price: parseFloat(totalPrice),
       quantity: totalQty,
-      order_type: orderType, comment: comment || null,
+      order_type: orderType,
+      comment: comment || null,
       scheduled_at: orderType === "Keyinroqi" && scheduledAt ? scheduledAt : null,
     });
 
-    if (error) { alert("Xato: " + error.message); setLoading(false); return; }
-
-    if (sourceType === "lead") {
-      await supabase.from("leads").update({ status: "Buyurtma berilgan" }).eq("id", sourceId);
+    if (!result.ok) {
+      toast.error(result.error);
+      setLoading(false);
+      return;
     }
 
-    setLoading(false); resetForm(); onSuccess(); onClose();
+    // Side effect preserved from the original: once an order is placed against a lead,
+    // move that lead's status to "Buyurtma berilgan". Best-effort, like the original.
+    if (sourceType === "lead") {
+      await updateLead(sourceId, { status: "Buyurtma berilgan" });
+    }
+
+    toast.success("Zakaz qo'shildi");
+    setLoading(false);
+    resetForm();
+    onSuccess();
+    onClose();
   }
 
   function resetForm() {

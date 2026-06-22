@@ -1,18 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { useOperator } from "@/lib/useOperator";
+import { useToast } from "@/components/ui/use-toast";
+import { listOrdersForSource, listFollowUpsForSource } from "@/lib/data/repository";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { OrderModal } from "@/components/shared/order-modal";
 import { FollowUpModal } from "@/components/shared/follow-up-modal";
+import { AsyncContent } from "@/components/shared/async-content";
 import {
   Phone, MapPin, MessageSquare, ShoppingCart, Bell,
   Clock, CheckCircle2, Package, Loader2, Calendar,
 } from "lucide-react";
-import { cn, formatDate, formatPrice, getStatusColor, getProductColor, formatPhoneForCall } from "@/lib/utils";
-import type { Lead, Client, SourceType } from "@/types";
+import { cn, formatDate, formatPrice, getStatusColor, getProductColor, formatPhoneForCall, getOrderTotal } from "@/lib/utils";
+import type { Lead, Client, Order, FollowUp, SourceType } from "@/types";
 
 interface PersonDetailModalProps {
   open: boolean;
@@ -23,14 +25,15 @@ interface PersonDetailModalProps {
 }
 
 export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh }: PersonDetailModalProps) {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [followUps, setFollowUps] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [followUps, setFollowUps] = useState<FollowUp[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [followUpModalOpen, setFollowUpModalOpen] = useState(false);
   const operator = useOperator();
   const operatorId = operator?.id || "";
-  const supabase = createClient();
+  const toast = useToast();
 
   useEffect(() => {
     if (open && person) loadDetails();
@@ -39,12 +42,20 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
   async function loadDetails() {
     if (!person) return;
     setLoading(true);
+    setError(null);
     const [ordersRes, fuRes] = await Promise.all([
-      supabase.from("orders").select("*").eq("source_id", person.id).eq("user_id", operatorId).order("created_at", { ascending: false }),
-      supabase.from("follow_ups").select("*").eq("source_id", person.id).eq("user_id", operatorId).order("scheduled_at", { ascending: false }),
+      listOrdersForSource(operatorId, person.id, sourceType),
+      listFollowUpsForSource(operatorId, person.id, sourceType),
     ]);
-    setOrders(ordersRes.data || []);
-    setFollowUps(fuRes.data || []);
+    if (!ordersRes.ok || !fuRes.ok) {
+      const message = !ordersRes.ok ? ordersRes.error : (fuRes as { ok: false; error: string }).error;
+      setError(message);
+      toast.error(message);
+      setLoading(false);
+      return;
+    }
+    setOrders(ordersRes.data);
+    setFollowUps(fuRes.data);
     setLoading(false);
   }
 
@@ -53,8 +64,12 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
   const isLead = sourceType === "lead";
   const lead = isLead ? (person as Lead) : null;
 
-  const totalAmount = orders.reduce((s, o) => s + Number(o.price), 0);
+  const totalAmount = getOrderTotal(orders);
   const pendingFU = followUps.filter((f) => f.status === "Kutilmoqda").length;
+
+  const compactLoading = (
+    <div className="flex justify-center py-4"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>
+  );
 
   return (
     <>
@@ -136,34 +151,39 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
                   <ShoppingCart className="w-3 h-3" /> Zakaz qo'shish
                 </Button>
               </div>
-              {loading ? (
-                <div className="flex justify-center py-4"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>
-              ) : orders.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-2">Hali zakaz yo'q</p>
-              ) : (
-                <div className="space-y-2">
-                  {orders.map((o) => (
-                    <div key={o.id} className="flex items-center gap-3 bg-secondary/50 border border-border rounded-lg px-4 py-3">
-                      <span className={cn("text-xs px-2 py-0.5 rounded-full flex-shrink-0", getProductColor(o.product))}>
-                        {o.product}
-                      </span>
-                      <span className="text-sm font-semibold text-foreground">{formatPrice(o.price)}</span>
-                      {o.order_type === "Keyinroqi" && o.scheduled_at && (
-                        <span className="flex items-center gap-1 text-xs text-orange-400 ml-auto">
-                          <Calendar className="w-3 h-3" />
-                          {formatDate(o.scheduled_at)}
+              <AsyncContent
+                loading={loading}
+                error={error}
+                data={orders}
+                onRetry={loadDetails}
+                loadingFallback={compactLoading}
+                empty={{ title: "Hali zakaz yo'q" }}
+              >
+                {(rows) => (
+                  <div className="space-y-2">
+                    {rows.map((o) => (
+                      <div key={o.id} className="flex items-center gap-3 bg-secondary/50 border border-border rounded-lg px-4 py-3">
+                        <span className={cn("text-xs px-2 py-0.5 rounded-full flex-shrink-0", getProductColor(o.product))}>
+                          {o.product}
                         </span>
-                      )}
-                      {o.order_type === "Hozirgi" && (
-                        <span className="ml-auto text-xs text-muted-foreground">{formatDate(o.created_at)}</span>
-                      )}
-                      {o.comment && (
-                        <span className="text-xs text-muted-foreground truncate max-w-[120px]">{o.comment}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <span className="text-sm font-semibold text-foreground">{formatPrice(o.price)}</span>
+                        {o.order_type === "Keyinroqi" && o.scheduled_at && (
+                          <span className="flex items-center gap-1 text-xs text-orange-400 ml-auto">
+                            <Calendar className="w-3 h-3" />
+                            {formatDate(o.scheduled_at)}
+                          </span>
+                        )}
+                        {o.order_type === "Hozirgi" && (
+                          <span className="ml-auto text-xs text-muted-foreground">{formatDate(o.created_at)}</span>
+                        )}
+                        {o.comment && (
+                          <span className="text-xs text-muted-foreground truncate max-w-[120px]">{o.comment}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </AsyncContent>
             </div>
 
             {/* Follow-ups */}
@@ -184,32 +204,37 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
                   <Bell className="w-3 h-3" /> Eslatma qo'shish
                 </Button>
               </div>
-              {loading ? (
-                <div className="flex justify-center py-4"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>
-              ) : followUps.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-2">Eslatmalar yo'q</p>
-              ) : (
-                <div className="space-y-2">
-                  {followUps.map((f) => (
-                    <div key={f.id} className={cn(
-                      "flex items-start gap-3 rounded-lg px-4 py-3 border",
-                      f.status === "Bajarildi" ? "bg-secondary/30 border-border opacity-60" : "bg-secondary/50 border-border"
-                    )}>
-                      {f.status === "Bajarildi"
-                        ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                        : <Clock className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
-                      }
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-muted-foreground">{formatDate(f.scheduled_at)}</p>
-                        {f.note && <p className="text-sm text-foreground mt-0.5">{f.note}</p>}
+              <AsyncContent
+                loading={loading}
+                error={error}
+                data={followUps}
+                onRetry={loadDetails}
+                loadingFallback={compactLoading}
+                empty={{ title: "Eslatmalar yo'q" }}
+              >
+                {(rows) => (
+                  <div className="space-y-2">
+                    {rows.map((f) => (
+                      <div key={f.id} className={cn(
+                        "flex items-start gap-3 rounded-lg px-4 py-3 border",
+                        f.status === "Bajarildi" ? "bg-secondary/30 border-border opacity-60" : "bg-secondary/50 border-border"
+                      )}>
+                        {f.status === "Bajarildi"
+                          ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                          : <Clock className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+                        }
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{formatDate(f.scheduled_at)}</p>
+                          {f.note && <p className="text-sm text-foreground mt-0.5">{f.note}</p>}
+                        </div>
+                        <span className={cn("text-xs flex-shrink-0", f.status === "Bajarildi" ? "text-emerald-400" : "text-orange-400")}>
+                          {f.status}
+                        </span>
                       </div>
-                      <span className={cn("text-xs flex-shrink-0", f.status === "Bajarildi" ? "text-emerald-400" : "text-orange-400")}>
-                        {f.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </AsyncContent>
             </div>
 
             {/* Action buttons */}

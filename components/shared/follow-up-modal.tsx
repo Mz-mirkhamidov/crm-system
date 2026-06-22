@@ -10,8 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
 import { useOperator } from "@/lib/useOperator";
+import { useToast } from "@/components/ui/use-toast";
+import { insertFollowUp } from "@/lib/data/repository";
 import type { SourceType } from "@/types";
 import { Loader2 } from "lucide-react";
 
@@ -39,26 +40,29 @@ export function FollowUpModal({
   const [loading, setLoading] = useState(false);
   const operator = useOperator();
   const operatorId = operator?.id || "";
-  const supabase = createClient();
+  const toast = useToast();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!scheduledAt) return;
     setLoading(true);
 
-    const user = { id: operatorId };
-
-    await supabase.from("follow_ups").insert({
-      user_id: user.id,
+    const result = await insertFollowUp(operatorId, {
       source_type: sourceType,
       source_id: sourceId,
       source_name: sourceName,
       source_phone: sourcePhone,
       scheduled_at: scheduledAt,
       note: note || null,
-      status: "Kutilmoqda",
     });
 
+    if (!result.ok) {
+      toast.error(result.error);
+      setLoading(false);
+      return;
+    }
+
+    toast.success("Eslatma belgilandi");
     setLoading(false);
     setScheduledAt("");
     setNote("");

@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, LogOut, Zap, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type Operator } from "@/lib/session";
+import { ToastProvider } from "@/components/ui/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 const adminNav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -48,8 +50,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="fixed left-0 top-0 h-screen w-60 bg-sidebar border-r border-border flex flex-col z-40">
+    <ToastProvider>
+      <div className="flex min-h-screen bg-background">
+        <aside className="fixed left-0 top-0 h-screen w-60 bg-sidebar border-r border-border flex flex-col z-40">
         <div className="px-6 py-5 border-b border-border">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-500/30 flex items-center justify-center">
@@ -92,6 +95,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
       <main className="flex-1 ml-60 p-6 max-w-7xl mx-auto">{children}</main>
-    </div>
+      </div>
+      <Toaster />
+    </ToastProvider>
   );
 }
