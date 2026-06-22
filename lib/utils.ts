@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { format, isToday, isPast, parseISO } from "date-fns";
 import { uz } from "date-fns/locale";
-import type { Lead, Order } from "@/types";
+import type { Client, Lead, Order } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -84,6 +84,7 @@ const MS_PER_DAY = 86_400_000;
 const CLOSED_LEAD_STATUSES: ReadonlyArray<Lead["status"]> = [
   "Buyurtma berilgan",
   "Rad etildi",
+  "Mijozga aylandi",
 ];
 
 export interface LeadFilterCriteria {
@@ -138,18 +139,53 @@ export interface LeadAge {
   color: string;
 }
 
+/** Tailwind color classes for an age/staleness bucket (shared by leads + clients). */
+function ageBucketColor(days: number): string {
+  if (days <= 1) return "text-emerald-400 bg-emerald-500/10 border-emerald-500/30";
+  if (days <= 4) return "text-blue-400 bg-blue-500/10 border-blue-500/30";
+  if (days <= 9) return "text-yellow-400 bg-yellow-500/10 border-yellow-500/30";
+  return "text-red-400 bg-red-500/10 border-red-500/30";
+}
+
 /** Compute a lead's age bucket (days + display label + Tailwind color classes). */
 export function getLeadAge(createdAt: string): LeadAge {
   const days = Math.floor((Date.now() - new Date(createdAt).getTime()) / MS_PER_DAY);
-  if (days === 0)
-    return { days, label: "Bugun", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" };
-  if (days === 1)
-    return { days, label: "Kecha", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" };
-  if (days <= 4)
-    return { days, label: `${days}k`, color: "text-blue-400 bg-blue-500/10 border-blue-500/30" };
-  if (days <= 9)
-    return { days, label: `${days}k`, color: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30" };
-  return { days, label: `${days}k`, color: "text-red-400 bg-red-500/10 border-red-500/30" };
+  const color = ageBucketColor(days);
+  if (days === 0) return { days, label: "Bugun", color };
+  if (days === 1) return { days, label: "Kecha", color };
+  return { days, label: `${days}k`, color };
+}
+
+export interface ClientStaleness {
+  /** Whole days since the effective last-contact timestamp. */
+  days: number;
+  /** True iff `days >= CLIENT_STALE_DAYS`. */
+  stale: boolean;
+  /** Display label. */
+  label: string;
+  /** Tailwind classes, mirroring the `getLeadAge` buckets. */
+  color: string;
+}
+
+/** Staleness threshold: a client is "stale" after this many whole days without contact. */
+export const CLIENT_STALE_DAYS = 7;
+
+/**
+ * Client staleness derived from the effective last-contact timestamp
+ * (`last_contacted_at`, falling back to `created_at` when null). Pure: the reference
+ * "now" is injected so the function is fully testable. Future timestamps clamp to 0 days.
+ */
+export function getClientStaleness(
+  client: Pick<Client, "last_contacted_at" | "created_at">,
+  now: number = Date.now()
+): ClientStaleness {
+  const reference = client.last_contacted_at ?? client.created_at;
+  const elapsed = now - new Date(reference).getTime();
+  const days = Math.max(0, Math.floor(elapsed / MS_PER_DAY));
+  const stale = days >= CLIENT_STALE_DAYS;
+  const label = stale ? `${days} kun aloqasiz` : "Faol";
+  const color = ageBucketColor(days);
+  return { days, stale, label, color };
 }
 
 /** Initials (up to two uppercase letters) derived from a person's name. */

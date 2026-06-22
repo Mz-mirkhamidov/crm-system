@@ -42,6 +42,7 @@ function makeLead(over: Partial<Lead> = {}): Lead {
     tag: null,
     status: "Yangi",
     comment: null,
+    converted_client_id: null,
     created_at: now,
     updated_at: now,
     ...over,

@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import fc from "fast-check";
 import { ToastProvider } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { ClientsTable } from "@/components/clients/clients-table";
+import { ClientsTable, filterClients } from "@/components/clients/clients-table";
+import { getClientStaleness } from "@/lib/utils";
 import type { Client } from "@/types";
 
 // Component tests for the clients table + form (frontend-ux-improvements task 9.3).
@@ -20,6 +22,7 @@ vi.mock("@/lib/data/repository", () => ({
   deleteRow: vi.fn(),
   insertClient: vi.fn(),
   updateClient: vi.fn(),
+  convertLeadToClient: vi.fn(),
 }));
 
 import {
@@ -39,7 +42,9 @@ function makeClient(over: Partial<Client> = {}): Client {
     name: "Mijoz Bir",
     phone: "+998901234567",
     address: "Toshkent",
+    tag: null,
     comment: null,
+    last_contacted_at: null,
     created_at: now,
     updated_at: now,
     ...over,
@@ -112,5 +117,100 @@ describe("ClientsTable", () => {
 
     await waitFor(() => expect(insertClient).toHaveBeenCalledTimes(1));
     expect(await screen.findByText("Mijoz qo'shildi")).toBeInTheDocument();
+  });
+});
+
+
+
+// ---- Task 7.3: client-management-enhancements additions ----
+
+describe("ClientsTable — Property 8: clients are not deletable from the UI", () => {
+  it("renders no delete control and no destructive confirmation dialog", async () => {
+    (listClients as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+      ok([makeClient({ id: "c1", name: "Mijoz Bir" }), makeClient({ id: "c2", name: "Mijoz Ikki" })])
+    );
+
+    renderTable();
+
+    expect(await screen.findByText("Mijoz Bir")).toBeInTheDocument();
+    // No delete affordance: neither the AlertDialog title nor its destructive action exist.
+    expect(screen.queryByText("Mijozni o'chirish")).not.toBeInTheDocument();
+    expect(screen.queryByText("O'chirish")).not.toBeInTheDocument();
+    expect(screen.queryByText(/o'chirmoqchimisiz/i)).not.toBeInTheDocument();
+  });
+});
+
+describe("Property 9: tag filter soundness", () => {
+  it("Feature: client-management-enhancements, Property 9: non-'all' tag filter yields only exact-tag matches", () => {
+    const tagArb = fc.constantFrom("Sayt", "Excel", "Estet", "Primoy", "VIP");
+    fc.assert(
+      fc.property(
+        fc.array(
+          fc.record({
+            id: fc.uuid(),
+            tag: fc.option(tagArb, { nil: null }),
+            name: fc.string(),
+            phone: fc.string(),
+          }),
+          { maxLength: 30 }
+        ),
+        tagArb,
+        (rows, selected) => {
+          const clients = rows.map((r, i) =>
+            makeClient({ id: `${r.id}-${i}`, name: r.name, phone: r.phone, tag: r.tag })
+          );
+          const result = filterClients(clients, "", selected);
+          // Soundness: every displayed row has exactly the selected tag.
+          expect(result.every((c) => c.tag === selected)).toBe(true);
+        }
+      ),
+      { numRuns: 100 }
+    );
+  });
+
+  it("'all' shows every client regardless of tag", () => {
+    const clients = [
+      makeClient({ id: "c1", tag: "Sayt" }),
+      makeClient({ id: "c2", tag: null }),
+      makeClient({ id: "c3", tag: "Excel" }),
+    ];
+    expect(filterClients(clients, "", "all")).toHaveLength(3);
+  });
+});
+
+describe("ClientsTable — stale banner", () => {
+  const dayMs = 86_400_000;
+
+  it("shows the needs-attention banner when at least one client is stale", async () => {
+    const staleClient = makeClient({
+      id: "c1",
+      name: "Eski Mijoz",
+      created_at: new Date(Date.now() - 10 * dayMs).toISOString(),
+      last_contacted_at: null,
+    });
+    expect(getClientStaleness(staleClient).stale).toBe(true);
+    (listClients as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ok([staleClient]));
+
+    renderTable();
+
+    expect(await screen.findByText("Eski Mijoz")).toBeInTheDocument();
+    expect(screen.getByText(/e'tibor talab qiladi/)).toBeInTheDocument();
+  });
+
+  it("hides the banner when no client is stale", async () => {
+    const freshNow = new Date().toISOString();
+    const freshClient = makeClient({
+      id: "c1",
+      name: "Yangi Mijoz",
+      created_at: freshNow,
+      last_contacted_at: freshNow,
+    });
+    expect(getClientStaleness(freshClient).stale).toBe(false);
+    (listClients as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ok([freshClient]));
+
+    renderTable();
+
+    expect(await screen.findByText("Yangi Mijoz")).toBeInTheDocument();
+    expect(screen.queryByText(/e'tibor talab qiladi/)).not.toBeInTheDocument();
   });
 });

@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import type {
   Lead,
   Client,
+  Note,
   Order,
   FollowUp,
   LeadStatus,
@@ -39,7 +40,14 @@ export interface ClientInput {
   name: string;
   phone: string;
   address: string | null;
+  tag: string | null;
   comment: string | null;
+}
+
+export interface NoteInput {
+  source_type: SourceType;
+  source_id: string;
+  body: string;
 }
 
 export interface OrderInput {
@@ -163,6 +171,48 @@ export async function listFollowUpsForSource(
   return mapMany<FollowUp>(res, "Eslatmalar tarixini yuklab bo'lmadi");
 }
 
+// ---- Notes reads/writes (every read applies .eq(SCOPE_COLUMN, operatorId)) ----
+
+export async function listNotesForSource(
+  operatorId: string,
+  sourceId: string,
+  sourceType: SourceType
+): Promise<Result<Note[]>> {
+  const supabase = createClient();
+  const res = await supabase
+    .from("notes")
+    .select("*")
+    .eq(SCOPE_COLUMN, operatorId)
+    .eq("source_id", sourceId)
+    .eq("source_type", sourceType)
+    .order("created_at", { ascending: false });
+  return mapMany<Note>(res, "Eslatmalarni yuklab bo'lmadi");
+}
+
+export async function addNote(
+  operatorId: string,
+  input: NoteInput
+): Promise<Result<Note>> {
+  const supabase = createClient();
+  const res = await supabase
+    .from("notes")
+    .insert({ [SCOPE_COLUMN]: operatorId, operator_id: operatorId, ...input })
+    .select()
+    .single();
+  return mapSingle<Note>(res, "Eslatmani saqlab bo'lmadi");
+}
+
+export async function updateNote(id: string, body: string): Promise<Result<Note>> {
+  const supabase = createClient();
+  const res = await supabase
+    .from("notes")
+    .update({ body })
+    .eq("id", id)
+    .select()
+    .single();
+  return mapSingle<Note>(res, "Eslatmani yangilab bo'lmadi");
+}
+
 export async function getSourceById(
   operatorId: string,
   sourceType: SourceType,
@@ -235,6 +285,87 @@ export async function updateClient(
     .select()
     .single();
   return mapSingle<Client>(res, "Mijozni yangilab bo'lmadi");
+}
+
+/**
+ * Touch a client's `last_contacted_at` timestamp. Defaults to now. Best-effort helper
+ * used after a note/order/follow-up interaction is recorded for the client.
+ */
+export async function touchClientLastContacted(
+  id: string,
+  whenISO?: string
+): Promise<Result<Client>> {
+  const supabase = createClient();
+  const res = await supabase
+    .from("clients")
+    .update({ last_contacted_at: whenISO ?? new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  return mapSingle<Client>(res, "Mijozni yangilab bo'lmadi");
+}
+
+/**
+ * Convert a lead into a client, operator-scoped (Requirements 3.1–3.5, 3.8).
+ *
+ * Idempotent: if the lead is already converted (`converted_client_id` set), the existing
+ * client is returned without creating a second client or duplicating notes. On client
+ * insert failure the error is returned and NO notes re-point / lead update is performed.
+ * After a successful insert the lead's notes timeline is re-pointed to the client, then
+ * the lead is marked `'Mijozga aylandi'` and linked via `converted_client_id`.
+ */
+export async function convertLeadToClient(
+  operatorId: string,
+  lead: Lead
+): Promise<Result<Client>> {
+  const supabase = createClient();
+
+  // Idempotent guard: already converted → return the existing client, no new inserts.
+  if (lead.converted_client_id) {
+    const existing = await supabase
+      .from("clients")
+      .select("*")
+      .eq(SCOPE_COLUMN, operatorId)
+      .eq("id", lead.converted_client_id)
+      .single();
+    return mapSingle<Client>(existing, "Mijozni yuklab bo'lmadi");
+  }
+
+  // 1. Create the client from the lead's fields, scoped to the operator.
+  const insertRes = await supabase
+    .from("clients")
+    .insert({
+      [SCOPE_COLUMN]: operatorId,
+      operator_id: operatorId,
+      name: lead.name,
+      phone: lead.phone,
+      address: lead.address,
+      tag: lead.tag,
+      comment: lead.comment,
+      last_contacted_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+  const clientResult = mapSingle<Client>(insertRes, "Mijozni saqlab bo'lmadi");
+  // On insert failure: return the error and perform NO notes/lead mutation.
+  if (!clientResult.ok) return clientResult;
+  const client = clientResult.data;
+
+  // 2. Re-point the lead's entire notes timeline to the new client (no copy/loss).
+  await supabase
+    .from("notes")
+    .update({ source_type: "client", source_id: client.id })
+    .eq(SCOPE_COLUMN, operatorId)
+    .eq("source_type", "lead")
+    .eq("source_id", lead.id);
+
+  // 3. Mark the lead converted and link it to the client (kept as historical record).
+  await supabase
+    .from("leads")
+    .update({ status: "Mijozga aylandi", converted_client_id: client.id })
+    .eq("id", lead.id);
+
+  return ok(client);
 }
 
 // ---- Order writes ----

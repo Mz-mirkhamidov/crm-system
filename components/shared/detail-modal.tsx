@@ -3,17 +3,28 @@
 import { useState, useEffect } from "react";
 import { useOperator } from "@/lib/useOperator";
 import { useToast } from "@/components/ui/use-toast";
-import { listOrdersForSource, listFollowUpsForSource } from "@/lib/data/repository";
+import { listOrdersForSource, listFollowUpsForSource, updateClient } from "@/lib/data/repository";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { OrderModal } from "@/components/shared/order-modal";
 import { FollowUpModal } from "@/components/shared/follow-up-modal";
+import { NotesFeed } from "@/components/shared/notes-feed";
 import { AsyncContent } from "@/components/shared/async-content";
 import {
   Phone, MapPin, MessageSquare, ShoppingCart, Bell,
-  Clock, CheckCircle2, Package, Loader2, Calendar,
+  Clock, CheckCircle2, Package, Loader2, Calendar, Pencil,
 } from "lucide-react";
 import { cn, formatDate, formatPrice, getStatusColor, getProductColor, formatPhoneForCall, getOrderTotal } from "@/lib/utils";
+import { DEFAULT_TAGS } from "@/types";
 import type { Lead, Client, Order, FollowUp, SourceType } from "@/types";
 
 interface PersonDetailModalProps {
@@ -22,6 +33,52 @@ interface PersonDetailModalProps {
   person: Lead | Client | null;
   sourceType: SourceType;
   onRefresh?: () => void;
+}
+
+/** Quick-edit form values shared by the inline editor. */
+export interface ClientQuickEditValues {
+  name: string;
+  phone: string;
+  address: string;
+  tag: string;
+}
+
+/**
+ * Pure mapper from quick-edit form values to an `updateClient` payload (exported for
+ * property testing — design Property 11). The "none" sentinel maps to `null`, and an empty
+ * address maps to `null`; everything else is carried through verbatim.
+ */
+export function buildClientUpdatePayload(values: ClientQuickEditValues) {
+  return {
+    name: values.name,
+    phone: values.phone,
+    address: values.address ? values.address : null,
+    tag: values.tag === "none" ? null : values.tag,
+  };
+}
+
+export interface OrderStats {
+  count: number;
+  total: number;
+  /** Max `created_at` among the orders, or null when there are none. */
+  lastOrderDate: string | null;
+}
+
+/**
+ * Pure aggregate of a client's order statistics (exported for property testing — design
+ * Property 10): count = `orders.length`, total = `getOrderTotal(orders)`, and last-order
+ * date = max `created_at` (null when there are no orders). ISO-8601 timestamps compare
+ * lexicographically, so the string max equals the chronological max.
+ */
+export function getOrderStats(orders: Order[]): OrderStats {
+  return {
+    count: orders.length,
+    total: getOrderTotal(orders),
+    lastOrderDate: orders.reduce<string | null>(
+      (max, o) => (max === null || o.created_at > max ? o.created_at : max),
+      null
+    ),
+  };
 }
 
 export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh }: PersonDetailModalProps) {
@@ -34,6 +91,21 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
   const operator = useOperator();
   const operatorId = operator?.id || "";
   const toast = useToast();
+
+  // Local view of the person so quick-edits are reflected immediately without waiting for
+  // the parent list to refetch.
+  const [view, setView] = useState<Lead | Client | null>(person);
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editTag, setEditTag] = useState("none");
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  useEffect(() => {
+    setView(person);
+    setEditing(false);
+  }, [person]);
 
   useEffect(() => {
     if (open && person) loadDetails();
@@ -59,13 +131,51 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
     setLoading(false);
   }
 
-  if (!person) return null;
+  if (!person || !view) return null;
 
   const isLead = sourceType === "lead";
-  const lead = isLead ? (person as Lead) : null;
+  const lead = isLead ? (view as Lead) : null;
+  const clientView = !isLead ? (view as Client) : null;
 
-  const totalAmount = getOrderTotal(orders);
+  const stats = getOrderStats(orders);
   const pendingFU = followUps.filter((f) => f.status === "Kutilmoqda").length;
+
+  // Tag options for the quick-edit select: presets plus the client's current tag.
+  const tagOptions = Array.from(
+    new Set<string>([...DEFAULT_TAGS, ...(clientView?.tag ? [clientView.tag] : [])])
+  );
+
+  function startEdit() {
+    if (!view) return;
+    setEditName(view.name);
+    setEditPhone(view.phone);
+    setEditAddress(view.address ?? "");
+    setEditTag((view as Client).tag ?? "none");
+    setEditing(true);
+  }
+
+  async function saveEdit() {
+    if (!view) return;
+    setSavingEdit(true);
+    const payload = buildClientUpdatePayload({
+      name: editName,
+      phone: editPhone,
+      address: editAddress,
+      tag: editTag,
+    });
+    const result = await updateClient(view.id, payload);
+    setSavingEdit(false);
+    if (!result.ok) {
+      // Failure: one error toast; keep the modal in edit mode and retain entered values.
+      toast.error(result.error);
+      return;
+    }
+    toast.success("Mijoz yangilandi");
+    // Reflect exactly the submitted values; keep the modal open and refresh the parent.
+    setView({ ...(view as Client), ...payload });
+    setEditing(false);
+    onRefresh?.();
+  }
 
   const compactLoading = (
     <div className="flex justify-center py-4"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>
@@ -79,59 +189,112 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
           <DialogHeader>
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-xl font-bold text-primary flex-shrink-0">
-                {person.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+                {view.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
               </div>
               <div className="flex-1 min-w-0">
-                <DialogTitle className="text-xl">{person.name}</DialogTitle>
-                <a href={`tel:${formatPhoneForCall(person.phone)}`} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary mt-1 w-fit">
+                <DialogTitle className="text-xl">{view.name}</DialogTitle>
+                <a href={`tel:${formatPhoneForCall(view.phone)}`} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary mt-1 w-fit">
                   <Phone className="w-3.5 h-3.5" />
-                  {person.phone}
+                  {view.phone}
                 </a>
                 <div className="flex items-center flex-wrap gap-2 mt-2">
                   {isLead && lead?.tag && (
                     <span className="text-xs bg-secondary border border-border rounded-full px-2.5 py-0.5">{lead.tag}</span>
+                  )}
+                  {!isLead && clientView?.tag && (
+                    <span className="text-xs bg-secondary border border-border rounded-full px-2.5 py-0.5">{clientView.tag}</span>
                   )}
                   {isLead && lead?.status && (
                     <span className={cn("text-xs px-2.5 py-0.5 rounded-full border font-medium", getStatusColor(lead.status))}>
                       {lead.status}
                     </span>
                   )}
-                  <span className="text-xs text-muted-foreground">{formatDate(person.created_at)}</span>
+                  <span className="text-xs text-muted-foreground">{formatDate(view.created_at)}</span>
                 </div>
               </div>
 
-              {/* Stats */}
-              <div className="flex gap-3 flex-shrink-0">
+              {/* Stats + quick-edit toggle (clients only) */}
+              <div className="flex items-start gap-3 flex-shrink-0">
                 <div className="text-center">
-                  <p className="text-lg font-bold text-primary">{orders.length}</p>
+                  <p className="text-lg font-bold text-primary">{stats.count}</p>
                   <p className="text-xs text-muted-foreground">Zakaz</p>
                 </div>
                 <div className="text-center">
                   <p className="text-lg font-bold text-orange-400">{pendingFU}</p>
                   <p className="text-xs text-muted-foreground">Kutilmoqda</p>
                 </div>
+                {!isLead && !editing && (
+                  <Button size="icon" variant="ghost" className="h-7 w-7" title="Tahrirlash" onClick={startEdit}>
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                )}
               </div>
             </div>
           </DialogHeader>
 
           <div className="space-y-5 mt-2">
-            {/* Info */}
-            {(person.address || person.comment) && (
+            {/* Quick-edit (clients only) */}
+            {!isLead && editing && (
+              <div className="bg-secondary/50 border border-border rounded-xl p-4 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label>Ism</Label>
+                    <Input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="To'liq ism" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Telefon</Label>
+                    <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="+998..." />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Manzil</Label>
+                  <Input value={editAddress} onChange={(e) => setEditAddress(e.target.value)} placeholder="Manzil" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Teg</Label>
+                  <Select value={editTag} onValueChange={setEditTag}>
+                    <SelectTrigger><SelectValue placeholder="Tanlash" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">—</SelectItem>
+                      {tagOptions.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" size="sm" className="flex-1" onClick={() => setEditing(false)}>Bekor</Button>
+                  <Button type="button" size="sm" className="flex-1" disabled={savingEdit} onClick={saveEdit}>
+                    {savingEdit ? <Loader2 className="w-4 h-4 animate-spin" /> : "Saqlash"}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Info (legacy comment kept read-only, above the activity timeline) */}
+            {(view.address || view.comment) && (
               <div className="bg-secondary/50 rounded-xl p-4 space-y-2.5">
-                {person.address && (
+                {view.address && (
                   <div className="flex items-start gap-2.5 text-sm">
                     <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <span>{person.address}</span>
+                    <span>{view.address}</span>
                   </div>
                 )}
-                {person.comment && (
+                {view.comment && (
                   <div className="flex items-start gap-2.5 text-sm">
                     <MessageSquare className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <span className="whitespace-pre-wrap">{person.comment}</span>
+                    <span className="whitespace-pre-wrap">{view.comment}</span>
                   </div>
                 )}
               </div>
             )}
+
+            {/* Activity / notes timeline */}
+            <div>
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
+                <MessageSquare className="w-4 h-4 text-primary" />
+                Faoliyat
+              </h3>
+              <NotesFeed sourceId={view.id} sourceType={sourceType} />
+            </div>
 
             {/* Orders */}
             <div>
@@ -139,9 +302,9 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
                 <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Package className="w-4 h-4 text-purple-400" />
                   Zakazlar
-                  {orders.length > 0 && (
+                  {stats.count > 0 && (
                     <span className="text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full px-2 py-0.5">
-                      {orders.length} ta • {formatPrice(totalAmount)}
+                      {stats.count} ta • {formatPrice(stats.total)}
                     </span>
                   )}
                 </h3>
@@ -151,6 +314,9 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
                   <ShoppingCart className="w-3 h-3" /> Zakaz qo'shish
                 </Button>
               </div>
+              {stats.lastOrderDate && (
+                <p className="text-xs text-muted-foreground mb-2">Oxirgi zakaz: {formatDate(stats.lastOrderDate)}</p>
+              )}
               <AsyncContent
                 loading={loading}
                 error={error}
@@ -239,7 +405,7 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
 
             {/* Action buttons */}
             <div className="flex gap-2 pt-2 border-t border-border">
-              <a href={`tel:${formatPhoneForCall(person.phone)}`} className="flex-1">
+              <a href={`tel:${formatPhoneForCall(view.phone)}`} className="flex-1">
                 <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
                   <Phone className="w-3.5 h-3.5 text-emerald-400" /> Qo'ng'iroq
                 </Button>
@@ -251,13 +417,13 @@ export function PersonDetailModal({ open, onClose, person, sourceType, onRefresh
 
       {orderModalOpen && (
         <OrderModal open={orderModalOpen} onClose={() => setOrderModalOpen(false)}
-          sourceId={person.id} sourceName={person.name} sourceType={sourceType}
+          sourceId={view.id} sourceName={view.name} sourceType={sourceType}
           onSuccess={() => { loadDetails(); onRefresh?.(); }}
         />
       )}
       {followUpModalOpen && (
         <FollowUpModal open={followUpModalOpen} onClose={() => setFollowUpModalOpen(false)}
-          sourceId={person.id} sourceName={person.name} sourcePhone={person.phone}
+          sourceId={view.id} sourceName={view.name} sourcePhone={view.phone}
           sourceType={sourceType} onSuccess={loadDetails}
         />
       )}

@@ -15,16 +15,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { OrderModal } from "@/components/shared/order-modal";
 import { PersonDetailModal } from "@/components/shared/detail-modal";
 import { FollowUpModal } from "@/components/shared/follow-up-modal";
@@ -33,7 +29,6 @@ import {
   Plus,
   Search,
   Pencil,
-  Trash2,
   ShoppingCart,
   Bell,
   Loader2,
@@ -41,20 +36,40 @@ import {
   ChevronUp,
   MessageSquare,
   Users,
+  Clock,
 } from "lucide-react";
-import { cn, formatDate, formatPrice, getProductColor } from "@/lib/utils";
+import { cn, formatDate, formatPrice, getProductColor, getClientStaleness } from "@/lib/utils";
 import { LocationSelect } from "@/components/shared/location-select";
+import { DEFAULT_TAGS } from "@/types";
 import type { Client, Order } from "@/types";
 
+/**
+ * Pure filter used by the clients table (exported for property testing — design Property 9).
+ * Search matches name/phone; a non-"all" tag value keeps only exact-tag matches, while
+ * "all" disables the tag filter.
+ */
+export function filterClients(clients: Client[], search: string, tag: string): Client[] {
+  const q = search.trim().toLowerCase();
+  return clients.filter((c) => {
+    const matchesSearch =
+      q === "" || c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q);
+    const matchesTag = tag === "all" || c.tag === tag;
+    return matchesSearch && matchesTag;
+  });
+}
+
 export function ClientsTable() {
-  const { data: clients, loading, error, refetch, remove, loadClientOrders } = useClients();
+  // NOTE: `remove` is intentionally NOT destructured — clients are non-destructive from the
+  // UI (Requirement 1, design Property 8). The capability stays in the data layer for
+  // non-UI/back-compat callers only.
+  const { data: clients, loading, error, refetch, loadClientOrders } = useClients();
   const operator = useOperator();
   const operatorId = operator?.id || "";
 
   const [search, setSearch] = useState("");
+  const [filterTag, setFilterTag] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [clientOrders, setClientOrders] = useState<Record<string, Order[]>>({});
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [detailClient, setDetailClient] = useState<Client | null>(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -62,21 +77,21 @@ export function ClientsTable() {
   const [orderClient, setOrderClient] = useState<Client | null>(null);
   const [followUpClient, setFollowUpClient] = useState<Client | null>(null);
 
-  const q = search.toLowerCase();
-  const filtered = search
-    ? clients.filter((c) => c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q))
-    : clients;
+  // Tag filter options: DEFAULT_TAGS plus any tag present in the loaded clients (Req 4.2).
+  const tagOptions = Array.from(
+    new Set<string>([
+      ...DEFAULT_TAGS,
+      ...clients.map((c) => c.tag).filter((t): t is string => !!t),
+    ])
+  );
+
+  const filtered = filterClients(clients, search, filterTag);
+  const staleCount = clients.filter((c) => getClientStaleness(c).stale).length;
 
   async function loadOrdersFor(clientId: string) {
     if (clientOrders[clientId]) return;
     const orders = await loadClientOrders(clientId);
     setClientOrders((prev) => ({ ...prev, [clientId]: orders }));
-  }
-
-  async function handleDelete(id: string) {
-    setDeletingId(id);
-    await remove(id);
-    setDeletingId(null);
   }
 
   function toggleExpand(id: string) {
@@ -86,11 +101,32 @@ export function ClientsTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
+      {/* Needs-attention banner — mirrors the leads cold banner (Req 6.4). */}
+      {staleCount > 0 && (
+        <div className="flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-4 py-2.5 text-sm">
+          <Clock className="w-4 h-4 text-orange-400 flex-shrink-0" />
+          <span className="text-orange-300">
+            <span className="font-bold">{staleCount} ta mijoz</span> 7+ kun aloqasiz — e'tibor talab qiladi
+          </span>
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input className="pl-9" placeholder="Ism yoki telefon..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
+
+        <Select value={filterTag} onValueChange={setFilterTag}>
+          <SelectTrigger className="w-36">
+            <SelectValue placeholder="Teg" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Barcha teglar</SelectItem>
+            {tagOptions.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+          </SelectContent>
+        </Select>
+
         <Button onClick={() => setAddOpen(true)} size="sm">
           <Plus className="w-4 h-4" /> Yangi mijoz
         </Button>
@@ -110,49 +146,40 @@ export function ClientsTable() {
                 <tr className="border-b border-border bg-secondary/50">
                   <th className="text-left px-4 py-3 text-muted-foreground font-medium">Ism</th>
                   <th className="text-left px-4 py-3 text-muted-foreground font-medium">Telefon</th>
-                  <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden md:table-cell">Manzil</th>
-                  <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden lg:table-cell">Qo'shilgan</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden md:table-cell">Teg</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Faollik</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden lg:table-cell">Manzil</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((client) => {
-                  const isDeleting = deletingId === client.id;
+                  const staleness = getClientStaleness(client);
                   return (
                     <Fragment key={client.id}>
                       <tr className="border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer" onClick={() => setDetailClient(client)}>
                         <td className="px-4 py-3 font-medium">{client.name}</td>
                         <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{client.phone}</td>
-                        <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell">{client.address}</td>
-                        <td className="px-4 py-3 text-muted-foreground text-xs hidden lg:table-cell">{formatDate(client.created_at)}</td>
+                        <td className="px-4 py-3 hidden md:table-cell">
+                          {client.tag && <span className="text-xs bg-secondary border border-border rounded-full px-2.5 py-1">{client.tag}</span>}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={cn("text-xs px-2 py-0.5 rounded-full border font-medium", staleness.color)}>
+                            {staleness.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground text-xs hidden lg:table-cell">{client.address}</td>
                         <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center gap-1 justify-end">
-                            <Button size="icon" variant="ghost" className="h-7 w-7 text-green-400 hover:bg-green-500/10" title="Zakaz" disabled={isDeleting} onClick={() => setOrderClient(client)}>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 text-green-400 hover:bg-green-500/10" title="Zakaz" onClick={() => setOrderClient(client)}>
                               <ShoppingCart className="w-3.5 h-3.5" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 text-blue-400 hover:bg-blue-500/10" title="Follow-up" disabled={isDeleting} onClick={() => setFollowUpClient(client)}>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 text-blue-400 hover:bg-blue-500/10" title="Follow-up" onClick={() => setFollowUpClient(client)}>
                               <Bell className="w-3.5 h-3.5" />
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-7 w-7" disabled={isDeleting} onClick={() => setEditClient(client)}>
+                            <Button size="icon" variant="ghost" className="h-7 w-7" title="Tahrirlash" onClick={() => setEditClient(client)}>
                               <Pencil className="w-3.5 h-3.5" />
                             </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button size="icon" variant="ghost" className="h-7 w-7 text-red-400 hover:bg-red-500/10" disabled={isDeleting}>
-                                  {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Mijozni o'chirish</AlertDialogTitle>
-                                  <AlertDialogDescription>{client.name} ni o'chirmoqchimisiz?</AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Bekor</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDelete(client.id)}>O'chirish</AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
                             <button className="p-1 text-muted-foreground" onClick={() => toggleExpand(client.id)}>
                               {expandedId === client.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                             </button>
@@ -161,7 +188,7 @@ export function ClientsTable() {
                       </tr>
                       {expandedId === client.id && (
                         <tr className="bg-secondary/20">
-                          <td colSpan={5} className="px-4 py-4">
+                          <td colSpan={6} className="px-4 py-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="space-y-2">
                                 {client.comment && (
@@ -218,14 +245,28 @@ function ClientFormModal({ open, onClose, onSuccess, client, operatorId }: { ope
   const [name, setName] = useState(client?.name || "");
   const [phone, setPhone] = useState(client?.phone || "");
   const [address, setAddress] = useState(client?.address || "");
+  const [tag, setTag] = useState(client?.tag || "none");
   const [comment, setComment] = useState(client?.comment || "");
   const [saving, setSaving] = useState(false);
   const toast = useToast();
 
+  // Tag options: DEFAULT_TAGS plus the client's current tag if it isn't a preset.
+  const tagOptions = Array.from(
+    new Set<string>([...DEFAULT_TAGS, ...(client?.tag ? [client.tag] : [])])
+  );
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const payload = { name, phone, address: address || null, comment: comment || null };
+    // `tag` is now part of the required ClientInput shape, so it must be included in the
+    // insert/update payload (fixes the prior type error).
+    const payload = {
+      name,
+      phone,
+      address: address || null,
+      tag: tag === "none" ? null : tag,
+      comment: comment || null,
+    };
     const result = client
       ? await updateClient(client.id, payload)
       : await insertClient(operatorId, payload);
@@ -257,6 +298,16 @@ function ClientFormModal({ open, onClose, onSuccess, client, operatorId }: { ope
             </div>
           </div>
           <LocationSelect value={address} onChange={setAddress} />
+          <div className="space-y-1.5">
+            <Label>Teg</Label>
+            <Select value={tag} onValueChange={setTag}>
+              <SelectTrigger><SelectValue placeholder="Tanlash" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">—</SelectItem>
+                {tagOptions.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-1.5">
             <Label>Kommentariya</Label>
             <textarea className="flex w-full rounded-md border border-input bg-input px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none min-h-[70px]" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Tarix, eslatma..." />

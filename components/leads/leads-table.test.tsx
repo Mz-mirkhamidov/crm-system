@@ -22,6 +22,9 @@ vi.mock("@/lib/data/repository", () => ({
   findDuplicateByPhone: vi.fn(),
   insertLead: vi.fn(),
   updateLead: vi.fn(),
+  // useClients (convert action) data access.
+  listClients: vi.fn(),
+  convertLeadToClient: vi.fn(),
 }));
 
 import {
@@ -30,6 +33,8 @@ import {
   listOrdersForSource,
   findDuplicateByPhone,
   insertLead,
+  listClients,
+  convertLeadToClient,
 } from "@/lib/data/repository";
 
 const ok = <T,>(data: T) => ({ ok: true as const, data });
@@ -46,6 +51,7 @@ function makeLead(over: Partial<Lead> = {}): Lead {
     tag: null,
     status: "Yangi",
     comment: null,
+    converted_client_id: null,
     created_at: now,
     updated_at: now,
     ...over,
@@ -66,6 +72,7 @@ beforeEach(() => {
   (listOrders as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ok([]));
   (listOrdersForSource as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ok([]));
   (findDuplicateByPhone as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ok(null));
+  (listClients as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ok([]));
 });
 
 describe("LeadsTable", () => {
@@ -159,5 +166,62 @@ describe("LeadsTable", () => {
     expect(await screen.findByText("Lidni saqlab bo'lmadi: boom")).toBeInTheDocument();
     expect(alertSpy).not.toHaveBeenCalled();
     alertSpy.mockRestore();
+  });
+});
+
+
+
+// ---- Task 8.4: client-management-enhancements convert action ----
+
+function makeClient(id: string) {
+  const ts = new Date().toISOString();
+  return {
+    id,
+    user_id: "op-1",
+    name: "Mijoz",
+    phone: "+998901234567",
+    address: null,
+    tag: null,
+    comment: null,
+    last_contacted_at: ts,
+    created_at: ts,
+    updated_at: ts,
+  };
+}
+
+describe("LeadsTable — convert action", () => {
+  it("disables the convert action once the lead is converted", async () => {
+    (listLeads as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+      ok([makeLead({ id: "l1", name: "Ali Valiyev", converted_client_id: "c1", status: "Mijozga aylandi" })])
+    );
+
+    renderTable();
+
+    expect(await screen.findByText("Ali Valiyev")).toBeInTheDocument();
+    expect(screen.getByTitle("Mijozga aylantirish")).toBeDisabled();
+  });
+
+  it("converts a lead and refetches both leads and clients on success", async () => {
+    (listLeads as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+      ok([makeLead({ id: "l1", name: "Ali Valiyev" })])
+    );
+    (convertLeadToClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ok(makeClient("c1")));
+
+    renderTable();
+
+    expect(await screen.findByText("Ali Valiyev")).toBeInTheDocument();
+    const leadsCallsBefore = (listLeads as unknown as ReturnType<typeof vi.fn>).mock.calls.length;
+    const clientsCallsBefore = (listClients as unknown as ReturnType<typeof vi.fn>).mock.calls.length;
+
+    fireEvent.click(screen.getByTitle("Mijozga aylantirish"));
+
+    await waitFor(() => expect(convertLeadToClient).toHaveBeenCalledTimes(1));
+    // Both lists refetched after a successful conversion (Req 3.9).
+    await waitFor(() =>
+      expect((listLeads as unknown as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(leadsCallsBefore)
+    );
+    await waitFor(() =>
+      expect((listClients as unknown as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(clientsCallsBefore)
+    );
   });
 });

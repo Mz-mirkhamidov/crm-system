@@ -3,7 +3,8 @@ export type LeadStatus =
   | "Ko'rib chiqilmoqda"
   | "Kelishildi"
   | "Rad etildi"
-  | "Buyurtma berilgan";
+  | "Buyurtma berilgan"
+  | "Mijozga aylandi";
 
 export type OrderType = "Hozirgi" | "Keyinroqi";
 export type SourceType = "lead" | "client";
@@ -24,6 +25,7 @@ export interface Lead {
   tag: string | null;
   status: LeadStatus;
   comment: string | null;
+  converted_client_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -34,7 +36,19 @@ export interface Client {
   name: string;
   phone: string;
   address: string | null;
-  comment: string | null;
+  tag: string | null;
+  comment: string | null; // legacy, kept for backward-compat
+  last_contacted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Note {
+  id: string;
+  user_id: string;
+  source_type: SourceType;
+  source_id: string;
+  body: string;
   created_at: string;
   updated_at: string;
 }

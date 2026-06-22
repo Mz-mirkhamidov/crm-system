@@ -4,6 +4,7 @@ import { useState, Fragment } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useOperator } from "@/lib/useOperator";
 import { useLeads } from "@/lib/data/use-leads";
+import { useClients } from "@/lib/data/use-clients";
 import { insertLead, updateLead, type DuplicateMatch } from "@/lib/data/repository";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,7 @@ import { OrderModal } from "@/components/shared/order-modal";
 import { FollowUpModal } from "@/components/shared/follow-up-modal";
 import { PersonDetailModal } from "@/components/shared/detail-modal";
 import { AsyncContent } from "@/components/shared/async-content";
-import { Plus, Search, Pencil, Trash2, ShoppingCart, Bell, Loader2, ChevronDown, ChevronUp, Phone, MapPin, MessageSquare, Package, Clock, AlertCircle, Users } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ShoppingCart, Bell, Loader2, ChevronDown, ChevronUp, Phone, MapPin, MessageSquare, Package, Clock, AlertCircle, Users, UserCheck } from "lucide-react";
 import { cn, formatPrice, getStatusColor, getProductColor, formatPhoneForCall, applyFilters, getInitials, getLeadAge } from "@/lib/utils";
 import { LocationSelect } from "@/components/shared/location-select";
 import type { Lead, LeadStatus, Order } from "@/types";
@@ -23,6 +24,7 @@ import { LEAD_STATUSES, DEFAULT_TAGS } from "@/types";
 
 export function LeadsTable() {
   const { data: leads, loading, error, refetch, remove, loadLeadOrders, checkDuplicate, orderCounts } = useLeads();
+  const { convert, refetch: refetchClients } = useClients();
   const operator = useOperator();
   const operatorId = operator?.id || "";
 
@@ -35,6 +37,7 @@ export function LeadsTable() {
   const [leadOrders, setLeadOrders] = useState<Record<string, Order[]>>({});
   const [detailLead, setDetailLead] = useState<Lead | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [convertingId, setConvertingId] = useState<string | null>(null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editLead, setEditLead] = useState<Lead | null>(null);
@@ -58,6 +61,18 @@ export function LeadsTable() {
     setDeletingId(id);
     await remove(id);
     setDeletingId(null);
+  }
+
+  // Convert a lead into a client (Requirements 3.7, 3.9). On success refetch both the
+  // leads list (so the lead shows 'Mijozga aylandi') and the clients list.
+  async function handleConvert(lead: Lead) {
+    setConvertingId(lead.id);
+    const client = await convert(lead);
+    setConvertingId(null);
+    if (client) {
+      refetch();
+      refetchClients();
+    }
   }
 
   function toggleExpand(id: string) {
@@ -164,6 +179,8 @@ export function LeadsTable() {
                 {rows.map((lead, idx) => {
                   const age = getLeadAge(lead.created_at);
                   const isDeleting = deletingId === lead.id;
+                  const isConverted = !!lead.converted_client_id || lead.status === "Mijozga aylandi";
+                  const isConverting = convertingId === lead.id;
                   return (
                     <Fragment key={lead.id}>
                       <tr className="border-b border-border hover:bg-secondary/30 transition-colors cursor-pointer"
@@ -221,6 +238,13 @@ export function LeadsTable() {
                               onClick={() => setFollowUpLead(lead)}>
                               <Bell className="w-3.5 h-3.5" />
                               <span className="hidden xl:inline">Eslatma</span>
+                            </Button>
+                            <Button size="sm" variant="ghost" disabled={isDeleting || isConverted || isConverting}
+                              className="h-8 px-2 text-xs text-purple-400 hover:bg-purple-500/10 gap-1"
+                              title="Mijozga aylantirish"
+                              onClick={() => handleConvert(lead)}>
+                              {isConverting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserCheck className="w-3.5 h-3.5" />}
+                              <span className="hidden xl:inline">Mijoz</span>
                             </Button>
                             <Button size="icon" variant="ghost" className="h-8 w-8" disabled={isDeleting} onClick={() => setEditLead(lead)}>
                               <Pencil className="w-3.5 h-3.5" />
