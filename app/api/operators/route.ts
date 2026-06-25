@@ -1,14 +1,14 @@
-// Admin-only operator creation (Supabase Auth).
+// Admin-only operator creation (Supabase Auth via SQL RPC).
 //
-// Authorization is enforced from the server-verified Supabase session: only an admin may
-// create operators. The new user is created fully-confirmed and active via the Auth admin
-// API; the `operators` profile row is created by the DB trigger from the user metadata.
+// Authorization is enforced twice: (1) the server-verified session must be an admin, and
+// (2) the `app_admin_create_operator` RPC itself re-checks auth.uid() is an admin. No
+// service-role key is required.
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import { getServerOperator } from "@/lib/auth-server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { phoneToEmail, normalizePhone, isValidPhone } from "@/lib/phone";
+import { isValidPhone } from "@/lib/phone";
 
 export async function POST(request: Request) {
   const me = await getServerOperator();
@@ -35,36 +35,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, reason: "invalid_phone" }, { status: 400 });
   }
 
-  let admin;
-  try {
-    admin = createAdminClient();
-  } catch {
-    return NextResponse.json({ success: false, reason: "error" }, { status: 500 });
-  }
-
-  const email = phoneToEmail(phoneRaw);
-  const phone = `+${normalizePhone(phoneRaw)}`;
-
-  const { data: created, error } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { name, phone },
-    app_metadata: { role, provider: "email", providers: ["email"] },
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("app_admin_create_operator", {
+    p_phone: phoneRaw,
+    p_name: name,
+    p_password: password,
+    p_role: role,
   });
 
-  if (error || !created.user) {
-    const msg = error?.message?.toLowerCase() ?? "";
-    if (msg.includes("already") || msg.includes("exists") || msg.includes("registered")) {
-      return NextResponse.json({ success: false, reason: "exists" }, { status: 400 });
-    }
-    return NextResponse.json({ success: false, reason: error?.message ?? "error" }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ success: false, reason: "error" }, { status: 500 });
+  }
+  if (!data?.success) {
+    const reason = data?.reason ?? "error";
+    const status = reason === "forbidden" ? 403 : 400;
+    return NextResponse.json({ success: false, reason }, { status });
   }
 
-  // Trigger sets role from app_metadata; ensure admin role is reflected defensively.
-  if (role === "admin") {
-    await admin.from("operators").update({ role: "admin" }).eq("id", created.user.id);
-  }
-
-  return NextResponse.json({ success: true, id: created.user.id });
+  return NextResponse.json({ success: true, id: data.id });
 }

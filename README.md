@@ -31,9 +31,10 @@ SMS/OTP shart emas. Sessiya xavfsiz HttpOnly cookie orqali saqlanadi.
 
 | O'zgaruvchi | Qayerdan | Izoh |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API | Public |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API | Public (anon/publishable) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role | **Maxfiy**, faqat server |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase -> Settings -> API | Public |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase -> Settings -> API | Public (anon/publishable) |
+
+Faqat shu ikki ochiq kalit kerak — service-role kalit shart emas.
 
 ---
 

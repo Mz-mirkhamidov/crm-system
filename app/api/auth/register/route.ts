@@ -1,14 +1,14 @@
-// Server-side open registration (Supabase Auth).
+// Server-side open registration (Supabase Auth via SQL RPC).
 //
-// Creates a fully-confirmed, immediately-active user via the Auth admin API (service role),
-// then signs them in so they land straight in the app. The `operators` profile row is
-// created automatically by the `on_auth_user_created` DB trigger from the user metadata.
+// Uses the `app_register_operator` SECURITY DEFINER function to create a fully-confirmed,
+// immediately-active user with ONLY the public anon key — no service-role key required.
+// The `operators` profile row is created by the on_auth_user_created DB trigger. After
+// creation we sign the user in so they land straight in the app.
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { phoneToEmail, normalizePhone, isValidPhone } from "@/lib/phone";
+import { phoneToEmail, isValidPhone } from "@/lib/phone";
 
 export async function POST(request: Request) {
   let body: { phone?: unknown; name?: unknown; password?: unknown };
@@ -29,35 +29,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, reason: "invalid_phone" }, { status: 400 });
   }
 
-  const email = phoneToEmail(phoneRaw);
-  const phone = `+${normalizePhone(phoneRaw)}`;
-
-  let admin;
-  try {
-    admin = createAdminClient();
-  } catch {
-    return NextResponse.json({ success: false, reason: "error" }, { status: 500 });
-  }
-
-  const { data: created, error } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { name, phone },
-    app_metadata: { role: "operator", provider: "email", providers: ["email"] },
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("app_register_operator", {
+    p_phone: phoneRaw,
+    p_name: name,
+    p_password: password,
   });
 
-  if (error || !created.user) {
-    const msg = error?.message?.toLowerCase() ?? "";
-    if (msg.includes("already") || msg.includes("exists") || msg.includes("registered")) {
-      return NextResponse.json({ success: false, reason: "exists" }, { status: 400 });
-    }
+  if (error) {
     return NextResponse.json({ success: false, reason: "error" }, { status: 500 });
   }
+  if (!data?.success) {
+    const reason = data?.reason ?? "error";
+    return NextResponse.json({ success: false, reason }, { status: 400 });
+  }
 
-  // Auto sign-in: open registration is immediately active.
-  const supabase = await createClient();
-  await supabase.auth.signInWithPassword({ email, password });
+  // Open registration is immediately active — sign the new user in.
+  await supabase.auth.signInWithPassword({ email: phoneToEmail(phoneRaw), password });
 
   return NextResponse.json({ success: true, role: "operator" });
 }

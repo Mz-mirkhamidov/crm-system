@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, LogOut, Zap, Search } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, Zap, Search, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type Operator } from "@/lib/session";
 import { ToastProvider } from "@/components/ui/use-toast";
@@ -84,6 +84,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
         <div className="px-3 py-4 border-t border-border">
+          <Link href="/profile"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-secondary transition-all mb-1">
+            <User className="w-4 h-4" /> Profil
+          </Link>
           <Link href="/dashboard"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-secondary transition-all mb-1">
             <LayoutDashboard className="w-4 h-4" /> Operator paneli
