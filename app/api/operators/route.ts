@@ -1,23 +1,18 @@
-// Server-side admin operator creation route (Task 6.1).
+// Admin-only operator creation (Supabase Auth).
 //
-// Replaces the previous client-side SHA-256 hashing in app/admin/operators/page.tsx so no
-// password is ever hashed in the browser. Authorization is enforced here via the
-// server-verified `crm_op_session` (verifySession) — only an admin session may create
-// operators — and the RAW password is forwarded to the `admin_create_operator` RPC, which
-// stores a slow, per-user-salted bcrypt hash via pgcrypto.
+// Authorization is enforced from the server-verified Supabase session: only an admin may
+// create operators. The new user is created fully-confirmed and active via the Auth admin
+// API; the `operators` profile row is created by the DB trigger from the user metadata.
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
-import { SESSION_COOKIE, verifySession } from "@/lib/session";
+import { getServerOperator } from "@/lib/auth-server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { phoneToEmail, normalizePhone, isValidPhone } from "@/lib/phone";
 
 export async function POST(request: Request) {
-  // Single authoritative enforcement path: trust only the verified crm_op_session.
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE)?.value;
-  const session = token ? await verifySession(token) : null;
-  if (!session || session.role !== "admin") {
+  const me = await getServerOperator();
+  if (!me || me.role !== "admin") {
     return NextResponse.json({ success: false, reason: "forbidden" }, { status: 403 });
   }
 
@@ -28,31 +23,48 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, reason: "invalid" }, { status: 400 });
   }
 
-  const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+  const phoneRaw = typeof body.phone === "string" ? body.phone.trim() : "";
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const password = typeof body.password === "string" ? body.password : "";
   const role = body.role === "admin" ? "admin" : "operator";
 
-  if (!phone || !name || password.length < 6) {
+  if (!phoneRaw || !name || password.length < 6) {
     return NextResponse.json({ success: false, reason: "invalid" }, { status: 400 });
   }
+  if (!isValidPhone(phoneRaw)) {
+    return NextResponse.json({ success: false, reason: "invalid_phone" }, { status: 400 });
+  }
 
-  const supabase = await createClient();
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch {
+    return NextResponse.json({ success: false, reason: "error" }, { status: 500 });
+  }
 
-  const { data, error } = await supabase.rpc("admin_create_operator", {
-    p_phone: phone,
-    p_name: name,
-    p_password: password,
-    p_role: role,
+  const email = phoneToEmail(phoneRaw);
+  const phone = `+${normalizePhone(phoneRaw)}`;
+
+  const { data: created, error } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { name, phone },
+    app_metadata: { role, provider: "email", providers: ["email"] },
   });
 
-  if (error) {
-    return NextResponse.json({ success: false, reason: error.message }, { status: 500 });
+  if (error || !created.user) {
+    const msg = error?.message?.toLowerCase() ?? "";
+    if (msg.includes("already") || msg.includes("exists") || msg.includes("registered")) {
+      return NextResponse.json({ success: false, reason: "exists" }, { status: 400 });
+    }
+    return NextResponse.json({ success: false, reason: error?.message ?? "error" }, { status: 500 });
   }
 
-  if (!data?.success) {
-    return NextResponse.json({ success: false, reason: data?.reason ?? "error" }, { status: 400 });
+  // Trigger sets role from app_metadata; ensure admin role is reflected defensively.
+  if (role === "admin") {
+    await admin.from("operators").update({ role: "admin" }).eq("id", created.user.id);
   }
 
-  return NextResponse.json({ success: true, id: data.id });
+  return NextResponse.json({ success: true, id: created.user.id });
 }

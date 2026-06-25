@@ -4,12 +4,11 @@ import { useState, useEffect } from "react";
 import { type Operator } from "@/lib/session";
 
 /**
- * Client hook returning the SERVER-VERIFIED operator identity.
+ * Client hook returning the server-verified operator identity.
  *
- * The `crm_op_session` cookie is HttpOnly and cannot be read from the browser, so this
- * fetches `/api/auth/me`, which verifies the signed session server-side via
- * `verifySession`. The displayed identity is therefore always the one the server trusts —
- * never a client-decoded cookie (design Fix Implementation change 4).
+ * Fetches `/api/auth/me`, which validates the Supabase Auth session on the server and
+ * returns the operator's profile (id / name / phone / role). The displayed identity is
+ * therefore always the one the server trusts, never a value read directly from the browser.
  */
 export function useOperator(): Operator | null {
   const [operator, setOperator] = useState<Operator | null>(null);

@@ -1,71 +1,46 @@
-# Sellora Plus CRM
+# Sellora CRM
 
 Shaxsiy CRM tizimi — Lidlar, Mijozlar, Zakazlar, Follow-up va Telegram bot.
 
 ## Tech Stack
 
-- **Frontend:** Next.js 14 (App Router)
-- **Database:** Supabase (PostgreSQL + Auth + RLS)
-- **UI:** Tailwind CSS + Custom components
+- **Frontend:** Next.js 16 (App Router)
+- **Auth:** Supabase Auth (telefon + parol)
+- **Database:** Supabase (PostgreSQL)
+- **UI:** Tailwind CSS + custom komponentlar
 - **Deploy:** Vercel (GitHub bilan ulangan)
-- **Bot:** Supabase Edge Functions (har kuni 09:00 Toshkent)
+- **Bot:** Supabase Edge Functions
 
 ---
 
-## Setup (Bir martalik)
+## Login tizimi (Supabase Auth)
 
-### 1. Supabase sozlash
+Foydalanuvchilar **telefon raqam + parol** orqali kiradilar. Ichkarida har bir telefon
+raqam yashirin (sintetik) emailga aylantiriladi va Supabase Auth orqali tekshiriladi —
+SMS/OTP shart emas. Sessiya xavfsiz HttpOnly cookie orqali saqlanadi.
 
-1. supabase.com → loyihangizni oching
-2. SQL Editor → `supabase/migrations/001_initial.sql` faylini to'liq run qiling
-3. Authentication → Users → Add user: `mz@crm.uz` + parolingiz
+- `app/login` — kirish
+- `app/register` — ro'yxatdan o'tish (ochiq, darhol faol)
+- `app/api/auth/*` — server route'lar (login / register / logout / me)
+- `lib/phone.ts` — telefon → email mapping
+- `proxy.ts` — sahifalarni rol bo'yicha himoyalaydi
 
-**Kerakli keys (Settings → API):**
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+`operators` jadvali profil jadvali sifatida saqlanadi va `auth.users.id === operators.id`.
 
-### 2. Vercel deploy
+### Kerakli Environment Variables (Vercel)
 
-1. Bu reponi GitHub ga push qiling
-2. Vercel → New Project → repo tanlash
-3. Environment Variables qo'shing (yuqoridagi 2 ta)
-4. Deploy — tayyor!
-
-### 3. Telegram Bot (har kuni 09:00)
-
-```bash
-# Supabase CLI
-npm install -g supabase
-supabase login
-supabase link --project-ref YOUR_PROJECT_ID
-
-# Secrets
-supabase secrets set TELEGRAM_BOT_TOKEN=your_token
-supabase secrets set TELEGRAM_CHAT_ID=your_chat_id
-supabase secrets set SUPABASE_URL=https://xxx.supabase.co
-supabase secrets set SUPABASE_SERVICE_ROLE_KEY=your_key
-
-# Deploy
-supabase functions deploy telegram-daily
-```
-
-Cron: Supabase Dashboard → Edge Functions → telegram-daily → Schedule: `0 4 * * *`
-
----
-
-## Login
-
-| Panel | Email | Parol |
-|-------|-------|-------|
-| CRM (/login) | mz@crm.uz | Supabase Auth da o'rnating |
+| O'zgaruvchi | Qayerdan | Izoh |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API | Public |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API | Public (anon/publishable) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role | **Maxfiy**, faqat server |
 
 ---
 
 ## Funksiyalar
 
-- Dashboard: statistika + 7 kunlik grafik + bugungi ro'yxatlar
-- Lidlar: CRUD + filter + zakaz berish + follow-up
-- Mijozlar: CRUD + zakaz + follow-up
-- Zakazlar: barcha zakazlar + keyinroqilar ajratilgan
-- Follow-ups: bugungi (qizil) + kechikkanlar (sariq) + bajarildi belgisi
-- Telegram: har kuni 09:00 da avtomatik xabar
+- Dashboard: statistika + grafik + bugungi ro'yxatlar
+- Lidlar / Mijozlar / Zakazlar: CRUD + filter + follow-up
+- Follow-ups: bugungi + kechikkanlar + bajarildi belgisi
+- Admin panel: operatorlar va umumiy statistika
+- Telegram: kunlik avtomatik xabar (Edge Function)
