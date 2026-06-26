@@ -34,7 +34,11 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      router.push(data.role === "admin" ? "/admin" : "/dashboard");
+      if (data.mustChange) {
+        router.push("/set-password");
+      } else {
+        router.push(data.role === "admin" ? "/admin" : "/dashboard");
+      }
       router.refresh();
     } catch {
       setError("Internet aloqasini tekshiring va qayta urinib ko'ring.");
@@ -158,6 +162,9 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          <div className="mt-4 text-center">
+            <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary">Parolni unutdingizmi?</Link>
+          </div>
           <div className="mt-5 pt-4 border-t border-border/30 text-center">
             <span className="text-xs text-muted-foreground">Hisobingiz yo'qmi? </span>
             <Link href="/register" className="text-xs text-primary hover:underline font-semibold">

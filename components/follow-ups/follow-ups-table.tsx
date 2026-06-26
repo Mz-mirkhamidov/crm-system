@@ -10,23 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { AsyncContent } from "@/components/shared/async-content";
-import { Trash2, Loader2, CheckCircle2, Clock, AlertCircle, Bell } from "lucide-react";
+import { Loader2, CheckCircle2, Clock, AlertCircle, Bell } from "lucide-react";
 import { cn, formatDate, isTodayDate, isOverdue } from "@/lib/utils";
 
 export function FollowUpsTable() {
-  const { data: followUps, loading, error, refetch, remove, markDone } = useFollowUps();
+  const { data: followUps, loading, error, refetch, markDone } = useFollowUps();
 
   const [filterStatus, setFilterStatus] = useState("all");
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -37,11 +26,6 @@ export function FollowUpsTable() {
     setBusyId(null);
   }
 
-  async function handleDelete(id: string) {
-    setBusyId(id);
-    await remove(id);
-    setBusyId(null);
-  }
 
   const filtered = filterStatus === "all"
     ? followUps
@@ -90,7 +74,7 @@ export function FollowUpsTable() {
         empty={{ icon: Bell, title: "Follow-uplar topilmadi" }}
       >
         {(rows) => (
-          <div className="rounded-xl border border-border overflow-hidden">
+          <div className="rounded-xl border border-border overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-secondary/50">
@@ -154,23 +138,6 @@ export function FollowUpsTable() {
                               {isBusy ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5 mr-1" />} Bajarildi
                             </Button>
                           )}
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="icon" variant="ghost" className="h-7 w-7 text-red-400 hover:bg-red-500/10" disabled={isBusy}>
-                                {isBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Follow-upni o'chirish</AlertDialogTitle>
-                                <AlertDialogDescription>{fu.source_name} uchun follow-upni o'chirmoqchimisiz?</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Bekor</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(fu.id)}>O'chirish</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
                         </div>
                       </td>
                     </tr>

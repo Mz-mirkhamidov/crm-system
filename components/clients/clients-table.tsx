@@ -140,7 +140,7 @@ export function ClientsTable() {
         empty={{ icon: Users, title: "Mijozlar topilmadi" }}
       >
         {(rows) => (
-          <div className="rounded-xl border border-border overflow-hidden">
+          <div className="rounded-xl border border-border overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-secondary/50">

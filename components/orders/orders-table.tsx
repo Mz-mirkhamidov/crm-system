@@ -4,17 +4,16 @@ import { useState } from "react";
 import { useOrders } from "@/lib/data/use-orders";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { PersonDetailModal } from "@/components/shared/detail-modal";
 import { AsyncContent } from "@/components/shared/async-content";
-import { Trash2, Loader2, Search, Clock, CheckCheck, ChevronRight, ShoppingCart } from "lucide-react";
+import { Loader2, Search, Clock, CheckCheck, ChevronRight, ShoppingCart } from "lucide-react";
 import { cn, formatDate, formatPrice, isTodayDate, getOrderTotal } from "@/lib/utils";
 import type { Order, Lead, Client } from "@/types";
 
 type Tab = "hozirgi" | "keyinroqi";
 
 export function OrdersTable() {
-  const { data: orders, loading, error, refetch, remove, confirm, loadSource } = useOrders();
+  const { data: orders, loading, error, refetch, confirm, loadSource } = useOrders();
 
   const [activeTab, setActiveTab] = useState<Tab>("hozirgi");
   const [search, setSearch] = useState("");
@@ -22,11 +21,6 @@ export function OrdersTable() {
   const [detailType, setDetailType] = useState<"lead" | "client">("lead");
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  async function handleDelete(id: string) {
-    setBusyId(id);
-    await remove(id);
-    setBusyId(null);
-  }
 
   async function handleConfirm(id: string) {
     setBusyId(id);
@@ -104,7 +98,7 @@ export function OrdersTable() {
                 </p>
                 <p className="text-sm font-semibold text-primary">{formatPrice(confirmedTotal)}</p>
               </div>
-              <div className="rounded-xl border border-border overflow-hidden">
+              <div className="rounded-xl border border-border overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-secondary/50">
@@ -113,12 +107,11 @@ export function OrdersTable() {
                       <th className="text-left px-4 py-3 text-muted-foreground font-medium">Narx</th>
                       <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden md:table-cell">Manba</th>
                       <th className="text-left px-4 py-3 text-muted-foreground font-medium hidden lg:table-cell">Sana</th>
-                      <th className="px-4 py-3"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((order) => {
-                      const isBusy = busyId === order.id;
+                      
                       return (
                         <tr key={order.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
                           <td className="px-4 py-3">
@@ -134,25 +127,6 @@ export function OrdersTable() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-muted-foreground text-xs hidden lg:table-cell">{formatDate(order.created_at)}</td>
-                          <td className="px-4 py-3">
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button size="icon" variant="ghost" className="h-7 w-7 text-red-400 hover:bg-red-500/10" disabled={isBusy}>
-                                  {isBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Zakazni o'chirish</AlertDialogTitle>
-                                  <AlertDialogDescription>Bu zakazni o'chirmoqchimisiz?</AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Bekor</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDelete(order.id)}>O'chirish</AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </td>
                         </tr>
                       );
                     })}
@@ -206,23 +180,6 @@ export function OrdersTable() {
                             onClick={() => handleConfirm(order.id)}>
                             {isBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCheck className="w-3.5 h-3.5" />} Tasdiqlash
                           </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="icon" variant="ghost" className="h-7 w-7 text-red-400 hover:bg-red-500/10" disabled={isBusy}>
-                                {isBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Zakazni o'chirish</AlertDialogTitle>
-                                <AlertDialogDescription>Bu zakazni o'chirmoqchimisiz?</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Bekor</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(order.id)}>O'chirish</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
                         </div>
                       </div>
                     </div>

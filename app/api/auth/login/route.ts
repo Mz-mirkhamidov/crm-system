@@ -1,10 +1,6 @@
-// Server-side login (Supabase Auth).
-//
-// The browser submits phone + password. We map the phone to the internal synthetic email
-// (lib/phone) and call Supabase `signInWithPassword`, which — via the @supabase/ssr cookie
-// adapter — sets the secure HttpOnly auth cookies. We then enforce the profile's
-// active/blocked status before reporting success. No password handling happens in the
-// browser.
+// Server-side login (Supabase Auth). Maps phone -> synthetic email, signs in (sets HttpOnly
+// cookies), enforces blocked/pending status, and reports whether the user must set a new
+// password before continuing.
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
@@ -35,10 +31,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, reason: "invalid" }, { status: 401 });
   }
 
-  // Enforce profile status (blocked / pending) — sign back out if not allowed.
   const { data: profile } = await supabase
     .from("operators")
-    .select("role, status, is_active")
+    .select("role, status, is_active, must_change_password")
     .eq("id", data.user.id)
     .single();
 
@@ -53,5 +48,9 @@ export async function POST(request: Request) {
 
   const role =
     (profile?.role as string) ?? (data.user.app_metadata?.role as string) ?? "operator";
-  return NextResponse.json({ success: true, role });
+  return NextResponse.json({
+    success: true,
+    role,
+    mustChange: profile?.must_change_password ?? false,
+  });
 }
