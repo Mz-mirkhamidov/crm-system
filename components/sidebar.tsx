@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, UserCheck, ShoppingCart, Bell, LogOut, Zap, Search } from "lucide-react";
+import { LayoutDashboard, Users, UserCheck, ShoppingCart, Bell, LogOut, Zap, Search, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useOperator } from "@/lib/useOperator";
 
@@ -13,6 +13,7 @@ const navItems = [
   { href: "/orders", label: "Zakazlar", icon: ShoppingCart },
   { href: "/follow-ups", label: "Follow-ups", icon: Bell },
   { href: "/search", label: "Global qidiruv", icon: Search },
+  { href: "/profile", label: "Profil", icon: User },
 ];
 
 export function Sidebar() {

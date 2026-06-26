@@ -2,9 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import type { Operator } from "@/lib/session";
 
 /**
- * Resolve the current request's identity from the Supabase Auth session, then enrich it
- * with the profile row in `operators` (the app's profile table, whose id === auth user id).
- * Returns null when there is no valid session. Server-only.
+ * Resolve the current request's identity from the Supabase Auth session, enriched with the
+ * profile row in `operators` (id === auth user id). Returns null when there is no session.
+ * Server-only.
  */
 export async function getServerOperator(): Promise<Operator | null> {
   const supabase = await createClient();
@@ -15,7 +15,7 @@ export async function getServerOperator(): Promise<Operator | null> {
 
   const { data: profile } = await supabase
     .from("operators")
-    .select("id, name, phone, role")
+    .select("id, name, phone, role, must_change_password")
     .eq("id", user.id)
     .single();
 
@@ -25,14 +25,15 @@ export async function getServerOperator(): Promise<Operator | null> {
       name: profile.name ?? "",
       phone: profile.phone ?? "",
       role: (profile.role as "admin" | "operator") ?? "operator",
+      mustChangePassword: profile.must_change_password ?? false,
     };
   }
 
-  // Fallback to auth metadata if the profile row is missing for any reason.
   return {
     id: user.id,
     name: (user.user_metadata?.name as string) ?? "",
     phone: (user.user_metadata?.phone as string) ?? "",
     role: (user.app_metadata?.role as "admin" | "operator") ?? "operator",
+    mustChangePassword: false,
   };
 }
