@@ -22,7 +22,7 @@ export interface UseNotesResult {
   error: string | null;
   reload: () => Promise<void>;
   /** Returns false on empty/whitespace validation or on repository error. */
-  addNote: (body: string) => Promise<boolean>;
+  addNote: (body: string, kind?: string) => Promise<boolean>;
 }
 
 export function useNotes(sourceId: string, sourceType: SourceType): UseNotesResult {
@@ -56,13 +56,13 @@ export function useNotes(sourceId: string, sourceType: SourceType): UseNotesResu
   }, [reload]);
 
   const addNote = React.useCallback(
-    async (body: string): Promise<boolean> => {
+    async (body: string, kind: string = "note"): Promise<boolean> => {
       const trimmed = body.trim();
       // Validation: reject empty/whitespace-only bodies before any repository call.
       if (trimmed === "") return false;
 
       const result = await runMutation<Note>({
-        op: () => addNoteRepo(operatorId, { source_type: sourceType, source_id: sourceId, body: trimmed }),
+        op: () => addNoteRepo(operatorId, { source_type: sourceType, source_id: sourceId, body: trimmed, kind }),
         toast,
         successMessage: "Eslatma qo'shildi",
         // Prepend optimistically: timeline stays reverse-chronological (newest first).

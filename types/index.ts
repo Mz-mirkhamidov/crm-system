@@ -49,6 +49,8 @@ export interface Note {
   source_type: SourceType;
   source_id: string;
   body: string;
+  /** 'note' (default) or 'status' (auto-logged status change). */
+  kind?: string;
   created_at: string;
   updated_at: string;
 }

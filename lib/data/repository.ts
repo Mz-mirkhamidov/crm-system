@@ -48,6 +48,7 @@ export interface NoteInput {
   source_type: SourceType;
   source_id: string;
   body: string;
+  kind?: string;
 }
 
 export interface OrderInput {

@@ -6,9 +6,9 @@ export default function FollowUpsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Follow-ups</h1>
+        <h1 className="text-2xl font-bold text-foreground">Vazifalar</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Rejalashtirilgan qo'ng'iroq va uchrashuvlar
+          Bugungi va kelgusi vazifalar markazi
         </p>
       </div>
       <FollowUpsTable />
