@@ -28,3 +28,14 @@ Taqdimotdan chiqish uchun tasdiqlash so‘raladi. Ekran ulashishdan **oldin** ta
 - Xodimlarning bo‘shashi mumkin bo‘lgan vaqtining pul ekvivalenti **ROIga qo‘shilmaydi**.
 
 **Muhim:** Hisob prognoz, natija kafolati emas. Xato yoki yetishmaydigan ma’lumotlar bo‘lsa natija yakuniy emas. Demo qiymatlarini mijoz faktlari bilan adashtirmang. Mijoz ma’lumotlari shu brauzerning `localStorage` xotirasida; zaxira uchun JSON eksport qiling. Ekran ulashishdan oldin taqdimot rejimiga o‘ting, chunki ichki ish rejimi maxfiy suhbat matnini saqlaydi.
+
+
+## Kirish va rahbar profili (v3)
+
+- `Kirish va rahbar` — SPIN'dan oldin alohida ish bosqichi. Tanishish, vaqt va agenda kelishish, savolga ruxsat, Situationga o'tish uchun 5 bosqichli checklist.
+- Rahbar F.I.Sh., lavozimi, telefon/Telegram/email, qaror roli va qarorga ta’sir qiluvchi shaxslar; agentlik nomi, shahar, sayt, yillik tajriba, jamoa soni, lid manbalari, hozirgi CRM; uchrashuv sanasi/vaqti/joyi/formati/holati; kelishuv va keyingi aloqa.
+- 3 ta tabiiy kirish nutqi (rasmiy, qisqa, samimiy), nutq tanlash va nusxa olish tugmasi. Nutqda mavjud rahbar nomidan foydalanadi.
+- Kirish qaydlari ichki hisobotga kiritiladi, ammo ommaviy taqdimot va PDFga chiqarilmaydi. Shaxsiy kontaktlar hech bir ommaviy slaydga chiqarilmaydi.
+- Oldingi `toursales-insight-v1` localStorage yozuvlari bilan mos: yangi maydonlar bo‘sh qoladi, oldingi agentlik/savollar/kalkulyator saqlanadi.
+
+**Shaxsiy ma’lumotlar:** sayt serverga avtomatik yubormaydi; kontaktlar va qaydlar faqat o‘sha brauzerning `localStorage` xotirasida va foydalanuvchi alohida eksport qilgan JSONda qoladi. Umumiy qurilmadan foydalanmang va JSON eksportni xavfsiz joyda saqlang. Bu foydalanuvchilararo avtorizatsiyali CRM tizimi emas.
