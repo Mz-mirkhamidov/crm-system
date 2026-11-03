@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101d32">
-  <meta name="description" content="Omon CRM narx kalkulyatori: agentlar, 6 va 12 oylik obuna, texnik xizmat va telefoniya xarajatlari.">
+  <meta name="description" content="Omon CRM: 6 va 12 oylik CRM obunasi, MyZvanki, UzTel va bir martalik texnik xizmat bilan umumiy narx hisoblash.">
   <title>Omon CRM — Narx kalkulyatori</title>
   <style>
     :root { --navy:#101d32; --navy2:#182943; --ink:#16243a; --muted:#708097; --green:#0d9985; --green2:#eaf8f4; --bg:#f4f6fa; --line:#e7ebf1; --white:#fff; --shadow:0 12px 35px rgba(24,36,58,.05); --radius:22px; }
@@ -80,131 +80,236 @@
     @media(max-width:850px){.layout{grid-template-columns:1fr}.wrap{max-width:680px;padding-top:29px}.summary{padding:26px}.card-inner{padding:24px}.sum-big{font-size:37px}}
     @media(max-width:540px){.top-inner{padding:14px 17px}.header-side{display:none}.wrap{padding:27px 14px 48px}.intro{align-items:start;flex-direction:column}.intro h1{font-size:27px}.reset{padding:9px 13px}.card-inner{padding:21px 18px}.summary{padding:25px 20px}.packages{padding:20px 18px}.total-section{padding:21px 18px}.choice-3 .option{padding:10px 6px}.compare strong{font-size:18px}.sum-big{font-size:35px}}
     @media print{body{background:#fff}.top{background:#fff!important;color:#111!important;border-bottom:1px solid #e7ebef}.top-inner{padding:14px}.mark{background:#0d9887!important;color:#fff!important}.identity strong{color:#121d30}.identity small{color:#4b6070}.wrap{padding:22px 14px}.intro{margin-bottom:15px}.layout{display:block}.calculator-inputs,.reset,.actions,.fx-line,footer,.header-side{display:none!important}.summary{background:#101d32!important;color:#fff!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}.card{box-shadow:none}.main-output{width:100%}.packages,.total-section{break-inside:avoid}.option,.compare{print-color-adjust:exact;-webkit-print-color-adjust:exact}.fineprint{color:#42546b}}
-  </style>
+  
+    /* v5: package total first, exact breakdowns and readable mobile layout */
+    .hero-total{background:linear-gradient(115deg,#10243a 0%,#173750 100%);color:#fff;border-radius:20px;padding:24px 27px;margin:0 0 22px;box-shadow:0 13px 32px rgba(12,37,56,.13)}
+    .hero-label{font-size:12px;letter-spacing:.6px;font-weight:800;color:#91edd9;text-transform:uppercase}
+    .hero-price{font-weight:900;font-size:clamp(32px,4.5vw,48px);letter-spacing:-1.9px;line-height:1.18;margin:9px 0 6px;font-variant-numeric:tabular-nums}
+    .hero-price small{font-size:18px;letter-spacing:0;font-weight:600;color:#d3e5ee;white-space:nowrap}
+    .hero-desc{font-size:12px;color:#b5ccdb;line-height:1.6;margin:0}
+    .hero-details{display:flex;gap:12px;flex-wrap:wrap;margin-top:19px}
+    .hero-details div{background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:10px 13px;min-width:138px;flex:1}
+    .hero-details span{display:block;color:#a9c2d2;font-size:11px}.hero-details strong{display:block;color:#fff;font-size:15px;margin-top:3px}
+    .support-rate{font-size:11px;color:#7b899e;margin-top:10px}
+    .support-uzs{font-size:13px;color:#078673;font-weight:800;margin-top:5px}
+    .rate-control{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px}
+    .rate-control label{font-size:12px;font-weight:750}
+    .rate-control input{padding:10px 9px;width:142px;max-width:48%;border:1px solid #dce4ed;border-radius:10px;text-align:right;background:#fff;font-weight:750}
+    .rate-caption{color:#7c8ba0;font-size:11px;line-height:1.55;margin-top:7px}
+    .refresh-rate{border:0;background:transparent;color:#087e70;font-weight:750;padding:0;font-size:11px;margin-top:6px;text-decoration:underline;text-underline-offset:2px}
+    .service-row{border:1px solid #e5edf1;padding:12px;border-radius:12px;background:#f9fbfc;margin-top:13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .service-row span{font-size:12px;color:#63768d}.service-row strong{font-size:14px;color:#0b7e70;text-align:right}
+    .sum-technical strong{font-size:17px;text-align:right}
+    .comp-price{font-size:clamp(17px,2vw,21px)}
+    .compare strong{white-space:normal;overflow-wrap:anywhere;line-height:1.24}
+    .compare .dollar{min-height:auto}
+    .total-item.main strong{font-size:21px}
+    .micro-note{font-size:11px;color:#7f8fa1;line-height:1.55;margin:12px 0 0}
+    .field .rate-caption{margin-bottom:0}
+    @media(max-width:540px){.hero-total{padding:22px 18px}.hero-price{font-size:35px}.hero-price small{font-size:14px}.hero-details{gap:8px}.hero-details div{min-width:120px}.hero-details strong{font-size:13px}.choice-3 .option{min-height:69px;font-size:11px}}
+    @media print{.hero-total,.summary{print-color-adjust:exact;-webkit-print-color-adjust:exact}.rate-control input{border:none}.refresh-rate{display:none}.hero-total{border-radius:10px}.layout{display:block}.main-output{margin-top:15px}.hero-price{font-size:32px}}
+</style>
 </head>
 <body>
 <header class="top"><div class="top-inner">
-  <div class="identity"><div class="mark" aria-hidden="true">O</div><div><strong>OMON CRM</strong><small>Turagentliklar uchun hisob-kitob</small></div></div>
+  <div class="identity"><div class="mark" aria-hidden="true">O</div><div><strong>OMON CRM</strong><small>Turagentliklar uchun tarif hisob-kitobi</small></div></div>
   <div class="header-side"><i class="dot"></i> Narx kalkulyatori</div>
 </div></header>
 <main class="wrap">
-  <div class="intro"><div><p class="eyebrow">Narxlar · Oylik va paketlar</p><h1>Obuna kalkulyatori</h1><p class="lede">Agentlar sonini tanlang. 6 oy va 1 yillik xarajatlar avtomatik hisoblanadi.</p></div><button class="reset" type="button" id="reset">↺ Tozalash</button></div>
+  <div class="intro"><div><p class="eyebrow">CRM · Bir martalik texnik xizmat · Telefoniya</p><h1>Tarif kalkulyatori</h1><p class="lede">Agentlar soni va qo‘shimcha xizmatlarni tanlang. Yakuniy summani darhol ko‘ring.</p></div><button class="reset" type="button" id="reset">↺ Tozalash</button></div>
+
+  <section class="hero-total" aria-label="Paket uchun jami summa" aria-live="polite">
+    <div class="hero-label" id="heroPeriod">6 OYLIK PAKET · UMUMIY SUMMA</div>
+    <div class="hero-price"><span id="heroTotal">5 790 330</span> <small>so‘m</small></div>
+    <p class="hero-desc">CRM obunasi + tanlangan telefon xizmati + <strong>bir martalik</strong> texnik xizmat. Hammasi hisobga olingan.</p>
+    <div class="hero-details">
+      <div><span>CRM / oy</span><strong id="heroCrmMonthly">567 000 so‘m</strong></div>
+      <div><span>CRM / paket</span><strong id="heroCrmTotal">3 402 000 so‘m</strong></div>
+      <div><span>Texnik xizmat · 1 marta</span><strong id="heroSupport">2 388 330 so‘m</strong></div>
+    </div>
+  </section>
+
   <div class="layout">
-    <section class="card calculator-inputs" aria-label="Tarif parametrlari"><div class="card-inner">
-      <div class="section-heading"><h2>Hisob parametrlari</h2><span class="tiny">4 ta sozlama</span></div>
+    <section class="card calculator-inputs" aria-label="Hisob parametrlari"><div class="card-inner">
+      <div class="section-heading"><h2>Hisob parametrlari</h2><span class="tiny">Narxlar avtomatik</span></div>
       <div class="field"><div class="f-title"><label for="agents">Agentlar soni</label><small>189 000 so‘m / agent / oy</small></div>
         <div class="agent-row"><div class="stepper"><button type="button" data-step="agents:-1" aria-label="Agentni kamaytirish">−</button><input id="agents" aria-label="Agentlar soni" inputmode="numeric" type="number" min="1" max="999" value="3"><button type="button" data-step="agents:1" aria-label="Agentni oshirish">+</button></div><span class="unit-note">nafar agent</span></div>
       </div>
-      <div class="field"><div class="f-title">Paket muddati <small>Kamida 6 oy</small></div><div class="choices" role="group" aria-label="Paket muddati"><button type="button" class="option selected" data-period="6" aria-pressed="true">6 oylik paket</button><button type="button" class="option" data-period="12" aria-pressed="false">1 yillik paket</button></div></div>
-      <div class="divider"></div>
-      <div class="field"><div class="f-title">Texnik xizmat <small>Agentlar soniga qarab avtomatik</small></div>
-        <div class="support-box"><div><div class="caption" id="support-tier">3 agent uchun</div><strong id="support-price">$200</strong></div><div class="text-green" style="font-size:12px;font-weight:750">Avtomatik ✓</div></div>
-        <span class="small-label">Texnik xizmat qaysi davr uchun?</span>
-        <div class="choices" role="group" aria-label="Texnik xizmat to‘lov davri"><button type="button" class="option selected" data-support="once" aria-pressed="true">Bir martalik</button><button type="button" class="option" data-support="monthly" aria-pressed="false">Har oy</button></div>
-        <p class="field-help">Texnik xizmat davriyligi hali aniqlashtirilmagan. Hozir «bir martalik» taxmini tanlangan — shartnomaga qarab almashtiring.</p>
+      <div class="field"><div class="f-title">Paket muddati <small>Minimal muddat 6 oy</small></div>
+        <div class="choices" role="group" aria-label="Paket muddati"><button type="button" class="option selected" data-period="6" aria-pressed="true">6 oylik paket</button><button type="button" class="option" data-period="12" aria-pressed="false">12 oylik paket</button></div>
       </div>
       <div class="divider"></div>
-      <div class="field"><div class="f-title">Telefon qo‘ng‘iroqlari <small>Qo‘shimcha xizmat</small></div><div class="choices choice-3" role="group" aria-label="Telefoniya turi"><button type="button" class="option selected" data-phone="none" aria-pressed="true">Kerak emas</button><button type="button" class="option" data-phone="personal" aria-pressed="false">Shaxsiy raqam<br><span style="font-weight:500;font-size:11px">42 000 / oy</span></button><button type="button" class="option" data-phone="company" aria-pressed="false">Kompaniya raqami<br><span style="font-weight:500;font-size:11px">110 000 / oy</span></button></div>
-        <div class="phone-num" id="phoneCountRow" hidden><label for="phones">Raqamlar soni</label><div class="stepper"><button type="button" data-step="phones:-1" aria-label="Raqamni kamaytirish">−</button><input id="phones" aria-label="Raqamlar soni" inputmode="numeric" type="number" min="1" max="999" value="1"><button type="button" data-step="phones:1" aria-label="Raqamni oshirish">+</button></div></div>
-        <p class="field-help" id="phoneHelp">Telefon xarajati tanlangan raqamlar soniga ko‘paytirilib har oy hisoblanadi.</p>
+      <div class="field"><div class="f-title">Texnik xizmat <small>Bir martalik, avtomatik</small></div>
+        <div class="support-box"><div><div class="caption" id="support-tier">1–3 agent uchun</div><strong id="support-price">$200</strong><div class="support-uzs" id="support-uzs">2 388 330 so‘m</div></div><div class="text-green" style="font-size:12px;font-weight:750">✓ Hisobga qo‘shilgan</div></div>
+        <div class="rate-control"><label for="fxRate">1 USD = ? so‘m</label><input type="number" id="fxRate" min="1" step="0.01" inputmode="decimal" value="11941.65" aria-label="Bir dollar kursi so‘mda"></div>
+        <div class="rate-caption" id="rateStatus">03.11.2026 kursi asosida hisoblandi. Onlayn kurs tekshirilmoqda…</div>
+        <button class="refresh-rate" type="button" id="refreshRate">↻ Markaziy bank kursini yangilash</button>
+      </div>
+      <div class="divider"></div>
+      <div class="field"><div class="f-title">Qo‘shimcha telefon xizmati <small>Oylik to‘lov</small></div>
+        <div class="choices choice-3" role="group" aria-label="Telefon xizmati turi">
+          <button type="button" class="option selected" data-phone="none" aria-pressed="true">Kerak emas</button>
+          <button type="button" class="option" data-phone="personal" aria-pressed="false">MyZvanki<br><span style="font-weight:500;font-size:11px">42 000 so‘m / raqam</span></button>
+          <button type="button" class="option" data-phone="company" aria-pressed="false">UzTel<br><span style="font-weight:500;font-size:11px">110 000 so‘m / raqam</span></button>
+        </div>
+        <div class="phone-num" id="phoneCountRow" hidden><label for="phones">Ulanadigan raqamlar soni</label><div class="stepper"><button type="button" data-step="phones:-1" aria-label="Raqamni kamaytirish">−</button><input id="phones" aria-label="Raqamlar soni" inputmode="numeric" type="number" min="1" max="999" value="1"><button type="button" data-step="phones:1" aria-label="Raqamni oshirish">+</button></div></div>
+        <p class="field-help" id="phoneHelp">MyZvanki shaxsiy raqamlar uchun; UzTel kompaniya raqami uchun.</p>
+        <div class="service-row"><span id="serviceLabel">Qo‘shimcha telefoniya</span><strong id="serviceMonthly">0 so‘m / oy</strong></div>
       </div>
     </div></section>
+
     <section class="card main-output" aria-label="Natijalar">
       <div class="summary">
         <div class="summary-top"><h2>Hisob natijasi</h2><span class="summary-pill" id="selectedBadge">6 oy</span></div>
-        <p class="sum-name">Oylik abonent to‘lovi + telefoniya</p>
-        <div class="sum-big"><span id="monthlySum">567 000</span> <small>so‘m</small></div>
+        <p class="sum-name">CRM oylik abonent to‘lovi</p>
+        <div class="sum-big"><span id="monthlySum">567 000</span> <small>so‘m / oy</small></div>
         <div class="sum-sub" id="monthlyDetail">3 agent × 189 000 so‘m</div>
         <div class="sum-divider"></div>
-        <div class="sum-row"><span>CRM obunasi / oy</span><strong id="monthlyCrm">567 000 so‘m</strong></div>
-        <div class="sum-row"><span>Telefoniya / oy</span><strong id="monthlyPhone">0 so‘m</strong></div>
-        <div class="sum-technical"><div><span>Texnik xizmat</span><div style="font-size:11px;color:#9fb1c4;margin-top:3px" id="supportFreq">Bir martalik</div></div><strong id="technicalMain">$200</strong></div>
+        <div class="sum-row"><span>CRM / oy</span><strong id="monthlyCrm">567 000 so‘m</strong></div>
+        <div class="sum-row"><span id="monthlyPhoneLabel">Qo‘shimcha telefoniya / oy</span><strong id="monthlyPhone">0 so‘m</strong></div>
+        <div class="sum-technical"><div><span>Texnik xizmat · 1 martalik</span><div style="font-size:11px;color:#9fb1c4;margin-top:3px" id="supportFreq">$200 · paket uchun faqat 1 marta</div></div><strong id="technicalMain">2 388 330 so‘m</strong></div>
       </div>
-      <div class="packages"><h3>6 oy va 1 yil taqqoslanishi</h3>
+      <div class="packages"><h3>6 va 12 oylik paketlar — texnik xizmat bilan</h3>
         <div class="compare-grid">
-          <button class="compare active" type="button" data-compare="6" aria-pressed="true"><span class="period">6 OY</span><strong><span id="sixPrice">3 402 000</span></strong><span class="dollar" id="sixUsd">+ $200 xizmat</span></button>
-          <button class="compare" type="button" data-compare="12" aria-pressed="false"><span class="period">12 OY</span><strong><span id="twelvePrice">6 804 000</span></strong><span class="dollar" id="twelveUsd">+ $200 xizmat</span></button>
-        </div><p class="fineprint">Yuqoridagi so‘mdagi hisob CRM obunasi va tanlangan telefoniya xarajatidan iborat. Dollar xizmat to‘lovi alohida ko‘rsatiladi.</p>
+          <button class="compare active" type="button" data-compare="6" aria-pressed="true"><span class="period">6 OY · JAMI</span><strong class="comp-price"><span id="sixPrice">5 790 330</span> so‘m</strong><span class="dollar" id="sixUsd">Texnik xizmat qo‘shilgan</span></button>
+          <button class="compare" type="button" data-compare="12" aria-pressed="false"><span class="period">12 OY · JAMI</span><strong class="comp-price"><span id="twelvePrice">9 192 330</span> so‘m</strong><span class="dollar" id="twelveUsd">Texnik xizmat qo‘shilgan</span></button>
+        </div><p class="fineprint">Har ikkala summada CRM, tanlangan telefon xizmati va <strong>bir martalik</strong> texnik xizmatning so‘mdagi qiymati to‘liq hisoblangan.</p>
       </div>
       <div class="total-section"><p class="total-head" id="totalHeading">6 oylik paket tafsiloti</p>
-        <div class="total-item"><span>CRM obunasi</span><strong id="crmTotal">3 402 000 so‘m</strong></div>
-        <div class="total-item"><span>Telefon xizmati</span><strong id="phoneTotal">0 so‘m</strong></div>
-        <div class="total-item main"><span>Jami so‘m</span><strong id="uzsTotal">3 402 000 so‘m</strong></div>
-        <div class="total-item"><span>Texnik xizmat (USD)</span><strong id="usdTotal">$200</strong></div>
-        <div class="fx-line"><label for="fxRate"><span>Istasangiz, USD kursini kiriting<br><span style="font-weight:400;color:#8593a2;font-size:11px">1 USD = qancha so‘m?</span></span><input type="number" min="1" step="1" id="fxRate" placeholder="Masalan: 12000" inputmode="decimal"></label><div class="fx-total" id="convertedRow" hidden><span>Umumiy ekvivalent</span><strong id="convertedTotal">—</strong></div></div>
-        <div class="alert" id="warning" hidden></div>
+        <div class="total-item"><span>CRM obunasi (6 oy)</span><strong id="crmTotal">3 402 000 so‘m</strong></div>
+        <div class="total-item"><span id="phoneTotalLabel">Qo‘shimcha telefoniya (6 oy)</span><strong id="phoneTotal">0 so‘m</strong></div>
+        <div class="total-item"><span id="usdTotalLabel">Texnik xizmat ($200 × 11 941,65)</span><strong id="usdTotal">2 388 330 so‘m</strong></div>
+        <div class="total-item main"><span>UMUMIY SUMMA</span><strong id="uzsTotal">5 790 330 so‘m</strong></div>
+        <p class="micro-note" id="rateFooter">Texnik xizmat $200, avtomatik aniqlangan yoki qo‘lda kiritilgan USD kursi bo‘yicha so‘mga aylantiriladi.</p>
         <div class="actions"><button class="action" type="button" id="copy">⧉ Hisobni nusxalash</button><button class="action primary" type="button" id="print">⎙ PDF / Chop etish</button></div>
       </div>
     </section>
   </div>
-  <footer>OMON CRM • Kalkulyator faqat berilgan narxlar asosida hisoblaydi. Soliq, chegirma va boshqa xarajatlar kiritilmagan.</footer>
+  <footer>OMON CRM • Tarif hisob-kitobi. Yakuniy to‘lov kursga bog‘liq; xizmatlar uchun shartnoma narxini tekshiring.</footer>
 </main>
 <script>
 'use strict';
-const PRICES = Object.freeze({ agent:189000, personal:42000, company:110000 });
+const PRICES=Object.freeze({agent:189000,personal:42000,company:110000});
 const $=id=>document.getElementById(id);
-const state={agents:3,months:6,supportFrequency:'once',phoneType:'none',phones:1,exchangeRate:null};
+const state={agents:3,months:6,phoneType:'none',phones:1,exchangeRate:11941.65,rateSource:'fallback',rateDate:'03.11.2026',manualRate:false};
 const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n)).replace(/\u00a0/g,' ');
+const fxFmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n).replace(/\u00a0/g,' ');
 const currency=n=>fmt(n)+' so‘m';
 const dollar=n=>'$'+fmt(n);
-function capInt(value,min,max,fallback){const n=Number(value);return Number.isFinite(n)&&n>=min?Math.min(max,Math.floor(n)):fallback}
-function getSupport(agents){if(agents<=3)return 200; if(agents<=5)return 300;return 400}
+function capInt(v,min,max,fallback){const x=Number(v);return Number.isFinite(x)&&x>=min?Math.min(max,Math.floor(x)):fallback}
+function getSupport(agents){return agents<=3?200:agents<=5?300:400}
+function phoneName(type){return type==='personal'?'MyZvanki (shaxsiy raqam)':type==='company'?'UzTel (kompaniya raqami)':'Qo‘shimcha telefoniya'}
 function calculate(s=state,months=s.months){
   const crmMonthly=s.agents*PRICES.agent;
   const phoneMonthly=s.phoneType==='none'?0:s.phones*PRICES[s.phoneType];
   const supportUsd=getSupport(s.agents);
-  const technicalTotal=supportUsd===null?null:supportUsd*(s.supportFrequency==='monthly'?months:1);
-  const sumUzs=(crmMonthly+phoneMonthly)*months;
-  const sumAll=s.exchangeRate&&technicalTotal!==null?sumUzs+technicalTotal*s.exchangeRate:null;
-  return {crmMonthly,phoneMonthly,monthly:crmMonthly+phoneMonthly,crmTotal:crmMonthly*months,phoneTotal:phoneMonthly*months,uzsTotal:sumUzs,supportUsd,technicalTotal,sumAll};
+  const supportUzs=Math.round(supportUsd*s.exchangeRate);
+  const crmTotal=crmMonthly*months;
+  const phoneTotal=phoneMonthly*months;
+  return {crmMonthly,phoneMonthly,supportUsd,supportUzs,crmTotal,phoneTotal,total:crmTotal+phoneTotal+supportUzs,monthly:crmMonthly+phoneMonthly,months};
 }
 function setSelected(attr,value){document.querySelectorAll('button['+attr+']').forEach(el=>{const active=el.getAttribute(attr)===String(value);el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active))})}
 function render(){
-  const c=calculate(),six=calculate(state,6),twelve=calculate(state,12);
-  $('agents').value=state.agents;$('phones').value=state.phones;$('phoneCountRow').hidden=state.phoneType==='none';
-  setSelected('data-period',state.months);setSelected('data-support',state.supportFrequency);setSelected('data-phone',state.phoneType);
+  const c=calculate(),p6=calculate(state,6),p12=calculate(state,12);
+  $('agents').value=state.agents;
+  $('phones').value=state.phones;
+  $('phoneCountRow').hidden=state.phoneType==='none';
+  setSelected('data-period',state.months);
+  setSelected('data-phone',state.phoneType);
   document.querySelectorAll('[data-compare]').forEach(el=>{const selected=Number(el.dataset.compare)===state.months;el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected))});
-  $('support-tier').textContent=state.agents<=3?'1–3 agent uchun':state.agents<=5?'4–5 agent uchun':'6 va undan ko‘p agent uchun';
-  $('support-price').textContent=c.supportUsd===null?'Aniqlanadi':dollar(c.supportUsd);
-  $('selectedBadge').textContent=state.months+' oy';$('monthlySum').textContent=fmt(c.monthly);
-  const phoneDesc=state.phoneType==='none'?'':` + ${state.phones} raqam × ${fmt(PRICES[state.phoneType])}`;
-  $('monthlyDetail').textContent=`${state.agents} agent × 189 000${phoneDesc} so‘m`;
-  $('monthlyCrm').textContent=currency(c.crmMonthly);$('monthlyPhone').textContent=currency(c.phoneMonthly);
-  $('supportFreq').textContent=state.supportFrequency==='once'?'Bir martalik deb hisoblandi':'Har oy hisoblandi';
-  $('technicalMain').textContent=c.supportUsd===null?'Aniqlanadi':dollar(c.supportUsd)+(state.supportFrequency==='monthly'?' / oy':'');
-  $('sixPrice').textContent=fmt(six.uzsTotal);$('twelvePrice').textContent=fmt(twelve.uzsTotal);
-  $('sixUsd').textContent=six.technicalTotal===null?'USD tarifi belgilanmagan':`+ ${dollar(six.technicalTotal)} tex. xizmat`;
-  $('twelveUsd').textContent=twelve.technicalTotal===null?'USD tarifi belgilanmagan':`+ ${dollar(twelve.technicalTotal)} tex. xizmat`;
-  $('totalHeading').textContent=state.months+' oylik paket tafsiloti';
-  $('crmTotal').textContent=currency(c.crmTotal);$('phoneTotal').textContent=currency(c.phoneTotal);
-  $('uzsTotal').textContent=currency(c.uzsTotal);$('usdTotal').textContent=c.technicalTotal===null?'Aniqlashtiriladi':dollar(c.technicalTotal);
-  $('convertedRow').hidden=c.sumAll===null;$('convertedTotal').textContent=c.sumAll!==null?currency(c.sumAll):'—';
-  const notes=[];
-  if(state.supportFrequency==='once')notes.push('Texnik xizmat bir martalik deb hisoblandi. Agar u har oy olinadigan bo‘lsa, yuqorida «Har oy»ni tanlang.');
-  if(state.exchangeRate&&c.technicalTotal!==null)notes.push('USD → UZS hisoblash siz kiritgan kurs asosida.');
-  $('warning').hidden=notes.length===0;$('warning').textContent=notes.join(' ');
+  const tier=state.agents<=3?'1–3 agent uchun':state.agents<=5?'4–5 agent uchun':'6 va undan ko‘p agent uchun';
+  $('support-tier').textContent=tier;
+  $('support-price').textContent=dollar(c.supportUsd);
+  $('support-uzs').textContent=currency(c.supportUzs)+' · 1 marta';
+  $('selectedBadge').textContent=state.months+' oy';
+  $('heroPeriod').textContent=state.months+' OYLIK PAKET · UMUMIY SUMMA';
+  $('heroTotal').textContent=fmt(c.total);
+  $('heroCrmMonthly').textContent=currency(c.crmMonthly);
+  $('heroCrmTotal').textContent=currency(c.crmTotal);
+  $('heroSupport').textContent=currency(c.supportUzs);
+  $('monthlySum').textContent=fmt(c.crmMonthly);
+  $('monthlyDetail').textContent=state.agents+' agent × 189 000 so‘m';
+  $('monthlyCrm').textContent=currency(c.crmMonthly);
+  $('monthlyPhoneLabel').textContent=phoneName(state.phoneType)+' / oy';
+  $('monthlyPhone').textContent=currency(c.phoneMonthly);
+  $('supportFreq').textContent=dollar(c.supportUsd)+' · bir marta';
+  $('technicalMain').textContent=currency(c.supportUzs);
+  $('sixPrice').textContent=fmt(p6.total);
+  $('twelvePrice').textContent=fmt(p12.total);
+  $('sixUsd').textContent='CRM + telefoniya + '+dollar(c.supportUsd)+' xizmat';
+  $('twelveUsd').textContent='CRM + telefoniya + '+dollar(c.supportUsd)+' xizmat';
+  $('serviceLabel').textContent=phoneName(state.phoneType);
+  $('serviceMonthly').textContent=currency(c.phoneMonthly)+' / oy';
+  $('phoneHelp').textContent=state.phoneType==='none'?'MyZvanki — shaxsiy raqamlar; UzTel — kompaniya raqami uchun.':state.phones+' ta raqam × '+currency(PRICES[state.phoneType])+' / oy';
+  $('totalHeading').textContent=state.months+' oylik paketning to‘liq hisobi';
+  $('crmTotal').textContent=currency(c.crmTotal);
+  $('phoneTotalLabel').textContent=phoneName(state.phoneType)+' ('+state.months+' oy)';
+  $('phoneTotal').textContent=currency(c.phoneTotal);
+  $('usdTotalLabel').textContent='Texnik xizmat ('+dollar(c.supportUsd)+' × '+fxFmt(state.exchangeRate)+' so‘m)';
+  $('usdTotal').textContent=currency(c.supportUzs);
+  $('uzsTotal').textContent=currency(c.total);
+  const info=state.rateSource==='official'?'Markaziy bank kursi · '+state.rateDate:state.rateSource==='secondary'?'Markaziy bank kursi (muqobil manba) · '+state.rateDate:state.rateSource==='manual'?'Siz kiritgan USD kursi':'03.11.2026 dagi namunaviy kurs (avtomatik yangilash uchun internet kerak)';
+  $('rateStatus').textContent=info;
+  $('rateFooter').textContent='Texnik xizmat bir martalik: '+dollar(c.supportUsd)+' × 1 USD = '+fxFmt(state.exchangeRate)+' so‘m. '+info+'.';
 }
-function readNumber(input,stateKey,min=1){state[stateKey]=capInt(input.value,min,999,state[stateKey]);render()}
-document.querySelectorAll('[data-step]').forEach(button=>button.addEventListener('click',()=>{const [key,by]=button.dataset.step.split(':');state[key]=Math.max(1,Math.min(999,state[key]+Number(by)));render()}));
-$('agents').addEventListener('change',event=>readNumber(event.target,'agents'));
-$('phones').addEventListener('change',event=>readNumber(event.target,'phones'));
-document.querySelectorAll('[data-period],[data-compare]').forEach(b=>b.addEventListener('click',()=>{state.months=Number(b.dataset.period||b.dataset.compare);render()}));
-document.querySelectorAll('[data-support]').forEach(b=>b.addEventListener('click',()=>{state.supportFrequency=b.dataset.support;render()}));
-document.querySelectorAll('[data-phone]').forEach(b=>b.addEventListener('click',()=>{state.phoneType=b.dataset.phone;render()}));
-$('fxRate').addEventListener('input',e=>{const raw=e.target.value.trim();const v=Number(raw);state.exchangeRate=raw&&Number.isFinite(v)&&v>0?v:null;render()});
-$('reset').addEventListener('click',()=>{Object.assign(state,{agents:3,months:6,supportFrequency:'once',phoneType:'none',phones:1,exchangeRate:null});$('fxRate').value='';render()});
-function quoteText(){const c=calculate(),p6=calculate(state,6),p12=calculate(state,12);return [
-  'OMON CRM — NARX HISOBI',`Agentlar soni: ${state.agents}`,`CRM: ${currency(c.crmMonthly)} / oy`,
-  `Telefoniya: ${state.phoneType==='none'?'Kerak emas':(state.phoneType==='personal'?'shaxsiy':'kompaniya')+' — '+state.phones+' ta raqam'}`,`Telefoniya narxi: ${currency(c.phoneMonthly)} / oy`,
-  `6 oy: ${currency(p6.uzsTotal)}${p6.technicalTotal===null?' + texnik xizmat aniqlashtiriladi':' + '+dollar(p6.technicalTotal)+' texnik xizmat'}`,
-  `12 oy: ${currency(p12.uzsTotal)}${p12.technicalTotal===null?' + texnik xizmat aniqlashtiriladi':' + '+dollar(p12.technicalTotal)+' texnik xizmat'}`,
-  `Tanlangan paket: ${state.months} oy`,`Texnik xizmat davri: ${state.supportFrequency==='once'?'bir martalik (taxmin)':'har oy'}`,
-  c.sumAll!==null?`Kiritilgan kurs: 1 USD = ${currency(state.exchangeRate)}; ekvivalent: ${currency(c.sumAll)}`:'So‘m va USD alohida hisoblangan.',
-  'Izoh: texnik xizmat davriyligi alohida tasdiqlanishi kerak.'
-].join('\n')}
-$('copy').addEventListener('click',async()=>{const t=quoteText();try{await navigator.clipboard.writeText(t);$('copy').textContent='✓ Nusxalandi';setTimeout(()=>$('copy').textContent='⧉ Hisobni nusxalash',1800)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.append(a);a.select();document.execCommand('copy');a.remove();$('copy').textContent='✓ Nusxalandi';setTimeout(()=>$('copy').textContent='⧉ Hisobni nusxalash',1800)}});
+function readNumber(input,key){state[key]=capInt(input.value,1,999,state[key]);render()}
+document.querySelectorAll('[data-step]').forEach(btn=>btn.addEventListener('click',()=>{const a=btn.dataset.step.split(':');state[a[0]]=Math.max(1,Math.min(999,state[a[0]]+Number(a[1])));render()}));
+$('agents').addEventListener('change',e=>readNumber(e.target,'agents'));
+$('phones').addEventListener('change',e=>readNumber(e.target,'phones'));
+document.querySelectorAll('[data-period],[data-compare]').forEach(btn=>btn.addEventListener('click',()=>{state.months=Number(btn.dataset.period||btn.dataset.compare);render()}));
+document.querySelectorAll('[data-phone]').forEach(btn=>btn.addEventListener('click',()=>{state.phoneType=btn.dataset.phone;render()}));
+$('fxRate').addEventListener('input',e=>{const value=Number(e.target.value);if(!Number.isFinite(value)||value<=0){$('rateStatus').textContent='USD kursi 0 dan katta son bo‘lishi kerak';return}state.exchangeRate=value;state.manualRate=true;state.rateSource='manual';render()});
+$('reset').addEventListener('click',()=>{state.agents=3;state.months=6;state.phoneType='none';state.phones=1;render()});
+function quoteText(){
+ const c=calculate(),p6=calculate(state,6),p12=calculate(state,12);
+ const phone=state.phoneType==='none'?'Qo‘shimcha telefoniya yo‘q':phoneName(state.phoneType)+' — '+state.phones+' ta raqam';
+ return [
+  'OMON CRM — NARX TAKLIFI',
+  'Agentlar: '+state.agents,
+  'CRM: '+currency(c.crmMonthly)+' / oy',
+  'CRM ('+state.months+' oy): '+currency(c.crmTotal),
+  phone,
+  'Telefon xizmati: '+currency(c.phoneMonthly)+' / oy; '+state.months+' oyga '+currency(c.phoneTotal),
+  'Texnik xizmat (bir martalik): '+dollar(c.supportUsd)+' = '+currency(c.supportUzs),
+  'USD kursi: 1 USD = '+fxFmt(state.exchangeRate)+' so‘m ('+state.rateSource+', '+state.rateDate+')',
+  '6 oylik jami: '+currency(p6.total),
+  '12 oylik jami: '+currency(p12.total),
+  'TANLANGAN PAKET ('+state.months+' oy) JAMI: '+currency(c.total)
+ ].join('\n');
+}
+$('copy').addEventListener('click',async()=>{
+ const t=quoteText();try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.append(a);a.select();document.execCommand('copy');a.remove()}
+ const btn=$('copy');btn.textContent='✓ Nusxalandi';setTimeout(()=>btn.textContent='⧉ Hisobni nusxalash',1800);
+});
 $('print').addEventListener('click',()=>window.print());
+async function refreshRate(){
+ const urls=[
+   'https://cbu.uz/uz/arkhiv-kursov-valyut/json/USD/',
+   'https://apicloud.uz/v1/currency/rates?valyuta=USD'
+ ];
+ $('rateStatus').textContent='USD kursi tekshirilmoqda…';
+ for(let i=0;i<urls.length;i++){
+  try{
+   const res=await fetch(urls[i],{cache:'no-store'});
+   if(!res.ok)throw Error('HTTP '+res.status);
+   const data=await res.json();
+   const obj=Array.isArray(data)?data[0]:data;
+   const raw=obj?.Rate??obj?.valyuta?.kurs??obj?.kurs??obj?.rate;
+   const rate=Number(String(raw).replace(',','.'));
+   if(!Number.isFinite(rate)||rate<1000||rate>50000)throw Error('Kurs mavjud emas');
+   if(state.manualRate)return;
+   state.exchangeRate=rate;
+   state.rateDate=obj?.Date??obj?.valyuta?.sana??obj?.sana??'so‘nggi e’lon';
+   state.rateSource=i===0?'official':'secondary';
+   $('fxRate').value=String(rate);
+   render();return;
+  }catch(e){}
+ }
+ if(!state.manualRate){state.rateSource='fallback';render()}
+}
+$('refreshRate').addEventListener('click',()=>{state.manualRate=false;refreshRate()});
 render();
+refreshRate();
 </script>
 </body>
 </html>
