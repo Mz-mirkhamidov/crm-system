@@ -67,3 +67,13 @@ Mijoz logotipi endi hero ichida mustaqil oq/qora qutisiz, OMON CRM ko‘k gradie
 - Shablon HTML/CSS asosida ishlaydi; turagentlik rasmi yoki nomi almashtirilsa avtomatik moslashadi. Ya’ni statik generatsiya qilingan rasm emas.
 - Qora *va silliq ko‘k* fonli yuklangan logolar uchun avtomatik shaffoflashtirish mavjud; kerak bo‘lsa tahrirlashdagi belgi orqali o‘chiriladi.
 - Telefon ekrani va PDFda muqova ixchamroq bo‘ladi. KP boshqa bo‘limlari va barcha narx formulalari o‘zgarmagan.
+
+
+## 2026-11-03 — bo‘sh maydonlarni avtomatik yashirish
+
+- Mijoz haqidagi to‘ldirilmagan kompaniya nomi, rahbar, telefon va sana qatorlari KP/PDFda chiqmaydi. Ijrochi ma’lumotlari doimiy qoladi.
+- **01. TURAGENTLIK HOLATI**: xodimlar, kunlik lidlar, ishlanmay qolgan lidlar yoki javob vaqti kiritilmagan bo‘lsa, o‘sha ko‘rsatkich kartasi yashiriladi. Barcha kartalar bo‘sh bo‘lsa, 01-bo‘lim ham yashiriladi.
+- **02. QO‘SHIMCHA SOTUV IMKONIYATI**: ishlanmay qolgan lidlar/oy, qo‘shimcha bronlar/oy va foyda prognozi faqat hisoblash uchun yetarli raqamlar mavjud bo‘lsa ko‘rsatiladi. To‘liq mavjud javob/qidiruv vaqtlarini alohida ko‘rsatadi, yarim to‘ldirilganlari yashiriladi. Hamma natija bo‘sh bo‘lsa butun 02-bo‘lim olib tashlanadi.
+- **Bo‘limlar ketma-ketligi avtomatik:** KPda 01 yoki 02 yashirilgan bo‘lsa, narx, tarkib va shartlar qayta 01, 02, 03… ketma-ket raqamlanadi; chap tahrirlash panelining bosqich raqamlari o‘zgarishsiz qoladi.
+- Chop etiladigan PDF ham bo‘sh KP elementlarini yashiradi. Nusxalash matnida ham foydalanuvchi kiritmagan ma’lumotlar «—» bilan chiqmaydi.
+- Hisob narxlari va biznes prognozi formulalariga tegilmagan.
