@@ -308,6 +308,17 @@
   .proposal-hero .hero-pill{font-size:11px;padding:6px 14px}
   .proposal-hero .hero-sub{font-size:9px;margin:7px 0 0}
 }
+
+/* Individual company name and selected price visibility */
+.hero-partner{min-width:0;gap:10px;align-items:center}
+.hero-partner-art{flex:0 1 105px;max-width:105px;justify-content:center}
+.hero-partner-art img{max-width:100%;max-height:60px}
+.hero-partner-name{display:block!important;flex:1 1 0;min-width:0;font-size:clamp(14px,2.1vw,21px);text-align:left;line-height:1.2;overflow-wrap:anywhere}
+.price-row.selected-tier{background:#edf5ff;border:1px solid #cfe1ff;border-radius:11px;margin-bottom:9px;padding:12px}
+.price-row.selected-tier span{font-weight:820;color:#1b4e9e}
+.price-row.selected-tier strong{font-size:20px;color:#074cc0}
+@media(max-width:760px){.hero-partner{gap:6px}.hero-partner-art{flex:0 1 56px;max-width:56px}.hero-partner-art img{max-height:45px}.hero-partner-name{font-size:clamp(11px,2.7vw,15px)}}
+@media print{.hero-partner-art{flex:0 1 65px;max-width:65px}.hero-partner-art img{max-height:35px}.hero-partner-name{font-size:11px}.price-row.selected-tier{padding:6px;margin-bottom:5px}.price-row.selected-tier strong{font-size:13px}}
 </style>
 </head>
 <body>
@@ -390,8 +401,8 @@
     <p class="hint" id="kExplanation">Natija — qayta aloqa ulushi, bron ehtimoli va har bir bron sof foydasi bo‘yicha ssenariy. Haqiqiy natijalar farq qilishi mumkin.</p>
     <div class="signal"><span id="kReply">Javob vaqti: —</span><span id="kSearch">Tur qidirish: —</span><span id="kTime">Faol ish vaqti tejalishi: —</span></div>
     <div class="section-title"><span class="glyph">▤</span><h3>03. NARX HISOB-KITOBI</h3></div>
-    <div class="price-grid"><div class="price-box"><h4 id="pPricingHeading">CRM obunasi</h4><div class="price-row"><span>1 agent / oy</span><strong>189 000 so‘m</strong></div><div class="price-row"><span id="pCrmLabel">CRM · 3 agent / oy</span><strong id="pCrmMonthly">567 000 so‘m</strong></div><div class="price-row" id="pPhoneRow" hidden><span id="pPhoneLabel">Qo‘shimcha telefoniya / oy</span><strong id="pPhoneMonthly">0 so‘m</strong></div><div class="price-row"><span id="pCrmAllLabel">CRM obunasi (6 oy)</span><strong id="pCrmAll">3 402 000 so‘m</strong></div><div class="price-row" id="pPhoneAllRow" hidden><span id="pPhoneAllLabel">Telefoniya (6 oy)</span><strong id="pPhoneAll">0 so‘m</strong></div><div class="price-row total"><span id="pRecurringLabel">CRM obunasi jami</span><strong id="pRecurring">3 402 000 so‘m</strong></div></div>
-    <div class="price-box"><h4>Texnik xizmat va to‘liq narx</h4><div class="price-row"><span>1–3 agent</span><strong>$200</strong></div><div class="price-row"><span>4–5 agent</span><strong>$300</strong></div><div class="price-row"><span>6+ agent</span><strong>$400</strong></div><div class="price-row"><span>Tanlangan bir martalik xizmat</span><strong id="pSupportUsd">$200</strong></div><div class="price-row"><span id="pFxLabel">1 USD = 11 941,65 so‘m</span><strong id="pSupportUzs">2 388 330 so‘m</strong></div><div class="price-row total"><span>Bir martalik xizmat qo‘shilgan jami</span><strong id="pAllIn">5 790 330 so‘m</strong></div></div></div>
+    <div class="price-grid"><div class="price-box"><h4 id="pPricingHeading">CRM obunasi</h4><div class="price-row"><span id="pCrmCalcLabel">189 000 × 3 agent / oy</span><strong id="pCrmCalcValue">567 000 so‘m / oy</strong></div><div class="price-row"><span id="pCrmLabel">567 000 × 6 oy</span><strong id="pCrmMonthly">3 402 000 so‘m</strong></div><div class="price-row" id="pPhoneRow" hidden><span id="pPhoneLabel">Qo‘shimcha telefoniya / oy</span><strong id="pPhoneMonthly">0 so‘m</strong></div><div class="price-row"><span id="pCrmAllLabel">6 oy to‘lov + 1 oy bonus</span><strong id="pCrmAll">7 oy foydalanish</strong></div><div class="price-row" id="pPhoneAllRow" hidden><span id="pPhoneAllLabel">Telefoniya (6 oy)</span><strong id="pPhoneAll">0 so‘m</strong></div><div class="price-row total"><span id="pRecurringLabel">CRM obunasi jami</span><strong id="pRecurring">3 402 000 so‘m</strong></div></div>
+    <div class="price-box"><h4>Texnik xizmat va yakuniy narx</h4><div class="price-row selected-tier"><span id="pSupportTier">1–3 agent uchun · 1 marta</span><strong id="pSupportUsd">$200</strong></div><div class="price-row"><span id="pFxLabel">1 USD = 11 941,65 so‘m</span><strong id="pSupportUzs">2 388 330 so‘m</strong></div><div class="price-row total"><span id="pAllInLabel">CRM + texnik xizmat jami</span><strong id="pAllIn">5 790 330 so‘m</strong></div></div></div>
     <div class="plans"><div class="plan" id="plan6"><span>6 oy to‘lov</span><strong class="plan-term">6 OY + 1 OY BONUS</strong><b id="pSix">—</b><span class="plan-gift">7 oy foydalanish</span></div><div class="plan" id="plan12"><span>12 oy to‘lov</span><strong class="plan-term">12 OY + 3 OY BONUS</strong><b id="pTwelve">—</b><span class="plan-gift">15 oy foydalanish</span></div></div>
     <div class="final-bar"><div><span>UMUMIY YAKUNIY SUMMA</span><strong id="pFinal">—</strong><small id="pBonus">Tanlangan muddat uchun jami to‘lov</small></div><span>To‘liq taklif</span></div>
     <div class="section-title"><span class="glyph">✦</span><h3>04. TAKLIF TARKIBI — SIZ NIMA OLASIZ?</h3></div>
@@ -480,10 +491,10 @@ function display(){
  $('pPhoneRow').hidden=!hasPhone;$('pPhoneAllRow').hidden=!hasPhone;
  put('pPricingHeading',hasPhone?'CRM va '+(q.phoneType==='personal'?'MyZvanki':'UzTel'):'CRM obunasi');
  put('pRecurringLabel',hasPhone?'CRM + telefoniya (to‘lov davri)':'CRM obunasi jami');
- put('pCrmLabel','CRM · '+q.agents+' agent / oy');put('pCrmMonthly',money(q.crmMonthly));
+ put('pCrmCalcLabel',fmt(PRICE.agent)+' × '+q.agents+' agent / oy');put('pCrmCalcValue',money(q.crmMonthly)+' / oy');put('pCrmLabel',fmt(q.crmMonthly)+' × '+q.months+' oy');put('pCrmMonthly',money(q.crmTotal));
  if(hasPhone){put('pPhoneLabel',phoneName(q.phoneType)+' / oy');put('pPhoneMonthly',money(q.phoneMonthly));put('pPhoneAllLabel',phoneName(q.phoneType)+' ('+q.months+' oy)');put('pPhoneAll',money(q.phoneTotal))}
- put('pCrmAllLabel','CRM obunasi ('+q.months+' oy)');put('pCrmAll',money(q.crmTotal));put('pRecurring',money(q.recurring));
- put('pSupportUsd','$'+q.supportUsd);put('pFxLabel','1 USD = '+(num(state.fx)>0?fxfmt(Number(state.fx)):'—')+' so‘m');
+ put('pCrmAllLabel',q.months+' oy to‘lov + '+bonus+' oy bonus');put('pCrmAll',accessible+' oy foydalanish');put('pRecurring',money(q.recurring));
+ put('pSupportTier',(q.agents<=3?'1–3 agent':q.agents<=5?'4–5 agent':'6+ agent')+' uchun · 1 marta');put('pSupportUsd','$'+q.supportUsd);put('pAllInLabel',hasPhone?'CRM + telefoniya + texnik xizmat jami':'CRM + texnik xizmat jami');put('pFxLabel','1 USD = '+(num(state.fx)>0?fxfmt(Number(state.fx)):'—')+' so‘m');
  put('pSupportUzs',q.supportUzs===null?'Kurs kiritilmagan':money(q.supportUzs));put('pAllIn',q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total));
  put('pSix',q6.total===null?money(q6.recurring)+' + $'+q6.supportUsd:money(q6.total));put('pTwelve',q12.total===null?money(q12.recurring)+' + $'+q12.supportUsd:money(q12.total));
  $('plan6').classList.toggle('active',q.months===6);$('plan12').classList.toggle('active',q.months===12);
@@ -574,7 +585,7 @@ function stripDarkLogoBackdrop(img){
 function paintAgencyImage(){
  const raw=state.agencyImage||'';
  const ok=typeof raw==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(raw);
- $('agencyImagePreview').hidden=!ok;$('partnerLogoStage').hidden=!ok;$('heroPartnerName').hidden=ok;
+ $('agencyImagePreview').hidden=!ok;$('partnerLogoStage').hidden=!ok;$('heroPartnerName').hidden=false;
  const remove=$('logoRemoveBackground');
  remove.checked=state.logoRemoveBackground!==false;
  const token=++logoRenderToken;
