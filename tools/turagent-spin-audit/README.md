@@ -38,3 +38,13 @@ Bonus oylar to‘lov oylariga ko‘paytirilmaydi. USD kursi Markaziy bank orqali
 ## Ishlatish
 
 Bitta `index.html` fayl, tashqi JS paketlari va backend talab qilinmaydi. Vercel root: `tools/turagent-spin-audit`. Tahrirlash, mijozga taqdim etish, PDFga chop etish, taklifni saqlash/yuklash va JSON eksport ishlaydi. Shaxsiy ma’lumot va agentlik rasmi faqat joriy brauzerning localStorage xotirasida saqlanadi — umumiy qurilmalarda ehtiyot bo‘ling.
+
+
+## 2026-11-03 — vizual va rasm yuklash tuzatishlari
+
+- Hamkor turagentlik logotipi KP yuqori qismida yorug‘ fonli premium karta ko‘rinishida; nisbatlari saqlanadi.
+- JPG, PNG, WebP, AVIF yoki GIF rasmlarni **20 MB** gacha yuklashga ruxsat bor. Brauzer bir nechta hajm va sifatda avtomatik siqadi, lokal saqlash uchun mos rasm tanlaydi.
+- Brauzer xotirasi to‘lsa, foydalanuvchi ogohlantiriladi. Takliflar va rasmlar hamon faqat shu qurilma brauzeri xotirasida, serverga yuklanmaydi.
+- 03-bo‘lim: keng ekranda ikki teng ustunli, teng balandlikdagi narx kartalari; bir xil qator oraliqlari; 6+1 va 12+3 paketlari tekis bloklarda. Tor ekranda moslashuvchan bir ustun, A4 printda ixcham ikki ustun.
+- Inputlar bir xil o‘lchamda va mobilga moslashtirilgan.
+- Hisob formulalari (CRM, texnik xizmat, telefoniya va bonus) o‘zgarmagan.
