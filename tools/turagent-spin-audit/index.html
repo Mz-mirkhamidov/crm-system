@@ -1,378 +1,210 @@
 <!doctype html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101827">
-<title>TourSales Insight — SPIN audit & ROI kalkulyator</title>
-<style>
-:root{--bg:#f5f7fb;--ink:#172238;--muted:#778399;--navy:#101b2e;--border:#e6eaf0;--card:#fff;--teal:#0d9887;--tealbg:#e6f6f3;--orange:#e69c38;--red:#c74b56;--redbg:#fff1f2;--shadow:0 10px 30px rgba(17,28,48,.045)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);font-size:14px}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}a{color:inherit}
-.shell{display:flex;min-height:100vh}.sidebar{background:var(--navy);width:258px;position:fixed;inset:0 auto 0 0;color:#c3cad7;padding:26px 16px;display:flex;flex-direction:column;z-index:40}.logo{padding:0 10px;display:flex;gap:12px;align-items:center;color:#fff}.logo-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#13ab9c;color:white;font-weight:900;font-size:20px;box-shadow:0 5px 20px #10af9b44}.logo h1{font-size:17px;line-height:1.1;margin:0;letter-spacing:-.5px}.logo small{display:block;color:#8899b2;font-size:11px;margin-top:4px}.side-caption{margin:42px 14px 12px;color:#8491a6;text-transform:uppercase;font-size:10px;letter-spacing:1.8px;font-weight:750}.nav{display:flex;flex-direction:column;gap:6px}.nav button{border:0;text-align:left;color:#a7b4c9;background:transparent;display:flex;align-items:center;gap:13px;width:100%;padding:13px 14px;border-radius:11px;font-weight:650}.nav button.active{background:#21374b;color:#fff}.nav button.active .navicon{color:#44d5c2}.navicon{font-size:19px;width:24px;text-align:center;color:#6f809a}.side-bottom{margin-top:auto;border-top:1px solid #253346;padding:22px 10px 0;font-size:12px;line-height:1.65;color:#8d9bb0}.side-bottom strong{color:#fff}.main{margin-left:258px;width:calc(100% - 258px);min-width:0}.topbar{height:77px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 35px;gap:16px;position:sticky;top:0;z-index:20}.crumb{color:#8491a5;font-size:12px;font-weight:600}.crumb strong{color:#243148;font-weight:750}.top-actions{display:flex;gap:10px;align-items:center}.btn{border:1px solid var(--border);border-radius:10px;padding:11px 15px;background:#fff;color:#26344b;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:39px;white-space:nowrap}.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}.btn.dark{background:var(--navy);color:#fff;border-color:var(--navy)}.btn.ghost{background:transparent}.btn.sm{padding:7px 11px;min-height:32px;font-size:12px}.btn.danger{color:var(--red)}.content{max-width:1320px;margin:0 auto;padding:36px 36px 70px}.eyebrow{color:var(--teal);text-transform:uppercase;letter-spacing:1.9px;font-size:11px;font-weight:850;margin:0 0 9px}.page-title{font-size:30px;letter-spacing:-1.2px;line-height:1.2;margin:0 0 9px;color:#172439}.subhead{color:var(--muted);line-height:1.7;margin:0}.heading-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:26px}.panel{background:var(--card);border:1px solid var(--border);border-radius:17px;padding:25px;box-shadow:var(--shadow);min-width:0}.panel-title{margin:0 0 8px;font-size:17px;letter-spacing:-.35px}.panel-sub{margin:0 0 23px;color:var(--muted);line-height:1.6;font-size:13px}.grid{display:grid;gap:17px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}.span2{grid-column:span 2}.stats{margin:22px 0 28px}.stat{padding:23px 25px;border:1px solid var(--border);border-radius:15px;background:#fff}.stat .k{color:var(--muted);font-size:12px;margin-bottom:13px;line-height:1.4}.stat .v{font-size:26px;font-weight:850;letter-spacing:-1px;font-variant-numeric:tabular-nums}.stat .hint{margin-top:8px;color:#8692a3;font-size:11px}.stat.negative .v{color:var(--red)}.stat.positive .v{color:var(--teal)}.hero{background:linear-gradient(116deg,#14263b,#1b4051);border-radius:20px;padding:32px 36px;display:flex;justify-content:space-between;gap:25px;color:#fff;position:relative;overflow:hidden}.hero:after{content:"";width:320px;height:320px;border-radius:50%;background:#1ecab814;position:absolute;right:-85px;top:-145px;border:1px solid #2fb8a44d}.hero h2{font-size:25px;letter-spacing:-.7px;margin:6px 0 11px}.hero p{color:#b0c1cc;max-width:600px;margin:0 0 18px;line-height:1.7}.hero .tag{color:#77dacd;font-weight:800;letter-spacing:1.4px;font-size:11px;text-transform:uppercase}.hero .btn{position:relative;z-index:1}.section-head{margin:30px 0 16px;display:flex;align-items:end;justify-content:space-between;gap:12px}.section-head h2{font-size:18px;margin:0;letter-spacing:-.4px}.section-head span{font-size:12px;color:var(--muted)}.steps{display:flex;align-items:stretch;gap:10px}.stepcard{flex:1;border:1px solid var(--border);border-radius:14px;background:#fff;padding:18px;cursor:pointer;transition:transform .18s, border-color .18s}.stepcard:hover{transform:translateY(-2px);border-color:#86d7cb}.step-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.step-num{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-weight:900;background:#f0f4f8;color:#34445b}.stepcard b{font-size:15px}.stepcard p{margin:9px 0 0;color:var(--muted);font-size:12px;line-height:1.65}.meter{background:#e8edf2;border-radius:30px;overflow:hidden;height:7px}.meter>i{height:100%;display:block;background:var(--teal);transition:width .2s}.progresslabel{font-weight:800;color:var(--teal);font-size:12px}.field{display:flex;flex-direction:column;gap:8px;min-width:0}.field label{font-size:12px;font-weight:750;line-height:1.45;color:#4d5b6e}.field input,.field select,.field textarea{width:100%;min-width:0;padding:12px 13px;background:#fcfdff;border:1px solid #dfe5ee;border-radius:9px;outline:none;color:#1e2b41;transition:border-color .2s}.field textarea{resize:vertical;min-height:85px}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px #0d988716}.field .detail{font-size:11px;color:#8995a6;line-height:1.5}.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.form-grid.two-col{grid-template-columns:repeat(2,minmax(0,1fr))}.pill{display:inline-flex;align-items:center;gap:5px;border-radius:50px;padding:5px 10px;font-size:11px;font-weight:800;background:var(--tealbg);color:#087e71}.pill.orange{background:#fff4e4;color:#b8751b}.pill.red{background:var(--redbg);color:var(--red)}.pill.grey{background:#f1f3f6;color:#637184}.muted{color:var(--muted)}.rule{height:1px;background:var(--border);margin:22px 0}.inline-note{background:#f0faf8;border:1px solid #d9f0ea;border-radius:12px;padding:15px 17px;color:#366a62;line-height:1.6;font-size:12px}.alert{background:#fff8e9;border:1px solid #f3e5c0;border-radius:11px;color:#826430;padding:12px 15px;font-size:12px;line-height:1.6}.questions{display:grid;gap:13px}.question{background:#fff;border:1px solid var(--border);border-radius:13px;padding:20px 22px;display:grid;grid-template-columns:38px 1fr minmax(125px,175px);gap:14px;align-items:start}.question .qid{height:35px;width:35px;background:#eef6f5;color:#0d9385;display:grid;place-items:center;border-radius:10px;font-weight:850}.question h3{font-size:14px;line-height:1.5;margin:0 0 7px}.question .why{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 12px}.question .note{background:#fbfcfe;font-size:12px;padding:10px 12px;min-height:38px}.question select{padding:11px;background:#f8fafc;border:1px solid var(--border);border-radius:9px;font-size:12px;width:100%}.phase-tabs{display:flex;gap:8px;margin:20px 0 22px;flex-wrap:wrap}.phase-tabs .btn{flex:1;min-width:130px}.phase-tabs .selected{background:var(--navy);color:#fff;border-color:var(--navy)}.phase-info{padding:21px 24px;margin-bottom:16px;border:1px solid var(--border);background:#fff;border-radius:13px;display:flex;align-items:center;justify-content:space-between;gap:15px}.phase-info h2{font-size:19px;margin:0 0 5px}.phase-info p{margin:0;color:var(--muted);font-size:12px}.phase-dot{width:12px;height:12px;background:var(--teal);border-radius:99px;display:inline-block;margin-right:8px}.actionsline{display:flex;align-items:center;justify-content:space-between;gap:13px;margin:22px 0}.calc-summary{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}.highlight{background:linear-gradient(130deg,#122b3c,#15483f);border-radius:17px;color:#fff;padding:28px}.highlight .subtitle{font-size:12px;color:#a6cfc9;margin-bottom:12px}.highlight .figure{font-size:34px;letter-spacing:-1.2px;font-weight:900}.highlight .mini{margin-top:12px;color:#b2d2d0;font-size:12px;line-height:1.55}.breakdown{display:grid;gap:13px}.breakrow{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px dashed #e5e9ef;padding-bottom:11px;font-size:13px}.breakrow:last-child{border-bottom:0}.breakrow span{color:var(--muted)}.breakrow strong{text-align:right;font-variant-numeric:tabular-nums}.formula{font-size:12px;padding:13px 15px;border-radius:11px;background:#f5f8fb;color:#5d6980;line-height:1.8;margin-top:15px}.barline{display:flex;align-items:center;gap:13px;margin:15px 0}.barline .name{width:117px;flex-shrink:0;color:#5d6b7e;font-size:12px}.barline .fill{flex:1;background:#edf0f3;height:11px;border-radius:9px;overflow:hidden}.barline .fill i{height:100%;display:block;background:var(--teal);border-radius:9px}.barline .value{width:65px;text-align:right;font-variant-numeric:tabular-nums;font-weight:800;font-size:12px}.client-list{display:flex;flex-direction:column;gap:8px}.client-item{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);padding:12px;border-radius:11px;gap:7px}.client-item.active{background:#f0faf8;border-color:#a8ddd5}.client-item button{background:none;border:0;text-align:left;flex:1;font-weight:700;color:var(--ink)}.client-item small{display:block;font-weight:450;color:var(--muted);margin-top:4px}.report-hero{background:#15253c;color:#fff;border-radius:17px;padding:29px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}.report-hero h2{font-size:25px;margin:7px 0 6px}.report-hero p{margin:0;color:#b3c1ce;font-size:12px}.report-summary{font-size:14px;line-height:1.9;color:#435066}.report-summary b{color:var(--ink)}.insight{border-left:3px solid #dd9b38;background:#fffbf2;padding:14px 18px;margin:11px 0;border-radius:0 9px 9px 0;line-height:1.7;font-size:13px}.insight.green{border-color:var(--teal);background:#f4faf8}.rec{padding:18px 0;border-bottom:1px solid var(--border)}.rec:last-child{border:0}.rec h4{font-size:14px;margin:0 0 7px}.rec p{color:var(--muted);margin:0 0 8px;font-size:12px;line-height:1.7}.rec em{font-size:12px;color:#087e71;font-style:normal;font-weight:700}.empty{border:1px dashed #cbd5df;border-radius:14px;padding:34px;text-align:center;color:var(--muted)}.empty strong{color:var(--ink);display:block;margin:8px}.footer{padding:25px 0 0;text-align:center;color:#9aa4b5;font-size:11px}.only-print{display:none}.hide{display:none!important}
-@media(max-width:1150px){.sidebar{width:218px}.main{margin-left:218px;width:calc(100% - 218px)}.content{padding:26px}.grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:770px){.shell{display:block}.sidebar{width:100%;height:auto;position:sticky;top:0;padding:12px;display:block}.logo{display:none}.side-caption,.side-bottom{display:none}.nav{flex-direction:row;overflow-x:auto;gap:5px}.nav button{white-space:nowrap;width:auto;flex:1;justify-content:center;padding:11px 12px;font-size:12px}.navicon{display:none}.main{margin:0;width:100%}.topbar{height:auto;min-height:63px;padding:12px 17px;top:55px}.top-actions{gap:5px}.top-actions .btn{font-size:11px;padding:7px 9px}.content{padding:22px 15px 50px}.page-title{font-size:24px}.heading-row{align-items:flex-start;flex-direction:column}.grid.two,.grid.three,.grid.four,.calc-summary{grid-template-columns:1fr}.span2{grid-column:auto}.steps{display:grid;grid-template-columns:repeat(2,1fr)}.hero{padding:25px;display:block}.form-grid,.form-grid.two-col{grid-template-columns:1fr 1fr}.question{grid-template-columns:35px 1fr}.question select{grid-column:2}.report-hero{display:block}.report-hero .pill{margin-top:13px}.phase-info{display:block}.phase-info .pill{margin-top:14px}}
-@media(max-width:430px){.form-grid,.form-grid.two-col{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.topbar{flex-wrap:wrap}.top-actions{width:100%}.top-actions .btn{flex:1}.stat .v{font-size:23px}.question{padding:15px}.phase-tabs .btn{min-width:130px}.hero h2{font-size:21px}}
-@media print{body{background:#fff;font-size:12px}.sidebar,.topbar,.no-print,.footer{display:none!important}.main{margin:0;width:100%}.content{max-width:none;padding:0}.panel,.stat{box-shadow:none;break-inside:avoid}.only-print{display:block}.page-title{font-size:24px}.grid.two,.grid.four,.calc-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.report-hero,.highlight{-webkit-print-color-adjust:exact;print-color-adjust:exact}.insight{-webkit-print-color-adjust:exact;print-color-adjust:exact}.print-break{break-before:page}}
-
-/* === Consultation / presentation upgrade === */
-.confidential{border-radius:12px;border:1px solid #ead6a8;background:#fffaf1;color:#86652e;padding:15px 18px;line-height:1.65;margin:0 0 18px;font-size:12px}
-.interviewer{margin-bottom:16px;background:linear-gradient(110deg,#fff,#f6fcfa)}
-.interviewer h2{font-size:17px;line-height:1.6;max-width:900px;margin:5px 0 15px}
-.scriptquote{font-size:15px;background:#f0faf8;color:#23695d;padding:17px;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;line-height:1.6;margin:0}
-.interview-actions{margin-top:17px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.question-tags{margin-bottom:8px}
-.inline-metric{padding:12px 14px;background:#f3f8fb;border:1px solid #e3eaf2;border-radius:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-.inline-metric label{font-size:12px;font-weight:700}
-.inline-metric input{border:1px solid #cbd7e0;background:#fff;border-radius:9px;padding:10px;width:138px}
-.inline-metric small{color:var(--muted);font-size:11px}
-.calc-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:20px}
-.calc-step{text-align:left;background:#fff;border:1px solid var(--border);border-radius:13px;padding:14px;display:flex;align-items:center;gap:11px;color:var(--ink)}
-.calc-step span{width:30px;height:30px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;background:#f0f4f8;color:#637488;font-size:12px;font-weight:900}
-.calc-step strong{font-size:12px;line-height:1.35}
-.calc-step.active{border-color:#0d9887;background:#eaf8f5}
-.calc-step.active span{background:var(--teal);color:#fff}
-.calc-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:18px;align-items:start}
-.calc-layout .panel .inline-note{margin-top:21px}
-.step-kicker{color:var(--teal);font-size:11px;letter-spacing:1.2px;font-weight:850;margin-bottom:12px}
-.live-panel{position:sticky;top:98px}
-.live-top{display:flex;align-items:start;justify-content:space-between;gap:12px}
-.live-top h2{font-size:18px;margin:0 0 15px}
-.live-stats{margin:6px 0 15px}
-.live-stats .stat{padding:15px}
-.live-stats .stat .v{font-size:20px;overflow-wrap:anywhere}
-.live-stats .stat .k{margin-bottom:5px}
-.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.scenario{min-width:0;border:1px solid var(--border);padding:12px 10px;border-radius:10px;background:#f9fafc;overflow-wrap:anywhere}
-.scenario small{display:block;color:var(--muted);font-size:10px;margin-bottom:8px}
-.scenario b{font-size:12px}
-.scenario.active{border-color:var(--teal);background:var(--tealbg)}
-.presenting{background:#f7f9fd}
-.presenting .sidebar,.presenting .topbar{display:none!important}
-.presenting .main{margin:0;width:100%}
-.presenting .content{max-width:1440px;padding:20px 32px 32px}
-.present-wrap{min-height:calc(100vh - 60px)}
-.present-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:8px 0 24px}
-.present-brand{display:flex;align-items:center;gap:9px;font-size:14px;color:#647185}
-.present-brand strong{color:#18243b}
-.present-symbol{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--teal);color:#fff;font-weight:900;font-size:19px}
-.present-controls{display:flex;gap:8px}
-.present-area{max-width:1320px;margin:auto}
-.present-slide{display:none;min-height:calc(100vh - 190px)}
-.present-slide.selected{display:block}
-.present-slide h1{font-size:clamp(29px,3.2vw,47px);line-height:1.13;letter-spacing:-1.5px;margin:12px 0 16px}
-.present-intro{color:var(--muted);font-size:17px;line-height:1.7;margin:0 0 27px;max-width:800px}
-.present-hero{border-radius:24px;background:linear-gradient(120deg,#132139,#143b4c);min-height:430px;color:#fff;padding:clamp(30px,5vw,74px);display:flex;align-items:flex-start;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-.present-hero:after{content:"";position:absolute;right:-110px;top:-190px;width:490px;height:490px;border-radius:50%;background:#189c8d1c;border:1px solid #2dd9c455}
-.present-hero h1{font-size:clamp(38px,5vw,68px);max-width:880px;position:relative;z-index:1}
-.present-hero h1 span{color:#7ddccf}
-.present-hero .eyebrow{color:#7ddccf;position:relative;z-index:1}
-.present-hero p{color:#b4c7ce;font-size:18px;line-height:1.7;max-width:690px;margin:8px 0}
-.present-date{color:#b4d0cb;margin-top:22px}
-.present-mini{border-radius:15px;background:#fff;border:1px solid var(--border);padding:25px}
-.present-mini span{display:block;color:var(--teal);font-weight:900;font-size:22px;margin-bottom:12px}
-.present-mini b{font-size:17px}
-.present-mini p{color:var(--muted);margin:8px 0 0}
-.public-flow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:24px}
-.public-flow>div{background:#f2f8f7;border-radius:14px;flex:1;text-align:center;padding:24px 10px}
-.public-flow strong{display:block;font-size:29px;font-weight:850;color:#17384d}
-.public-flow span:not(.flow-arrow){color:var(--muted);display:block;font-size:13px;margin-top:8px}
-.flow-arrow{font-size:25px;color:#87a6a1}
-.public-breakdown{margin-top:24px}
-.present-footnote{color:var(--muted);font-size:12px;margin-top:20px}
-.plan-card{background:#fff;border:1px solid var(--border);border-radius:15px;padding:25px;line-height:1.6}
-.plan-card span{font-size:23px;color:var(--teal);font-weight:900}
-.plan-card h2{font-size:17px;margin:15px 0 8px}
-.plan-card p{color:var(--muted);margin:0}
-.public-priority{display:flex;justify-content:space-between;gap:15px;padding:15px 0;border-bottom:1px solid var(--border)}
-.public-priority:last-child{border:0}
-.public-priority span{color:var(--muted);max-width:65%;text-align:right}
-.public-cta{margin-top:28px;background:var(--navy);border-radius:16px;color:white;text-align:center;font-size:23px;font-weight:800;padding:29px 18px}
-.present-pagination{display:flex;align-items:center;justify-content:center;gap:22px;margin:24px auto 4px}
-.present-pagination>span{color:var(--muted);font-size:12px;font-weight:700}
-.slide-dots{display:flex;gap:9px;align-items:center}
-.slide-dots button{border:0;background:#c4cfd7;width:9px;height:9px;border-radius:99px;padding:0}
-.slide-dots button.active{width:28px;background:var(--teal)}
-@media(max-width:1150px){.calc-layout{grid-template-columns:1fr}.live-panel{position:static}}
-@media(max-width:770px){.calc-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.presenting .content{padding:15px}.present-hero{min-height:360px}.present-area .grid.three{grid-template-columns:1fr}.present-area .grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}.public-flow{gap:5px}.public-flow strong{font-size:18px}.public-flow>div{padding:15px 5px}.flow-arrow{font-size:16px}.public-priority{display:block}.public-priority span{display:block;text-align:left;max-width:none;margin-top:7px}.present-pagination{gap:9px}}
-@media(max-width:420px){.calc-tabs{grid-template-columns:1fr 1fr}.calc-step{display:block}.calc-step strong{display:block;margin-top:7px}.present-toolbar{align-items:start}.present-brand>span:last-child{display:none}.present-slide h1{font-size:29px}.present-hero h1{font-size:35px}.present-area .stat{padding:13px}.present-area .stat .v{font-size:18px}.scenario-grid{grid-template-columns:1fr 1fr}.scenario:last-child{grid-column:span 2}}
-@media print{.presenting .content{padding:0!important}.present-wrap{min-height:0}.present-slide{display:block!important;min-height:0;break-after:page;page-break-after:always;padding:10mm 4mm}.present-slide:last-child{break-after:auto}.present-toolbar,.present-pagination{display:none!important}.present-hero{min-height:240px}.present-slide h1{font-size:29px}.present-hero h1{font-size:36px}.present-area .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.present-area .grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}.present-mini,.plan-card{padding:14px}.stat{padding:13px}.stat .v{font-size:18px}}
-
-
-/* Uchrashuvga tayyorgarlik va Kirish bosqichi — faqat ichki ish maydoni */
-.opening-lead{display:flex;gap:12px;justify-content:space-between;align-items:center;background:#edf9f6;border:1px solid #d4ece7;border-radius:13px;padding:14px 18px;margin-bottom:21px;color:#2c655d;line-height:1.65}
-.opening-lead b{color:#114b44}
-.opening-script{background:linear-gradient(125deg,#132338,#1d3b4c);border-radius:18px;color:white;padding:27px 30px;margin-bottom:18px}
-.opening-script .eyebrow{color:#75e1cc}
-.opening-script h2{margin:0 0 16px;font-size:21px}
-.opening-quote{font-size:18px;line-height:1.8;color:#f3fbff;white-space:pre-line;letter-spacing:.03px;margin:0}
-.opening-script .script-hint{font-size:12px;line-height:1.7;margin-top:18px;color:#bbd0d7}
-.opening-tips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.opening-tip{background:#fff;border:1px solid var(--border);padding:18px 20px;border-radius:12px}
-.opening-tip small{font-size:10px;color:var(--teal);font-weight:850;letter-spacing:1px}
-.opening-tip h3{font-size:14px;margin:9px 0}
-.opening-tip p{line-height:1.65;font-size:12px;color:#748094;margin:0}
-.opening-checks{display:grid;gap:9px}
-.opening-check{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border:1px solid var(--border);border-radius:12px;background:#fbfcfd;cursor:pointer}
-.opening-check input{width:18px;height:18px;accent-color:var(--teal);margin:1px 0 0;flex-shrink:0}
-.opening-check span{font-size:13px;line-height:1.55;color:#344257}
-.opening-check.checked{border-color:#a5dfd4;background:#f0faf7}
-.opening-check.checked span{color:#197e70}
-.opening-tagline{background:#f0faf8;border-radius:12px;border:1px solid #d3ece7;padding:16px 17px;color:#35635b;font-size:12px;line-height:1.8}
-.opening-profile{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-.opening-profile .field{min-width:0}
-.opening-progress{display:flex;align-items:center;gap:14px;margin-top:14px}
-.opening-progress .meter{flex:1;min-width:100px}
-@media(max-width:770px){.opening-profile,.opening-tips{grid-template-columns:1fr}.opening-lead{display:block}.opening-lead .btn{margin-top:10px}.opening-script{padding:23px 19px}.opening-quote{font-size:16px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d32">
+  <meta name="description" content="Omon CRM narx kalkulyatori: agentlar, 6 va 12 oylik obuna, texnik xizmat va telefoniya xarajatlari.">
+  <title>Omon CRM — Narx kalkulyatori</title>
+  <style>
+    :root { --navy:#101d32; --navy2:#182943; --ink:#16243a; --muted:#708097; --green:#0d9985; --green2:#eaf8f4; --bg:#f4f6fa; --line:#e7ebf1; --white:#fff; --shadow:0 12px 35px rgba(24,36,58,.05); --radius:22px; }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}[hidden]{display:none!important}
+    body{margin:0;background:var(--bg);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);font-size:14px;line-height:1.5}
+    button,input,select{font:inherit} button{cursor:pointer} button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #65b6ac;outline-offset:3px}
+    .top{background:var(--navy);color:#fff}
+    .top-inner{max-width:1120px;margin:auto;padding:19px 26px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .identity{display:flex;align-items:center;gap:12px}
+    .mark{background:#12a994;color:#fff;display:grid;place-items:center;height:40px;width:40px;border-radius:13px;font-size:23px;font-weight:900;letter-spacing:-3px;padding-right:3px}
+    .identity strong{display:block;font-size:17px;letter-spacing:-.4px;line-height:1.2}.identity small{display:block;color:#9babc1;font-size:12px;margin-top:4px}
+    .header-side{font-size:12px;color:#b5c4d6;display:flex;align-items:center;gap:8px}.dot{height:7px;width:7px;border-radius:50%;background:#34d5b3;display:inline-block}
+    .wrap{max-width:1120px;margin:auto;padding:40px 26px 65px}
+    .intro{margin-bottom:27px;display:flex;align-items:end;justify-content:space-between;gap:18px}
+    .eyebrow{font-size:11px;font-weight:800;letter-spacing:1.5px;color:#078673;text-transform:uppercase;margin:0 0 7px}
+    h1{margin:0;font-size:31px;line-height:1.2;letter-spacing:-1.15px} .lede{color:var(--muted);margin:10px 0 0;font-size:14px}
+    .reset{background:#fff;border:1px solid var(--line);color:#46576e;border-radius:11px;padding:11px 15px;font-weight:650;display:flex;align-items:center;gap:8px;white-space:nowrap}
+    .layout{display:grid;grid-template-columns:minmax(320px,1fr) minmax(355px,1fr);gap:22px;align-items:start}
+    .card{background:var(--white);border:1px solid #e8edf2;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card-inner{padding:27px 28px}
+    .section-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:24px}
+    .section-heading h2{font-size:18px;letter-spacing:-.5px;margin:0}.tiny{color:var(--muted);font-size:12px}
+    .field{margin-bottom:27px} .field:last-child{margin-bottom:0}
+    .f-title{font-size:13px;display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:11px;font-weight:750}
+    .f-title small{font-weight:500;color:var(--muted);font-size:11px}
+    .agent-row{display:flex;align-items:center;gap:10px}
+    .stepper{display:flex;align-items:center;border:1px solid #dce5ec;border-radius:12px;overflow:hidden;background:#fff;height:49px;max-width:230px;width:100%}
+    .stepper button{border:0;background:#f5f8fa;width:50px;align-self:stretch;font-weight:650;color:var(--navy);font-size:24px}
+    .stepper input{width:100%;border:0;outline:0!important;text-align:center;font-size:18px;font-weight:800;min-width:0;height:100%;color:var(--navy);appearance:textfield;-moz-appearance:textfield}
+    input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    .unit-note{font-size:12px;color:var(--muted)}
+    .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+    .option{border:1px solid #e0e7ed;background:#fff;border-radius:12px;min-height:55px;padding:12px 11px;text-align:center;font-weight:750;color:#4d5e72;transition:background .15s,border .15s}
+    .option.selected{border-color:#10a994;background:var(--green2);color:#007866;box-shadow:inset 0 0 0 1px #10a994}
+    .choice-3{grid-template-columns:repeat(3,minmax(0,1fr))}.choice-3 .option{font-size:12px;line-height:1.3}
+    .field-help{font-size:11px;color:#8390a1;margin:8px 0 0;line-height:1.55}
+    .divider{height:1px;background:var(--line);margin:26px 0}
+    .support-box{background:#f7f9fc;border:1px solid #e8edf3;border-radius:13px;padding:15px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .support-box strong{font-size:20px;letter-spacing:-.5px}.support-box .caption{color:var(--muted);font-size:12px}
+    .text-green{color:#0c8878}
+    .small-label{display:block;margin:16px 0 9px;font-size:12px;font-weight:750}
+    .phone-num{display:flex;justify-content:space-between;align-items:center;margin-top:15px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;gap:10px}
+    .phone-num label{font-size:13px;font-weight:650}.phone-num .stepper{height:38px;width:145px}.phone-num .stepper button{font-size:18px;width:39px}.phone-num input{font-size:15px}
+    .summary{background:var(--navy);color:white;padding:29px 28px}
+    .summary-top{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .summary-top h2{font-size:18px;margin:0;letter-spacing:-.5px}
+    .summary-pill{font-size:11px;color:#7de2d1;background:#22453f;border:1px solid #316355;border-radius:40px;padding:5px 10px;font-weight:700}
+    .sum-name{color:#a8b7cb;font-size:12px;margin:22px 0 7px}
+    .sum-big{font-size:40px;line-height:1.12;font-weight:850;letter-spacing:-1.9px;font-variant-numeric:tabular-nums}
+    .sum-big small{font-size:17px;color:#d7e4ef;letter-spacing:0;font-weight:500}
+    .sum-sub{font-size:12px;color:#b3c1d3;margin-top:9px}
+    .sum-divider{border-top:1px solid #34455d;margin:25px 0 18px}
+    .sum-row{display:flex;justify-content:space-between;gap:12px;margin:13px 0;font-size:13px}.sum-row span{color:#b6c3d2}.sum-row strong{font-variant-numeric:tabular-nums;text-align:right}
+    .sum-technical{background:#223750;border-radius:13px;padding:13px 15px;margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px}.sum-technical span{color:#b8c8d8;font-size:12px}.sum-technical strong{font-size:19px}
+    .packages{padding:24px 26px 26px}.packages h3{margin:0 0 14px;font-size:15px}
+    .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .compare{background:#f9fbfc;border:1px solid #e3e9ee;border-radius:13px;padding:16px;cursor:pointer;text-align:left;color:var(--ink);min-width:0}
+    .compare.active{border-color:#0fa28e;background:#f0faf6;box-shadow:inset 0 0 0 1px #0fa28e}
+    .compare .period{font-size:12px;font-weight:800;color:#5a6b80}.compare strong{font-size:20px;font-weight:850;letter-spacing:-.7px;display:block;margin:7px 0 3px;white-space:nowrap}.compare .dollar{font-size:12px;color:#718096;display:block;min-height:18px}.compare.active .period{color:#008676}
+    .fineprint{font-size:11px;line-height:1.6;color:#778599;margin:14px 2px 0}
+    .total-section{background:#fbfcfd;border-top:1px solid var(--line);padding:22px 27px}
+    .total-head{font-weight:750;font-size:13px;margin:0 0 15px}
+    .total-item{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:11px 0;font-size:13px}.total-item span{color:#6c7b90}.total-item strong{text-align:right;font-variant-numeric:tabular-nums}
+    .total-item.main{border-top:1px solid #e3e8ef;padding-top:13px;margin-top:16px;font-size:15px}.total-item.main span{color:var(--navy);font-weight:800}.total-item.main strong{font-size:18px;color:#087e70}
+    .fx-line{margin-top:17px;padding:13px 14px;background:#fff;border:1px dashed #dbe4ed;border-radius:12px}
+    .fx-line label{font-size:12px;font-weight:750;display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .fx-line input{border:1px solid #dce4ed;border-radius:8px;padding:9px 8px;width:128px;min-width:0;text-align:right;background:#fff}
+    .fx-total{margin:12px 0 0;display:flex;justify-content:space-between;gap:12px;color:#0c8474;font-size:13px;font-weight:800}
+    .alert{padding:11px 13px;border-radius:10px;color:#895d17;background:#fff8e7;border:1px solid #f4e5bc;margin-top:16px;font-size:12px;line-height:1.55}
+    .actions{display:flex;gap:10px;margin-top:15px}.action{border:1px solid #dbe5ed;background:#fff;border-radius:11px;flex:1;padding:12px 13px;font-weight:750;color:#243d52}.action.primary{background:#0e9a86;border-color:#0e9a86;color:#fff}
+    footer{color:#8994a6;text-align:center;font-size:11px;margin-top:30px}
+    @media(max-width:850px){.layout{grid-template-columns:1fr}.wrap{max-width:680px;padding-top:29px}.summary{padding:26px}.card-inner{padding:24px}.sum-big{font-size:37px}}
+    @media(max-width:540px){.top-inner{padding:14px 17px}.header-side{display:none}.wrap{padding:27px 14px 48px}.intro{align-items:start;flex-direction:column}.intro h1{font-size:27px}.reset{padding:9px 13px}.card-inner{padding:21px 18px}.summary{padding:25px 20px}.packages{padding:20px 18px}.total-section{padding:21px 18px}.choice-3 .option{padding:10px 6px}.compare strong{font-size:18px}.sum-big{font-size:35px}}
+    @media print{body{background:#fff}.top{background:#fff!important;color:#111!important;border-bottom:1px solid #e7ebef}.top-inner{padding:14px}.mark{background:#0d9887!important;color:#fff!important}.identity strong{color:#121d30}.identity small{color:#4b6070}.wrap{padding:22px 14px}.intro{margin-bottom:15px}.layout{display:block}.calculator-inputs,.reset,.actions,.fx-line,footer,.header-side{display:none!important}.summary{background:#101d32!important;color:#fff!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}.card{box-shadow:none}.main-output{width:100%}.packages,.total-section{break-inside:avoid}.option,.compare{print-color-adjust:exact;-webkit-print-color-adjust:exact}.fineprint{color:#42546b}}
+  </style>
 </head>
 <body>
-<div class="shell">
-<aside class="sidebar"><div class="logo"><div class="logo-mark">↗</div><div><h1>TourSales Insight</h1><small>SPIN · Audit · Business Case</small></div></div><div class="side-caption">Ish maydoni</div><nav class="nav" id="nav"><button data-view="home" class="active"><span class="navicon">◈</span> Bosh sahifa</button><button data-view="opening"><span class="navicon">♧</span> Kirish va rahbar</button><button data-view="spin"><span class="navicon">◎</span> SPIN suhbat</button><button data-view="calc"><span class="navicon">▦</span> Kalkulyator</button><button data-view="report"><span class="navicon">▤</span> Ichki hisobot</button><button data-view="present"><span class="navicon">▣</span> Rahbarga taqdimot</button></nav><div class="side-bottom"><strong>Turagentliklar uchun</strong><div>Rahbar bilan diagnostika → raqamli asos → keyingi qadam.</div><div style="margin-top:13px">Ma'lumotlar faqat shu brauzerda saqlanadi.</div></div></aside>
-<main class="main"><header class="topbar"><div class="crumb">Ish maydoni <span style="margin:0 9px">/</span> <strong id="crumb">Bosh sahifa</strong></div><div class="top-actions"><button class="btn sm" id="demoBtn">↺ Demo misol</button><button class="btn sm" id="exportBtn">↓ JSON eksport</button><button class="btn sm" id="printBtn">⎙ PDF</button><button class="btn primary sm" id="shareBtn">▣ Taqdimot</button></div></header><div class="content" id="app"></div></main>
-</div>
+<header class="top"><div class="top-inner">
+  <div class="identity"><div class="mark" aria-hidden="true">O</div><div><strong>OMON CRM</strong><small>Turagentliklar uchun hisob-kitob</small></div></div>
+  <div class="header-side"><i class="dot"></i> Narx kalkulyatori</div>
+</div></header>
+<main class="wrap">
+  <div class="intro"><div><p class="eyebrow">Narxlar · Oylik va paketlar</p><h1>Obuna kalkulyatori</h1><p class="lede">Agentlar sonini tanlang. 6 oy va 1 yillik xarajatlar avtomatik hisoblanadi.</p></div><button class="reset" type="button" id="reset">↺ Tozalash</button></div>
+  <div class="layout">
+    <section class="card calculator-inputs" aria-label="Tarif parametrlari"><div class="card-inner">
+      <div class="section-heading"><h2>Hisob parametrlari</h2><span class="tiny">4 ta sozlama</span></div>
+      <div class="field"><div class="f-title"><label for="agents">Agentlar soni</label><small>189 000 so‘m / agent / oy</small></div>
+        <div class="agent-row"><div class="stepper"><button type="button" data-step="agents:-1" aria-label="Agentni kamaytirish">−</button><input id="agents" aria-label="Agentlar soni" inputmode="numeric" type="number" min="1" max="999" value="3"><button type="button" data-step="agents:1" aria-label="Agentni oshirish">+</button></div><span class="unit-note">nafar agent</span></div>
+      </div>
+      <div class="field"><div class="f-title">Paket muddati <small>Kamida 6 oy</small></div><div class="choices" role="group" aria-label="Paket muddati"><button type="button" class="option selected" data-period="6" aria-pressed="true">6 oylik paket</button><button type="button" class="option" data-period="12" aria-pressed="false">1 yillik paket</button></div></div>
+      <div class="divider"></div>
+      <div class="field"><div class="f-title">Texnik xizmat <small>Agentlar soniga qarab avtomatik</small></div>
+        <div class="support-box"><div><div class="caption" id="support-tier">3 agent uchun</div><strong id="support-price">$200</strong></div><div class="text-green" style="font-size:12px;font-weight:750">Avtomatik ✓</div></div>
+        <span class="small-label">Texnik xizmat qaysi davr uchun?</span>
+        <div class="choices" role="group" aria-label="Texnik xizmat to‘lov davri"><button type="button" class="option selected" data-support="once" aria-pressed="true">Bir martalik</button><button type="button" class="option" data-support="monthly" aria-pressed="false">Har oy</button></div>
+        <p class="field-help">Texnik xizmat davriyligi hali aniqlashtirilmagan. Hozir «bir martalik» taxmini tanlangan — shartnomaga qarab almashtiring.</p>
+      </div>
+      <div class="divider"></div>
+      <div class="field"><div class="f-title">Telefon qo‘ng‘iroqlari <small>Qo‘shimcha xizmat</small></div><div class="choices choice-3" role="group" aria-label="Telefoniya turi"><button type="button" class="option selected" data-phone="none" aria-pressed="true">Kerak emas</button><button type="button" class="option" data-phone="personal" aria-pressed="false">Shaxsiy raqam<br><span style="font-weight:500;font-size:11px">42 000 / oy</span></button><button type="button" class="option" data-phone="company" aria-pressed="false">Kompaniya raqami<br><span style="font-weight:500;font-size:11px">110 000 / oy</span></button></div>
+        <div class="phone-num" id="phoneCountRow" hidden><label for="phones">Raqamlar soni</label><div class="stepper"><button type="button" data-step="phones:-1" aria-label="Raqamni kamaytirish">−</button><input id="phones" aria-label="Raqamlar soni" inputmode="numeric" type="number" min="1" max="999" value="1"><button type="button" data-step="phones:1" aria-label="Raqamni oshirish">+</button></div></div>
+        <p class="field-help" id="phoneHelp">Telefon xarajati tanlangan raqamlar soniga ko‘paytirilib har oy hisoblanadi.</p>
+      </div>
+    </div></section>
+    <section class="card main-output" aria-label="Natijalar">
+      <div class="summary">
+        <div class="summary-top"><h2>Hisob natijasi</h2><span class="summary-pill" id="selectedBadge">6 oy</span></div>
+        <p class="sum-name">Oylik abonent to‘lovi + telefoniya</p>
+        <div class="sum-big"><span id="monthlySum">567 000</span> <small>so‘m</small></div>
+        <div class="sum-sub" id="monthlyDetail">3 agent × 189 000 so‘m</div>
+        <div class="sum-divider"></div>
+        <div class="sum-row"><span>CRM obunasi / oy</span><strong id="monthlyCrm">567 000 so‘m</strong></div>
+        <div class="sum-row"><span>Telefoniya / oy</span><strong id="monthlyPhone">0 so‘m</strong></div>
+        <div class="sum-technical"><div><span>Texnik xizmat</span><div style="font-size:11px;color:#9fb1c4;margin-top:3px" id="supportFreq">Bir martalik</div></div><strong id="technicalMain">$200</strong></div>
+      </div>
+      <div class="packages"><h3>6 oy va 1 yil taqqoslanishi</h3>
+        <div class="compare-grid">
+          <button class="compare active" type="button" data-compare="6" aria-pressed="true"><span class="period">6 OY</span><strong><span id="sixPrice">3 402 000</span></strong><span class="dollar" id="sixUsd">+ $200 xizmat</span></button>
+          <button class="compare" type="button" data-compare="12" aria-pressed="false"><span class="period">12 OY</span><strong><span id="twelvePrice">6 804 000</span></strong><span class="dollar" id="twelveUsd">+ $200 xizmat</span></button>
+        </div><p class="fineprint">Yuqoridagi so‘mdagi hisob CRM obunasi va tanlangan telefoniya xarajatidan iborat. Dollar xizmat to‘lovi alohida ko‘rsatiladi.</p>
+      </div>
+      <div class="total-section"><p class="total-head" id="totalHeading">6 oylik paket tafsiloti</p>
+        <div class="total-item"><span>CRM obunasi</span><strong id="crmTotal">3 402 000 so‘m</strong></div>
+        <div class="total-item"><span>Telefon xizmati</span><strong id="phoneTotal">0 so‘m</strong></div>
+        <div class="total-item main"><span>Jami so‘m</span><strong id="uzsTotal">3 402 000 so‘m</strong></div>
+        <div class="total-item"><span>Texnik xizmat (USD)</span><strong id="usdTotal">$200</strong></div>
+        <div class="fx-line"><label for="fxRate"><span>Istasangiz, USD kursini kiriting<br><span style="font-weight:400;color:#8593a2;font-size:11px">1 USD = qancha so‘m?</span></span><input type="number" min="1" step="1" id="fxRate" placeholder="Masalan: 12000" inputmode="decimal"></label><div class="fx-total" id="convertedRow" hidden><span>Umumiy ekvivalent</span><strong id="convertedTotal">—</strong></div></div>
+        <div class="alert" id="warning" hidden></div>
+        <div class="actions"><button class="action" type="button" id="copy">⧉ Hisobni nusxalash</button><button class="action primary" type="button" id="print">⎙ PDF / Chop etish</button></div>
+      </div>
+    </section>
+  </div>
+  <footer>OMON CRM • Kalkulyator faqat berilgan narxlar asosida hisoblaydi. Soliq, chegirma va boshqa xarajatlar kiritilmagan.</footer>
+</main>
 <script>
 'use strict';
-const STORE='toursales-insight-v1';
-const order={S:['S2','S5','S1','S3','S4','S6','S8','S7','S9'],P:['P1','P2','P3','P6','P5','P7','P8','P9','P4'],I:['I1','I2','I4','I3','I5','I8','I6','I7'],N:['N1','N2','N3','N4','N5','N6','N9','N7','N8']};
-const essential={S:['S2','S5','S1','S6'],P:['P1','P2','P6','P5'],I:['I1','I2','I4','I8'],N:['N1','N2','N7','N8']};
-let extended=false,calcStep=0,presentSlide=0;
-const calcStages=[{title:'Hozirgi holat',subtitle:'Avval sotuv voronkasining real faktlari',icon:'01'},{title:'Yo‘qotishlar',subtitle:'Qaysi so‘rovlar e’tibordan chetda qolmoqda?',icon:'02'},{title:'O‘sish farazlari',subtitle:'Sotuv o‘sishi bo‘yicha alohida tekshiriladigan taxminlar',icon:'03'},{title:'Xarajat va natija',subtitle:'Investitsiya, vaqt va sof natijani solishtirish',icon:'04'}];
-const phases=[
-{id:'S',name:'Situation',uz:'Vaziyat',desc:'Agentlikda hozir ish qanday yuritilayotganini aniqlang. Taxmin emas, fakt va son yig‘ing.',color:'#3886b4',qs:[
-['Bir oyda nechta yangi so‘rov (lid) keladi?','Telegram, Instagram, telefon, sayt va tavsiyalarni alohida so‘rab ko‘ring.'],
-['Murojaatlar qaysi kanallardan keladi va kim qabul qiladi?','Bir mijoz bir nechta kanalda yozsa, bu qanday aniqlanadi?'],
-['Bir lidga birinchi javob berish o‘rtacha qancha vaqt oladi?','Ish vaqtidan tashqari kelgan murojaatlar bilan nima bo‘ladi?'],
-['Nechta menejer sotuv bilan shug‘ullanadi?','Mijozlarni taqsimlash kimning qo‘lida?'],
-['So‘rovdan bron/tour sotilgungacha qanday bosqichlar bor?','Bosqichlarni rahbar tili bilan yozib oling.'],
-['Mijoz javob bermasa qayta aloqa qilish qoidasi bormi?','Qachon, necha marta va kim kuzatadi?'],
-['Bron, to‘lov va qoldiq qarzlarni qayerda yuritasiz?','Excel, daftar, Telegram yoki boshqa dastur?'],
-['Rahbar kunlik sotuv va menejer natijasini qayerdan ko‘radi?','Hisobotni olish uchun qancha vaqt sarflanadi?'],
-['Qayta xarid qiluvchi mijozlar bazasi qanday yuritiladi?','Oldingi turistlarni mavsumga qarab qayta chaqirasizmi?']
-]},
-{id:'P',name:'Problem',uz:'Muammo',desc:'Jarayon qayerda uzilayotganini aniqlang. So‘zlarni rahbarning o‘zidan olish muhim.',color:'#d28a34',qs:[
-['Kelgan so‘rovlar ichida javobsiz yoki kech javob berilganlari bo‘ladimi?','Muammo bo‘lsa, bir oyda nechtaligi yoki foizini so‘rang.'],
-['Menejer qayta qo‘ng‘iroq qilishni unutgan holatlar uchraydimi?','Eng so‘nggi holatni misol qilib so‘rang.'],
-['Mijoz tarixi turli chatlarda tarqoq qoladimi?','Oldingi suhbatlarni topish qancha vaqt oladi?'],
-['Bir mijozga ikki menejer qayta-qayta yozib yuboradimi?','Takroriy lidni aniqlash mexanizmi bormi?'],
-['Mijozning to‘lov muddati yoki bronning statusi nazoratdan chiqadimi?','Buning real oqibatini so‘rang.'],
-['Rahbar bo‘lmaganda lid va sotuv intizomi pasayadimi?','Kim nimani bajarganini masofadan bilish mumkinmi?'],
-['Reklama kelayotgan bo‘lsa ham qaysi kanal sotuv bergani noma’lummi?','So‘rov ko‘p, sotuv kam kanal bormi?'],
-['Menejer ketganida mijozlar tarixi yo‘qolish xavfi bormi?','Raqam va chatlar xodimning shaxsiy akkauntidami?'],
-['Bekor bo‘lgan bronlarni qayta sotuvga aylantirish qiyinmi?','Sabablar va qayta aloqa mexanizmini so‘rang.']
-]},
-{id:'I',name:'Implication',uz:'Oqibat',desc:'Muammo biznesga qancha pul, vaqt va imkoniyatga tushayotganini rahbar bilan hisoblang.',color:'#c25b64',qs:[
-['Bir oyda javobsiz qolgan so‘rovlarning bir qismi sotuv bo‘lsa, bu qancha foyda bo‘lishi mumkin?','Bir bronning foydasi × taxminiy yo‘qotilgan bronlar.'],
-['Menejer unutgan follow-up tufayli nechta mijoz raqobatchiga ketishi mumkin?','Taxminni fakt sifatida emas, ssenariy sifatida yozing.'],
-['Reklamaga sarflangan mablag‘ning qanchasi yopilmagan so‘rovlarga ketmoqda?','Reklama xarajati va kanal konversiyasini solishtiring.'],
-['Kunlik qo‘lda hisobot va nazoratga nechta ish soati ketadi?','Haftalik yoki oylikka aylantiring.'],
-['Kecha javobsiz qolgan so‘rovlar haqidagi ma’lumotni bugun kim aytib bera oladi?','Aniq javob yo‘qligi nazoratdagi bo‘shliqni ko‘rsatadi.'],
-['Mijozga kech javob berish brend obro‘siga qanday ta’sir qilyapti?','Shikoyat yoki salbiy holatlar mavjudmi?'],
-['Sotuv hajmi 20% oshsa, hozirgi jarayon buni ko‘tara oladimi?','Ko‘proq xodim yollash talab etiladimi?'],
-['Tizimsiz davom etsa, 6 oy ichida qaysi muammo eng qimmatga tushadi?','Rahbarning o‘zi eng muhim riskni tanlasin.']
-]},
-{id:'N',name:'Need-Payoff',uz:'Yechim qiymati',desc:'Rahbar o‘z tilida kerakli natijani aytsin. Platformani majburan sotish o‘rniga natijani bog‘lang.',color:'#119989',qs:[
-['Barcha so‘rovlar bitta oynada ko‘rinsa, nima o‘zgarardi?','Qaysi jarayon birinchi bo‘lib osonlashishini so‘rang.'],
-['Har bir mijozga mas’ul menejer va keyingi vazifa aniq bo‘lsa, qanday foyda bo‘ladi?','O‘zgarishni rahbar raqam bilan ifodalasin.'],
-['Javobsiz lidlar avtomatik eslatma sifatida chiqsa, bu muammoni kamaytiradimi?','Qaysi xodim bunga javobgar bo‘ladi?'],
-['Rahbar telefonidan kunlik konversiya va tushumni ko‘rsa, qarorlar tezlashadimi?','Qaysi ko‘rsatkich unga eng muhim?'],
-['Eski mijozlarga qayta taklif yuborish tartiblansa, qo‘shimcha sotuv imkoniyati bormi?','Mavsum, yo‘nalish va segment bilan so‘rang.'],
-['To‘lov va bron jarayonining qaysi nazorati birinchi navbatda kerak?','Kerakli integratsiyani alohida tekshiring.'],
-['1 oy sinov o‘tkazsak, muvaffaqiyat mezoni nima bo‘ladi?','Masalan, javob vaqti, follow-up bajarilishi yoki konversiya.'],
-['Bunday natijaga erishish uchun joriy qilishni kim bilan kelishasiz?','Qaror, muddat va ishtirokchilarni aniqlang.'],
-['Siz uchun qaysi natija eng qimmatli: ko‘proq sotuv, vaqt nazorati yoki shaffoflik?','Rahbar aytgan ustuvorlikni xulosaga kiriting.']
-]}];
-const questions=phases.flatMap(p=>p.qs.map((q,i)=>({id:p.id+(i+1),phase:p.id,title:q[0],hint:q[1]})));
-const categories=[{id:'lead',name:'Lidlar va sotuv',desc:'Savdo voronkasi, javob tezligi va yo‘qolayotgan so‘rovlar'},{id:'team',name:'Menejer va vaqt',desc:'Qayta aloqa, kundalik ish va vaqt samaradorligi'},{id:'cost',name:'Investitsiya',desc:'Joriy etish xarajatlari va payback ssenariysi'}];
-const initialMetrics=()=>({leads:'',sales:'',missPct:'',missedCount:'',ticket:'',profit:'',recoveryPct:'',recoveryClosePct:'',followupPct:'',staff:'',hours:'',days:'',hourCost:'',timeSavingPct:'',crmFee:'',setup:''});
-const makeClient=(name='Yangi turagentlik')=>({id:'c'+Date.now()+'-'+Math.floor(Math.random()*100000),name,manager:'',contact:'',date:new Date().toISOString().slice(0,10),priority:'',notes:'',title:'',email:'',telegram:'',region:'',website:'',agencyYears:'',teamSize:'',leadSources:'',currentTool:'',decisionRole:'',decisionTeam:'',meetingTime:'',meetingPlace:'',meetingType:'offline',meetingStatus:'rejalashtirilgan',openingTone:'professional',openingNotes:'',rapportTopic:'',meetingAgenda:'',decisionDate:'',nextStep:'',nextDate:'',kickoff:{},answers:{},metrics:initialMetrics(),createdAt:new Date().toISOString()});
-let clients=[],activeId='',view='home',phase='S';
-function load(){try{const x=JSON.parse(localStorage.getItem(STORE));if(x&&Array.isArray(x.clients)&&x.clients.length){clients=x.clients;activeId=x.activeId||clients[0].id;return}}catch(e){}clients=[makeClient()];activeId=clients[0].id}
-function save(){try{localStorage.setItem(STORE,JSON.stringify({clients,activeId}))}catch(e){console.warn('Storage unavailable',e)}}
-function current(){return clients.find(c=>c.id===activeId)||clients[0]}
-function esc(x){return String(x==null?'':x).replace(/[&<>"']/g,a=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[a]))}
-function n(x){const v=Number(x);return Number.isFinite(v)?Math.max(0,v):0}
-function pct(x){return Math.min(100,Math.max(0,n(x)))/100}
-function fmt(v,d=0){return new Intl.NumberFormat('uz-UZ',{maximumFractionDigits:d,minimumFractionDigits:d}).format(Number.isFinite(v)?v:0)}
-function money(v){return fmt(Math.round(v))+' so‘m'}
-function moneyShort(v){if(Math.abs(v)>=1e9)return fmt(v/1e9,2)+' mlrd';if(Math.abs(v)>=1e6)return fmt(v/1e6,2)+' mln';if(Math.abs(v)>=1e3)return fmt(v/1e3,0)+' ming';return fmt(v)}
-function info(factor=1){
-  const m=current().metrics||initialMetrics();
-  const filled=k=>m[k]!==''&&m[k]!==undefined&&m[k]!==null;
-  const leads=n(m.leads),rawSales=n(m.sales),sales=Math.min(rawSales,leads);
-  const manualMiss=filled('missedCount');
-  const rawMiss=manualMiss?n(m.missedCount):leads*pct(m.missPct);
-  const missed=Math.min(rawMiss,leads),missPct=leads?missed/leads:0;
-  const reached=Math.max(0,leads-missed),eligible=Math.max(0,reached-sales);
-  const closeRate=reached?Math.min(1,sales/reached):0,conversion=leads?sales/leads:0;
-  const recoveredLeads=missed*Math.min(1,pct(m.recoveryPct)*factor);
-  const recoveredSales=recoveredLeads*Math.min(1,pct(m.recoveryClosePct)*factor);
-  const extraFollowups=eligible*Math.min(1,pct(m.followupPct)*factor);
-  const extraBookings=recoveredSales+extraFollowups;
-  const profit=n(m.profit),ticket=n(m.ticket);
-  const grossProfit=extraBookings*profit,revenue=extraBookings*ticket;
-  const workHours=n(m.staff)*n(m.hours)*n(m.days)*pct(m.timeSavingPct);
-  const timeValue=workHours*n(m.hourCost),fee=n(m.crmFee),setup=n(m.setup),netCash=grossProfit-fee;
-  const roi=filled('crmFee')&&fee>0?netCash/fee*100:null;
-  const firstMonthNet=netCash-setup;
-  const payback=netCash>0&&setup>0?setup/netCash:null;
-  const invalidSales=filled('sales')&&rawSales>reached;
-  const invalidMissed=manualMiss&&rawMiss>leads;
-  const invalidProfit=filled('ticket')&&ticket>0&&profit>ticket;
-  const invalidRates=['missPct','recoveryPct','recoveryClosePct','followupPct','timeSavingPct'].some(k=>filled(k)&&(Number(m[k])<0||Number(m[k])>100));
-  const valid=!invalidSales&&!invalidMissed&&!invalidProfit&&!invalidRates;
-  const hasBaseData=filled('leads')&&leads>0&&filled('sales')&&(manualMiss||filled('missPct'))&&filled('profit')&&profit>0;
-  const hasAssumptions=filled('recoveryPct')&&filled('recoveryClosePct')&&filled('followupPct');
-  const hasData=hasBaseData&&hasAssumptions&&valid;
-  const hasFee=filled('crmFee');
-  return {leads,sales,missed,missPct,reached,eligible,closeRate,conversion,recoveredLeads,recoveredSales,extraFollowups,extraBookings,grossProfit,revenue,workHours,timeValue,fee,setup,netCash,roi,firstMonthNet,payback,invalidSales,invalidMissed,invalidProfit,invalidRates,hasFee,hasBaseData,hasAssumptions,hasData,valid,missingProfit:!filled('profit')||!profit};
+const PRICES = Object.freeze({ agent:189000, personal:42000, company:110000 });
+const $=id=>document.getElementById(id);
+const state={agents:3,months:6,supportFrequency:'once',phoneType:'none',phones:1,exchangeRate:null};
+const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n)).replace(/\u00a0/g,' ');
+const currency=n=>fmt(n)+' so‘m';
+const dollar=n=>'$'+fmt(n);
+function capInt(value,min,max,fallback){const n=Number(value);return Number.isFinite(n)&&n>=min?Math.min(max,Math.floor(n)):fallback}
+function getSupport(agents){if(agents<3)return null; if(agents===3)return 200; if(agents<=5)return 300;return 400}
+function calculate(s=state,months=s.months){
+  const crmMonthly=s.agents*PRICES.agent;
+  const phoneMonthly=s.phoneType==='none'?0:s.phones*PRICES[s.phoneType];
+  const supportUsd=getSupport(s.agents);
+  const technicalTotal=supportUsd===null?null:supportUsd*(s.supportFrequency==='monthly'?months:1);
+  const sumUzs=(crmMonthly+phoneMonthly)*months;
+  const sumAll=s.exchangeRate&&technicalTotal!==null?sumUzs+technicalTotal*s.exchangeRate:null;
+  return {crmMonthly,phoneMonthly,monthly:crmMonthly+phoneMonthly,crmTotal:crmMonthly*months,phoneTotal:phoneMonthly*months,uzsTotal:sumUzs,supportUsd,technicalTotal,sumAll};
 }
-function statsAnswered(){const a=current().answers||{};return questions.filter(q=>a[q.id]&&(a[q.id].status||a[q.id].note)).length}
-function problems(){const a=current().answers||{};return questions.filter(q=>q.phase==='P'&&a[q.id]&&a[q.id].status==='problem')}
-function priorities(){const ps=problems();const s=ps.map(q=>q.title);const suggestions=[];if(s.some(x=>/javobsiz|kech/.test(x)))suggestions.push({title:'Murojaatlarni yo‘qotmaslik',why:'Kanallar bo‘yicha kelgan lidlarning mas’uli, statusi va birinchi javob vaqtini kuzatish.',test:'Sinovda javobsiz lidlar ulushini o‘lchang.'});if(s.some(x=>/qayta|follow-up|Bekor/.test(x)))suggestions.push({title:'Follow-up intizomi',why:'Har bir ochiq so‘rov uchun keyingi aloqa sanasi va bajarilish nazoratini joriy qilish.',test:'Muddati o‘tgan vazifalar sonini o‘lchang.'});if(s.some(x=>/tarix|ikki menejer|ketganida/.test(x)))suggestions.push({title:'Yagona mijoz tarixi',why:'Mijoz, mas’ul shaxs va o‘zaro aloqa yozuvlarini markazlashgan tartibda yuritish.',test:'Mijoz tarixini topishga ketgan vaqtni solishtiring.'});if(s.some(x=>/Reklama|Rahbar|natija/.test(x)))suggestions.push({title:'Rahbar uchun analitika',why:'Lead manbasi, menejer, bosqich va sotuv bo‘yicha muntazam hisobot.',test:'Kunlik hisobot tayyorlash vaqtini o‘lchang.'});if(s.some(x=>/to‘lov|bron|qoldiq/.test(x)))suggestions.push({title:'Bron va to‘lov nazorati',why:'Bron statuslari va to‘lov muddatlarini yagona ish jarayoniga bog‘lash.',test:'Kechikkan to‘lov bo‘yicha eslatmalarni sinang; kerakli integratsiyalarni tekshiring.'});return suggestions.length?suggestions:[{title:'Avval asosiy muammoni aniqlang',why:'Problem bosqichida rahbar tasdiqlagan muammolarni belgilang. Hozir aniq tashxis uchun dalil yetarli emas.',test:'1–2 ta muammoni misol va raqam bilan tasdiqlang.'}]}
-function setView(v){
- if(view==='present'&&v!=='present'&&!confirm('Ekran ulashish tugadimi? Ichki savollar va qaydlar ko‘rinishi mumkin.'))return;
- view=v;try{sessionStorage.setItem('toursales-presenting',v==='present'?'1':'0')}catch(e){}render();window.scrollTo({top:0,behavior:'instant'});
-}
-function setPhase(p){phase=p;render();window.scrollTo({top:0,behavior:'smooth'})}
-function header(title,sub,side=''){return `<div class="heading-row"><div><div class="eyebrow">Turagentlik diagnostikasi</div><h1 class="page-title">${title}</h1><p class="subhead">${sub}</p></div>${side}</div>`}
-function stat(label,val,hint='',type=''){return `<div class="stat ${type}"><div class="k">${label}</div><div class="v">${val}</div><div class="hint">${hint}</div></div>`}
-function home(){const c=current(),o=info(),answered=statsAnswered();return header('Sotuv uchrashuvini raqam bilan boshqaring','SPIN orqali holatni o‘rganing, yo‘qotishni hisoblang va rahbarga asosli xulosa ko‘rsating.',`<span class="pill">● Lokal ish maydoni</span>`)+`<div class="hero"><div><div class="tag">Savol → Diagnostika → Qaror</div><h2>Rahbar muammoni o‘zi aytsin.<br>Hisobni siz ko‘rsating.</h2><p>Avval ish jarayonini tushuning, so‘ng real ko‘rsatkichlarni kiriting. Natijada imkoniyat, taxminlar va keyingi uchrashuv uchun bir sahifalik hisobot chiqadi.</p><button class="btn primary" onclick="setView('opening')">01 · Kirish va tanishuv →</button> <button class="btn" onclick="openPresentation()">▣ Taqdimot rejimi</button></div></div>
-<div class="grid four stats">${stat('SPIN javoblari',answered+' / '+questions.length,'Qayd qilingan javoblar')}${stat('Aniqlangan muammolar',String(problems().length),'Rahbar bilan tasdiqlangan','negative')}${stat('Mavjud konversiya',o.leads?fmt(o.conversion*100,1)+'%':'—','Sotuv / murojaat')}${stat('Oylik qo‘shimcha foyda',o.hasData?moneyShort(o.grossProfit)+' so‘m':'—','Ssenariy, kafolat emas','positive')}</div>
-<div class="grid two"><div class="panel"><h2 class="panel-title">Agentlik kartasi</h2><p class="panel-sub">Har bir uchrashuv uchun alohida saqlanadi. Rahbar profili va suhbatga kirish ma’lumotlarini <button class="btn sm" onclick="setView('opening')" style="margin-top:9px">To‘liq to‘ldirish →</button> orqali kiriting.</p><div class="form-grid two-col">${field('name','Turagentlik nomi',c.name,'Masalan: Samarqand Travel','text','client')}${field('manager','Rahbar ismi',c.manager,'Ism va lavozim','text','client')}${field('contact','Aloqa / telefon',c.contact,'Ixtiyoriy','text','client')}${field('date','Uchrashuv sanasi',c.date,'','date','client')}</div><div style="margin-top:17px" class="field"><label>Rahbarning asosiy maqsadi</label><textarea data-client="priority" placeholder="Masalan: kelgan lidlarni ko‘proq sotuvga aylantirish">${esc(c.priority)}</textarea></div><div style="margin-top:17px" class="field"><label>Qo‘shimcha kuzatuv</label><textarea data-client="notes" placeholder="Muhim faktlar, e'tirozlar, kelishuvlar...">${esc(c.notes)}</textarea></div></div>
-<div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 class="panel-title" style="margin:0">Agentliklar ro‘yxati</h2><button class="btn sm primary" id="newClient">+ Yangi</button></div><p class="panel-sub" style="margin-top:8px">Boshqa turagentlik uchun alohida audit oching.</p><div class="client-list">${clients.map(x=>`<div class="client-item ${x.id===activeId?'active':''}"><button data-switch="${esc(x.id)}">${esc(x.name||'Nomsiz agentlik')}<small>${esc(x.date||'')}</small></button>${clients.length>1?`<button title="O‘chirish" style="flex:0;color:#c74b56" data-delete="${esc(x.id)}">✕</button>`:''}</div>`).join('')}</div><div class="rule"></div><div class="inline-note"><strong>Eslatma:</strong> Natijalar brauzer xotirasida turadi. Ularni boshqa qurilmaga o‘tkazish yoki zaxiralash uchun JSON eksportdan foydalaning. Maxfiy ma'lumotlarni umumiy qurilmada qoldirmang.</div><div style="margin-top:16px"><label class="btn sm" style="cursor:pointer">↑ JSON import <input id="importInput" type="file" accept=".json,application/json" hidden></label></div></div></div>
-<div class="section-head"><h2>Uchrashuv ketma-ketligi</h2><span>Kirish + 4 bosqichli SPIN</span></div><div class="steps"><div class="stepcard" onclick="setView('opening')"><div class="step-top"><div class="step-num">K</div><span class="progresslabel">${openingProgress()}/5</span></div><b>Kirish</b><p>Tanishuv, rahbar profili, suhbatga ruxsat va kun tartibi.</p><div class="meter" style="margin-top:18px"><i style="width:${openingProgress()*20}%"></i></div></div>${phases.map(p=>{const count=p.qs.filter((_,i)=>{const a=c.answers?.[p.id+(i+1)];return a&&(a.note||a.status)}).length;return `<div class="stepcard" data-phase="${p.id}"><div class="step-top"><div class="step-num">${p.id}</div><span class="progresslabel">${count}/${p.qs.length}</span></div><b>${p.uz}</b><p>${p.desc}</p><div class="meter" style="margin-top:18px"><i style="width:${count/p.qs.length*100}%"></i></div></div>`}).join('')}</div><div class="footer">TourSales Insight · SPIN savollar va moliyaviy gipoteza kalkulyatori</div>`}
-function field(key,label,value,placeholder='',type='number',scope='metric',detail=''){const attr=scope==='metric'?'data-metric':'data-client';return `<div class="field"><label for="f-${key}">${label}</label><input id="f-${key}" ${attr}="${key}" type="${type}" ${type==='number'?'min="0" step="any" inputmode="decimal"':''} value="${esc(value)}" placeholder="${esc(placeholder)}">${detail?`<div class="detail">${detail}</div>`:''}</div>`}
-
-const openingItems=[
- ['greeting','Tanishdim va rahbarning lavozimini aniqladim'],
- ['time','Uchrashuv uchun ajratilgan vaqtni kelishdik'],
- ['purpose','Bugungi suhbatdan kutilgan natijani so‘radim'],
- ['permission','Savol berish va qayd olishga ruxsat oldim'],
- ['bridge','Ish jarayonini o‘rganishga (Situation) tabiiy o‘tdim']
-];
-function openingProgress(){const k=current().kickoff||{};return openingItems.filter(([id])=>Boolean(k[id])).length}
-function selectClient(key,label,value,opts,detail=''){
- return `<div class="field"><label for="f-${key}">${label}</label><select id="f-${key}" data-client="${key}">${opts.map(([v,t])=>`<option value="${esc(v)}" ${String(value??'')===v?'selected':''}>${esc(t)}</option>`).join('')}</select>${detail?`<div class="detail">${esc(detail)}</div>`:''}</div>`;
-}
-function opening(){
- const c=current(),k=c.kickoff||{},name=(c.manager||'rahbar').trim();
- const greeting=name==='rahbar'?'Assalomu alaykum!':'Assalomu alaykum, '+name+'!';
- const scripts={
-  professional:`${greeting} Vaqt ajratganingiz uchun rahmat. Men turagentliklarning sotuv va mijoz bilan ishlash jarayonlarini o‘rganib, qaysi joylarda qo‘shimcha imkoniyat borligini raqamlar orqali aniqlash bilan shug‘ullanaman.\n\nAgar ma’qul bo‘lsa, 20–25 daqiqa ichida avval hozirgi ish tartibingizni tushunaman, keyin ayrim qiyinchiliklarni muhokama qilamiz. Oxirida sizga mos kelishi mumkin bo‘lgan hisob-kitobni ko‘rsataman.\n\nSiz uchun bugungi suhbat foydali bo‘lishi uchun qaysi masala birinchi o‘rinda?`,
-  short:`${greeting} Uchrashuv uchun rahmat. Men sizga shunchaki CRM ko‘rsatishdan ko‘ra, avval agentlikdagi sotuv jarayonini tushunib olishni xohlayman.\n\n15–20 daqiqa bir nechta savol berib, so‘ng taxminiy raqamlarda qayerda imkoniyat borligini ko‘rsatsam, maylimi?\n\nAyni paytda jamoangizda eng katta vazifa nima?`,
-  warm:`${greeting} Ishlaringiz yaxshimi? Uchrashuvga vaqt ajratganingizdan xursandman.\n\nMen avval biznesingiz qanday ishlashini tushunmoqchiman. Siz aytgan vaziyatlarga qarab, keyin foydali bo‘lishi mumkin bo‘lgan usullarni raqam bilan birga ko‘rib chiqamiz.\n\nAgar qarshi bo‘lmasangiz, avval sizning hozirgi ustuvor maqsadingizdan boshlasak?`
- };
- const tone=scripts[c.openingTone]||scripts.professional;
- const row=(key,label,placeholder='',type='text')=>field(key,label,c[key]??'',placeholder,type,'client');
- const area=(key,label,placeholder='',rows=3)=>`<div class="field"><label for="op-${key}">${label}</label><textarea id="op-${key}" rows="${rows}" data-client="${key}" placeholder="${esc(placeholder)}">${esc(c[key]||'')}</textarea></div>`;
- return header('01 · Kirish va rahbar profili','Tanishuv → vaqt va maqsad → savolga ruxsat → SPIN. Bu bo‘lim ichki: taqdimotda rahbarning shaxsiy ma’lumotlari va skript ko‘rinmaydi.',`<button class="btn primary" onclick="setView('spin')">Situation savollariga o‘tish →</button>`)+
- `<div class="confidential">🔒 <strong>FAQAT ICHKI ISH MAYDONI.</strong> Ekran ulashishdan oldin «Rahbarga taqdimot»ni bosing. F.I.Sh., telefon, Telegram, email va ichki qaydlar taqdimotda yashiriladi. Saqlash faqat joriy brauzerda amalga oshadi.</div>`+
- `<div class="grid two" style="margin-top:18px"><div class="panel"><h2 class="panel-title">Rahbar ma’lumotlari</h2><p class="panel-sub">Suhbatdan avval bilganlaringizni kiriting, qolganini uchrashuvda to‘ldirasiz.</p><div class="opening-profile">${row('manager','Rahbar F.I.Sh.','Ism va familiya')}${row('title','Lavozimi','Ta’sischi / Direktor')}${row('contact','Telefon','+998 ...','tel')}${row('telegram','Telegram username','@username')}${row('email','Email','example@mail.uz','email')}${selectClient('decisionRole','Qaror qabul qilish roli',c.decisionRole,[['','Aniqlanmagan'],['owner','Ega / ta’sischi'],['director','Direktor'],['manager','Boshqaruvchi'],['influencer','Tavsiya beruvchi / sherik']])}</div><div style="margin-top:16px">${area('decisionTeam','Qarorga yana kimlar ta’sir qiladi?','Sherik, bosh hisobchi, sotuv rahbari…',2)}</div></div>`+
- `<div class="panel"><h2 class="panel-title">Turagentlik haqida</h2><p class="panel-sub">Biznesni tushunish uchun dastlabki profil. Bu ma’lumotlar SPIN faktlari bilan to‘ldiriladi.</p><div class="opening-profile">${row('name','Turagentlik nomi','Agentlik')}${row('region','Shahar / hudud','Toshkent, ...')}${row('website','Sayt / Instagram','@agentlik yoki URL')}${row('agencyYears','Necha yildan beri ishlaydi?','Masalan: 5 yil')}${row('teamSize','Xodim / sotuvchilar soni','Masalan: 8 / 5')}${row('currentTool','Hozirgi CRM / hisob vositasi','Excel, AmoCRM, Telegram ...')}</div><div style="margin-top:16px">${area('leadSources','Asosiy mijoz keladigan kanallar','Instagram, Telegram, reklama, tavsiyalar…',2)}</div></div></div>`+
- `<div class="section-head"><h2>Uchrashuv tafsilotlari</h2><span>Oldindan tayyorlab qo‘ying</span></div><div class="panel"><div class="form-grid">${row('date','Sana','','date')}${row('meetingTime','Vaqt','','time')}${row('meetingPlace','Joy / havola','Ofis yoki onlayn havola')}${selectClient('meetingType','Format',c.meetingType,[['offline','Ofisda / yuzma-yuz'],['online','Onlayn / videomuloqot'],['phone','Telefon']])}${selectClient('meetingStatus','Uchrashuv holati',c.meetingStatus,[['rejalashtirilgan','Rejalashtirilgan'],['jarayonda','Jarayonda'],['yakunlangan','Yakunlangan'],['keyinga','Keyinga ko‘chirildi']])}${row('nextDate','Keyingi aloqa sanasi','','date')}</div><div class="form-grid two-col" style="margin-top:18px">${area('priority','Rahbarning eng muhim biznes maqsadi','Masalan, menejerlarni nazorat qilish, so‘rov yo‘qotmaslik…')}${area('rapportTopic','Tanishuv uchun kontekst / qiziqish','Ochilishiga, yangi filialiga yoki biznesdagi yutug‘iga tabrik — faqat haqiqatni ayting.')}</div></div>`+
- `<div class="section-head"><h2>Kirish suhbatining jonli ssenariysi</h2><span>Mahsulotni darhol sotishga shoshilmang</span></div><div class="grid two" style="align-items:start"><div><div class="panel" style="margin-bottom:15px"><div class="field"><label>Nutq uslubi</label><select data-client="openingTone" id="openingTone"><option value="professional" ${!c.openingTone||c.openingTone==='professional'?'selected':''}>Rasmiy · maslahatga yo‘naltirilgan</option><option value="short" ${c.openingTone==='short'?'selected':''}>Qisqa · aniq</option><option value="warm" ${c.openingTone==='warm'?'selected':''}>Samimiy · iliq</option></select></div></div><div class="opening-script"><span class="eyebrow">Tayyor kirish matni · ${esc(c.name||'turagentlik')}</span><h2>Suhbatni qanday boshlash</h2><p class="opening-quote">${esc(tone)}</p><p class="script-hint">Bu so‘zma-so‘z yodlash uchun emas, tabiiy suhbat andozasi. Rahbar vaqtini va muhokama chegarasini kelishing.</p><button class="btn sm" id="copyOpening" type="button">⧉ Matnni nusxalash</button></div><div class="opening-tagline"><b>O‘tish (bridge):</b> «Tushundim. Unda, avval sizda yangi mijoz kelganidan tur bron qilingungacha qanday ketma-ketlik borligini ko‘rsak?»<br><b>Keyingi qadam:</b> SPIN → Situation. Savollarni suhbat tarzida bering, birvarakayiga sanamang.</div></div>`+
- `<div><div class="panel"><h2 class="panel-title">Kirishdagi 5 muhim harakat</h2><p class="panel-sub">Belgilanganlar shu agentlik profilida saqlanadi.</p><div class="opening-checks">${openingItems.map(([id,label])=>`<label class="opening-check ${k[id]?'checked':''}"><input type="checkbox" data-opening-check="${id}" ${k[id]?'checked':''}><span>${esc(label)}</span></label>`).join('')}</div><div class="opening-progress"><span class="progresslabel" id="openingProgressText">${openingProgress()}/5 bajarildi</span><div class="meter"><i id="openingProgressBar" style="width:${openingProgress()*20}%"></i></div></div></div><div class="panel" style="margin-top:15px"><h2 class="panel-title">Kirishda beriladigan 3 ta savol</h2><div class="opening-tips" style="grid-template-columns:1fr"><div class="opening-tip"><small>MAQSAD</small><h3>“Bugungi suhbatdan qanday natija olishni xohlaysiz?”</h3><p>Rahbar nimaga e’tibor qaratishini uning o‘zidan oling.</p></div><div class="opening-tip"><small>USTUVORLIK</small><h3>“Hozir kompaniya o‘sishida qaysi masala eng dolzarb?”</h3><p>Yechim emas, muhim biznes mavzusini aniqlang.</p></div><div class="opening-tip"><small>RUXSAT</small><h3>“Bir nechta aniq savol berib, keyin raqamlarga o‘tsak, ma’qulmi?”</h3><p>Suhbat formatini kelishing va SPIN’ga yumshoq o‘ting.</p></div></div></div></div></div>`+
- `<div class="section-head"><h2>Ichki qaydlar va kelishuv</h2><span>Taqdimotda ko‘rinmaydi</span></div><div class="panel"><div class="form-grid two-col">${area('openingNotes','Rahbarning birinchi javobi va kuzatuvlar','Qanday urg‘u berdi? Qaysi so‘zlari keyingi savol uchun muhim?')}${area('meetingAgenda','Kelishilgan suhbat yo‘nalishi','Masalan: javobsiz so‘rovlar, sotuvchilar intizomi, hisobot…')}${area('nextStep','Keyingi harakat va kim mas’ul','Demo, taklif, sinov uchrashuvi, ma’lumot yuborish…')}${area('notes','Qo‘shimcha ichki eslatmalar','E’tirozlar, shartlar, muhim shaxslar…')}</div><div class="actionsline"><button class="btn" onclick="setView('home')">← Bosh sahifa</button><button class="btn primary" onclick="setView('spin')">02 · SPIN · Situation →</button></div></div>`;
-}
-
-function spin(){
- const c=current(),p=phases.find(x=>x.id===phase),done=statsAnswered();
- const qlist=order[phase].map(id=>questions.find(x=>x.id===id)).filter(Boolean);
- const items=extended?qlist:qlist.filter(q=>essential[phase].includes(q.id));
- const metricByQuestion={S1:{key:'leads',label:'So‘rovlar / oy'},S4:{key:'staff',label:'Sotuv menejerlari'},P1:{key:'missedCount',label:'Javobsiz lidlar / oy'},I1:{key:'profit',label:'Bir bron foydasi (so‘m)'},I4:{key:'hours',label:'Bir menejer vaqt sarfi (soat/kun)'}};
- const prompts={S:'“Avval ish tartibingizni tushunib olay. Sizda mijoz birinchi yozganidan to bron qilgungacha nima bo‘ladi?”',P:'“Shu jarayonda eng ko‘p qaysi joyda mijoz yoki vaqt yo‘qotiladi?”',I:'“Bu holatlar bir oyda takrorlansa, sotuv yoki xarajatga qanday ta’sir qiladi?”',N:'“Agar shu muammoni o‘lchab kamaytirsak, siz uchun natija nima bo‘ladi?”'};
- return header('Uchrashuv skripti · faqat siz uchun','Rahbar bilan tabiiy suhbat o‘tkazing: avval fakt, keyin muammo, oqibat va yechim qiymati.',`<button class="btn primary" onclick="openPresentation()">▣ Rahbarga taqdimot →</button>`)+
- `<div class="confidential">🔒 <strong>ICHKI REJIM:</strong> Bu savollar, eslatmalar va rahbarning shaxsiy javoblari taqdimotda ko‘rsatilmaydi. Ekran ulashishdan oldin “Rahbarga taqdimot” tugmasini bosing.</div>`+
- `<div class="phase-tabs">${phases.map(x=>`<button class="btn ${x.id===phase?'selected':''}" data-phase="${x.id}">${x.id} · ${x.uz}</button>`).join('')}</div>`+
- `<div class="panel interviewer"><span class="eyebrow">${p.name} · ${p.uz}</span><h2>${p.desc}</h2><p class="scriptquote">${prompts[phase]}</p><div class="interview-actions"><span class="pill grey">${done}/${questions.length} qayd</span><button class="btn sm" onclick="toggleExtended()">${extended?'− Qo‘shimcha savollarni yashirish':'+ Barcha savollar ('+qlist.length+')'}</button></div></div>`+
- `<div class="questions">${items.map((q,i)=>{const a=c.answers?.[q.id]||{},link=metricByQuestion[q.id],isEssential=essential[phase].includes(q.id);return `<div class="question"><div class="qid">${i+1}</div><div><div class="question-tags">${isEssential?'<span class="pill">Asosiy</span>':'<span class="pill grey">Qo‘shimcha</span>'}</div><h3>${esc(q.title)}</h3><p class="why">${esc(q.hint)}</p>${link?`<div class="inline-metric"><label for="s-${link.key}">${link.label}</label><input id="s-${link.key}" type="number" min="0" step="any" data-metric="${link.key}" value="${esc(c.metrics?.[link.key]??'')}" placeholder="Sonni kiriting"><small>Kalkulyatorda ham saqlanadi</small></div>`:''}<textarea class="field note" rows="2" data-answer-note="${q.id}" placeholder="Rahbarning javobi va aniq misol...">${esc(a.note||'')}</textarea></div><select data-answer-status="${q.id}" aria-label="Javob holati"><option value="" ${!a.status?'selected':''}>Natija...</option><option value="fact" ${a.status==='fact'?'selected':''}>Fakt</option><option value="problem" ${a.status==='problem'?'selected':''}>Muammo bor</option><option value="no" ${a.status==='no'?'selected':''}>Muammo yo‘q</option><option value="unknown" ${a.status==='unknown'?'selected':''}>Aniqlashtirish</option></select></div>`}).join('')}</div>`+
- `<div class="actionsline"><button class="btn" onclick="setPhase('${phases[Math.max(0,phases.findIndex(x=>x.id===phase)-1)].id}')" ${phase==='S'?'disabled':''}>← Oldingi</button>${phase==='N'?`<button class="btn primary" onclick="setView('calc')">Raqamli hisobga o‘tish →</button>`:`<button class="btn primary" onclick="setPhase('${phases[phases.findIndex(x=>x.id===phase)+1].id}')">Keyingi suhbat qismi →</button>`}</div>`;
-}
-
-function toggleExtended(){extended=!extended;render()}
-function setCalcStep(next){calcStep=Math.min(3,Math.max(0,next));render();window.scrollTo({top:0,behavior:'instant'})}
-function openPresentation(){presentSlide=0;view='present';try{sessionStorage.setItem('toursales-presenting','1')}catch(e){}render();window.scrollTo({top:0,behavior:'instant'})}
-function setPresentSlide(next){presentSlide=Math.min(3,Math.max(0,next));render();window.scrollTo({top:0,behavior:'instant'})}
-function printPublic(){presentSlide=0;view='present';try{sessionStorage.setItem('toursales-presenting','1')}catch(e){}render();setTimeout(()=>window.print(),120)}
-function calcLive(){const o=info(),lo=info(.6),hi=info(1.3);const good=o.hasData;
- const mark=(val,fn=money)=>good?fn(val):'—';
- return `<div class="live-top"><div><span class="eyebrow">Jonli biznes modeli</span><h2>O‘zgarishning hisobiy qiymati</h2></div><span class="pill ${good?'':'orange'}">${good?'Hisob tayyor':'Ma’lumot to‘ldirilmoqda'}</span></div>`+
- (!o.valid?`<div class="alert">⚠ Ma’lumotlarni tekshiring: ${o.invalidMissed?'javobsiz so‘rovlar jami so‘rovlardan ko‘p. ':''}${o.invalidSales?'sotuvlar javob berilgan so‘rovlardan ko‘p. ':''}${o.invalidProfit?'bir bron foydasi bron tushumidan ko‘p. ':''}${o.invalidRates?'foiz 0–100 oralig‘ida bo‘lishi kerak. ':''} Hisob yakuniy sifatida ko‘rsatilmaydi.</div>`:'')+
- (!o.hasBaseData?'<div class="inline-note">1–2-bosqichlarda so‘rov, sotuv, javobsiz murojaat va bir bron foydasini kiriting.</div>':!o.hasAssumptions?'<div class="inline-note">3-bosqichdagi uchta foiz — tekshiriladigan faraz. Ularni kiritsangiz, ssenariy hisoblanadi.</div>':'')+
- `<div class="grid two live-stats">${stat('Qo‘shimcha bronlar / oy',mark(o.extraBookings,v=>fmt(v,1)+' ta'),'Turli guruhlardan, takror hisoblanmaydi')}${stat('Qo‘shimcha foyda hissasi',mark(o.grossProfit),'Haqiqiy tushum emas, ssenariy','positive')}${stat('CRMdan keyingi oylik natija',o.hasFee?mark(o.netCash):'—','Joriy etish xarajatidan tashqari',good&&o.netCash<0?'negative':'positive')}${stat('Bo‘shashi mumkin bo‘lgan vaqt',fmt(o.workHours,1)+' soat','Naqd iqtisod emas')}</div>`+
- `<div class="scenario-grid"><div class="scenario"><small>Ehtiyotkor (60% faraz)</small><b>${o.hasFee?mark(lo.netCash):'—'}</b></div><div class="scenario active"><small>Asosiy faraz (100%)</small><b>${o.hasFee?mark(o.netCash):'—'}</b></div><div class="scenario"><small>Yuqori (130% faraz)</small><b>${o.hasFee?mark(hi.netCash):'—'}</b></div></div>`+
- `<div class="formula">Bu uchta natija kafolat emas: qayta bog‘lanish, sotuvga aylanish va follow-up foizlarini 0,6 / 1 / 1,3 koeffitsiyentga ko‘paytirish orqali solishtiriladi. Guruhlar kesishmaydi. Xodim vaqtining hisobiy qiymati foydaga qo‘shilmagan.</div>`;
-}
-
-function calc(){
- const c=current(),m=c.metrics||initialMetrics(),o=info();
- const number=(key,label,hint,detail='')=>field(key,label,m[key]??'',hint,'number','metric',detail);
- const layout=[
- `<div class="panel"><div class="step-kicker">01 · RAQAM BILAN BOSHLANG</div><h2 class="panel-title">Bir oyda agentlik qanday ishlaydi?</h2><p class="panel-sub">Rahbar bergan faktlarni kiriting. Misol raqamlarini fakt bilan aralashtirmang.</p><div class="form-grid two-col">${number('leads','Yangi so‘rovlar / oy','Masalan: 600','Jami takrorlanmagan murojaatlar')}${number('sales','Sotilgan tur / bron / oy','Masalan: 48','Aynan shu davrdagi bronlar')}${number('profit','1 bronning foyda hissasi, so‘m','Masalan: 650000','Tushum − to‘g‘ridan-to‘g‘ri tur xarajatlari')}${number('ticket','1 bronning sotuv narxi, so‘m (ixtiyoriy)','Masalan: 8000000','Faqat tushumni alohida ko‘rsatish uchun')}</div><div class="inline-note">Suhbat savoli: “O‘tgan oy qancha murojaat keldi, ulardan nechtasi haqiqiy bron bo‘ldi va bitta bron biznesga o‘rtacha qancha foyda qoldiradi?”</div></div>`,
- `<div class="panel"><div class="step-kicker">02 · MUAMMONI SONDA BILISH</div><h2 class="panel-title">Murojaatlarning qanchasi ishlanmay qoladi?</h2><p class="panel-sub">Javob berilmagan lidlar alohida guruh. Aloqa qilingan, ammo sotilmagan lidlar esa follow-up uchun asos.</p><div class="form-grid two-col">${number('missedCount','Javobsiz qolgan so‘rovlar / oy','Masalan: 90','Aniq son ma’lum bo‘lsa, shuni kiriting')}${number('missPct','Yoki javobsiz so‘rovlar foizi (%)','Masalan: 15','Aniq son kiritilgan bo‘lsa, foiz ishlatilmaydi')}</div><div class="breakdown" style="margin-top:21px"><div class="breakrow"><span>Javob berilgan murojaatlar</span><strong>${o.hasBaseData?fmt(o.reached,1):'—'}</strong></div><div class="breakrow"><span>Javob berilgan, ammo bron qilmaganlar</span><strong>${o.hasBaseData?fmt(o.eligible,1):'—'}</strong></div><div class="breakrow"><span>Hozirgi umumiy konversiya</span><strong>${o.leads?fmt(o.conversion*100,1)+'%':'—'}</strong></div></div><div class="inline-note">Suhbat savoli: “Birinchi javob kechikishi va qayta aloqa qilinmagani sabab aynan qayerda mijozlarni yo‘qotyapsiz?”</div></div>`,
- `<div class="panel"><div class="step-kicker">03 · FARAZLARNI OCHIQ KIRITING</div><h2 class="panel-title">Jarayon yaxshilansa nima o‘zgarishi mumkin?</h2><p class="panel-sub">Bu raqamlar hali erishilgan natija emas. 7–30 kunlik sinovda tekshirish uchun qo‘yilgan taxminlar.</p><div class="form-grid two-col">${number('recoveryPct','Javobsiz lidlarning qanchasiga qayta chiqamiz? (%)','Masalan: 40','Qayta bog‘lanish ulushi')}${number('recoveryClosePct','Qayta bog‘langanlarning necha foizi bron qiladi? (%)','Masalan: 8','Alohida konversiya taxmini, avtomatik olinmaydi')}${number('followupPct','Aloqaga chiqqan, sotilmaganlardan nechta % qo‘shimcha bron bo‘ladi?','Masalan: 1.5','Bu guruh javobsiz lidlarga qo‘shilmaydi')}</div><div class="formula">1) Tiklangan bron = javobsiz lidlar × qayta bog‘lanish % × qayta bog‘langanlardan sotuv %. 2) Follow-up bron = (javob berilgan − mavjud bronlar) × qo‘shimcha sotuv %. 3) Jami qo‘shimcha bron = ushbu ikki alohida guruh yig‘indisi.</div></div>`,
- `<div class="panel"><div class="step-kicker">04 · INVESTITSIYA VA TEKSHIRUV</div><h2 class="panel-title">Tizimning qiymati xarajatni qoplaydimi?</h2><p class="panel-sub">CRM tarifini va bir martalik ishga tushirish sarfini tasdiqlangan narx bilan to‘ldiring.</p><div class="form-grid two-col">${number('crmFee','Oylik CRM xarajati, so‘m','Masalan: 1200000')}${number('setup','Bir martalik sozlash, so‘m','Masalan: 0')}${number('staff','Sotuv menejerlari soni','Masalan: 5')}${number('hours','Bir menejer kuniga qo‘lda sarflaydigan vaqt (soat)','Masalan: 1.2')}${number('days','Oylik ish kunlari','Masalan: 22')}${number('timeSavingPct','Vaqt qisqarishi farazi (%)','Masalan: 40')}${number('hourCost','Bir soat mehnat qiymati, so‘m','Masalan: 45000')}</div><div class="breakdown" style="margin-top:25px"><div class="breakrow"><span>Oylik qo‘shimcha foyda hissasi</span><strong>${o.hasData?money(o.grossProfit):'—'}</strong></div><div class="breakrow"><span>CRM xarajatidan keyin</span><strong>${o.hasData&&m.crmFee!==''?money(o.netCash):'—'}</strong></div><div class="breakrow"><span>Birinchi oy natijasi (sozlash bilan)</span><strong>${o.hasData&&m.crmFee!==''&&m.setup!==''?money(o.firstMonthNet):'—'}</strong></div><div class="breakrow"><span>Hisobiy setup qoplash muddati</span><strong>${o.hasData&&m.crmFee!==''&&m.setup!==''?(o.setup===0?'Bir martalik xarajat yo‘q':o.payback?fmt(o.payback,1)+' oy':'Bu ssenariyda qoplanmaydi'):'—'}</strong></div></div><div class="formula">“Foyda” — bron uchun qoladigan foyda hissasi. Tejalishi mumkin bo‘lgan vaqt naqd foydaga va ROIga qo‘shilmaydi. Barcha foizlar pilot natijasida qayta o‘lchanadi.</div></div>`
- ];
- return header('Raqamli biznes diagnostika','Muloqotdagi ketma-ketlik: real sotuv → yo‘qotish → tekshiriladigan yaxshilanish → investitsiya.',`<button class="btn primary" onclick="openPresentation()">▣ Rahbarga ko‘rsatish →</button>`)+
- `<div class="calc-tabs">${calcStages.map((x,i)=>`<button type="button" class="calc-step ${calcStep===i?'active':''}" onclick="setCalcStep(${i})"><span>${x.icon}</span><strong>${x.title}</strong></button>`).join('')}</div>`+
- `<div class="calc-layout"><div>${layout[calcStep]}<div class="actionsline"><button class="btn" onclick="setCalcStep(${calcStep-1})" ${calcStep===0?'disabled':''}>← Oldingi</button>${calcStep===3?'<button class="btn primary" onclick="openPresentation()">Taqdimotga o‘tish →</button>':`<button class="btn primary" onclick="setCalcStep(${calcStep+1})">Keyingi: ${calcStages[calcStep+1].title} →</button>`}</div></div><div id="liveCalc" class="panel live-panel">${calcLive()}</div></div>`;
-}
-
-function present(){
- const c=current(),o=info(),has=o.hasData,rec=priorities().filter(x=>x.title!=='Avval asosiy muammoni aniqlang').slice(0,3);
- const slideOne=`<section class="present-slide ${presentSlide===0?'selected':''}"><div class="present-hero"><span class="eyebrow">TURAGENTLIK · BIZNES DIAGNOSTIKA</span><h1>${esc(c.name||'Turagentlik')}<br><span>savdolar rivojlanish rejasi</span></h1><p>Jarayonni o‘lchaymiz. Imkoniyatni raqamda ko‘ramiz. Natijani sinov bilan tekshiramiz.</p><div class="present-date">${esc(c.date||'')}</div></div><div class="grid three" style="margin-top:26px"><div class="present-mini"><span>1</span><b>Hozirgi holat</b><p>So‘rov va bron oqimi</p></div><div class="present-mini"><span>2</span><b>O‘sish imkoniyati</b><p>Yo‘qotilgan murojaatlar</p></div><div class="present-mini"><span>3</span><b>Amaliy reja</b><p>Natijani o‘lchash</p></div></div></section>`;
- const slideTwo=`<section class="present-slide ${presentSlide===1?'selected':''}"><div class="eyebrow">01 / HOZIRGI HOLAT</div><h1>Bugungi savdo voronkasi</h1><p class="present-intro">Bir davrning aniq raqamlarini solishtiramiz. Bu ko‘rsatkichlar rahbar bilan tekshiriladi.</p><div class="grid four">${stat('Murojaatlar / oy',o.hasBaseData?fmt(o.leads):'—','Jami so‘rov')}${stat('Amaldagi bron',o.hasBaseData?fmt(o.sales):'—','Sotilgan turlar')}${stat('Javobsiz so‘rov',o.hasBaseData?fmt(o.missed,1):'—','Qayta ko‘rib chiqiladigan guruh','negative')}${stat('Amaldagi konversiya',o.hasBaseData?fmt(o.conversion*100,1)+'%':'—','Bron / murojaat')}</div><div class="panel" style="margin-top:25px"><h2>Murojaat qayerda to‘xtab qolmoqda?</h2><div class="public-flow"><div><strong>${o.hasBaseData?fmt(o.leads):'—'}</strong><span>Kelgan so‘rov</span></div><span class="flow-arrow">→</span><div><strong>${o.hasBaseData?fmt(o.reached,1):'—'}</strong><span>Javob berilgan</span></div><span class="flow-arrow">→</span><div><strong>${o.hasBaseData?fmt(o.sales):'—'}</strong><span>Sotuvga aylangan</span></div></div></div></section>`;
- const slideThree=`<section class="present-slide ${presentSlide===2?'selected':''}"><div class="eyebrow">02 / O‘SISH IMKONIYATI</div><h1>Sotuv imkoniyatining puldagi ifodasi</h1><p class="present-intro">Quyidagi natija maqsadli ssenariy, amalga oshgan daromad emas. Foizlar sinovda tasdiqlanadi.</p>${has?`<div class="grid three">${stat('Qo‘shimcha bronlar',fmt(o.extraBookings,1)+' ta','Oyiga, taxmin')}${stat('Qo‘shimcha foyda hissasi',money(o.grossProfit),'Oyiga, taxmin','positive')}${stat('CRMdan keyingi natija',o.hasFee?money(o.netCash):'—','Tarif kiritilgach ko‘rinadi','positive')}</div><div class="panel public-breakdown"><h2>Natijaga nima ta’sir qiladi?</h2><div class="breakdown"><div class="breakrow"><span>Javobsiz so‘rovlardan qo‘shimcha bron</span><strong>${fmt(o.recoveredSales,1)} ta</strong></div><div class="breakrow"><span>Qayta aloqa orqali qo‘shimcha bron</span><strong>${fmt(o.extraFollowups,1)} ta</strong></div><div class="breakrow"><span>CRM oylik xarajati</span><strong>${current().metrics.crmFee===''?'Hali aniqlanmagan':money(o.fee)}</strong></div></div></div>`:`<div class="empty"><strong>Hisob uchun ma’lumot yig‘ilmoqda</strong>So‘rovlar, sotuv, javobsiz holatlar, foyda hissasi va yaxshilanish taxminlarini to‘ldirgach natija paydo bo‘ladi.</div>`}<div class="present-footnote">Hisobiy qiymat: moliyaviy kafolat emas. Vaqt tejalishi foydaga qo‘shilmagan.</div></section>`;
- const slideFour=`<section class="present-slide ${presentSlide===3?'selected':''}"><div class="eyebrow">03 / KEYINGI QADAM</div><h1>30 kunlik amaliy sinov rejasi</h1><p class="present-intro">Vazifa — qaysi imkoniyat qancha qiymat berishini taxmin bilan emas, real o‘lchov bilan tasdiqlash.</p><div class="grid three"><div class="plan-card"><span>01</span><h2>7 kun · holatni o‘lchash</h2><p>Murojaat soni, javob tezligi, sotuv va bajarilgan follow-up bazasi.</p></div><div class="plan-card"><span>02</span><h2>14 kun · kichik joriy etish</h2><p>1–2 menejer bilan ish jarayonini sinash va mas’ullarni belgilash.</p></div><div class="plan-card"><span>03</span><h2>30 kun · natijani solishtirish</h2><p>Yo‘qotilgan lid, konversiya va nazoratdagi o‘zgarishni taqqoslash.</p></div></div><div class="panel" style="margin-top:24px"><h2>Eng ustuvor yo‘nalishlar</h2>${rec.length?rec.map(r=>`<div class="public-priority"><b>${esc(r.title)}</b><span>${esc(r.test)}</span></div>`).join(''):'<p class="muted">Ustuvor jarayonlar rahbar bilan birga belgilanadi.</p>'}</div><div class="public-cta">Qaysi o‘zgarish sizning biznesingiz uchun birinchi o‘rinda?</div></section>`;
- return `<div class="present-wrap"><div class="present-toolbar no-print"><div class="present-brand"><span class="present-symbol">↗</span><strong>Biznes samaradorligi</strong><span>· ${esc(c.name||'Turagentlik')}</span></div><div class="present-controls"><button class="btn sm" onclick="printPublic()">⎙ PDF</button><button class="btn sm" onclick="setView('home')">✕ Taqdimotni yopish</button></div></div><div class="present-area">${slideOne}${slideTwo}${slideThree}${slideFour}</div><div class="present-pagination no-print"><button class="btn" onclick="setPresentSlide(${presentSlide-1})" ${presentSlide===0?'disabled':''}>← Oldingi</button><div class="slide-dots">${[0,1,2,3].map(i=>`<button aria-label="${i+1}-sahifa" class="${presentSlide===i?'active':''}" onclick="setPresentSlide(${i})"></button>`).join('')}</div><span>${presentSlide+1} / 4</span><button class="btn primary" onclick="setPresentSlide(${presentSlide+1})" ${presentSlide===3?'disabled':''}>Keyingi →</button></div></div>`;
-}
-
-function report(){const c=current(),o=info(),missing= !o.hasData;const p=problems(),pr=priorities(),answers=c.answers||{};const datestr=c.date||new Date().toISOString().slice(0,10);return header('Ichki audit xulosasi','Siz uchun batafsil javoblar va ishchi eslatmalar. Rahbarga ekran ulashishda taqdimot rejimidan foydalaning.',`<div class="no-print"><button class="btn primary" onclick="printPublic()">▣ Rahbar uchun PDF</button></div>`)+`<div class="report-hero"><div><div class="eyebrow" style="color:#73d6c4">Biznes diagnostika hisoboti</div><h2>${esc(c.name||'Turagentlik')}</h2><p>Rahbar: ${esc(c.manager||'Kiritilmagan')} · Sana: ${esc(datestr)} · SPIN savollar: ${statsAnswered()}/${questions.length}</p></div><span class="pill ${missing?'orange':''}">${missing?'Hisob uchun ma’lumot yetarli emas':'Ssenariy tayyor'}</span></div>
-<div class="grid four stats">${stat('So‘rovlar / oy',o.leads?fmt(o.leads):'—','Jami murojaat')}${stat('Amaldagi sotuv',o.leads?fmt(o.sales):'—','Bir oyda yopilgan bronlar')}${stat('Javobsiz so‘rov',o.leads?fmt(o.missed,1):'—','Foiz hisobida','negative')}${stat('Amaldagi konversiya',o.leads?fmt(o.conversion*100,2)+'%':'—','Jami so‘rovga nisbatan')}</div>
-${missing?`<div class="alert" style="margin-bottom:20px">Moliyaviy xulosa uchun kamida oylik so‘rovlar va bitta bronning foyda hissasini kiriting. Sotuvlar va boshqa parametrlar ham real ma’lumotlar asosida to‘ldirilishi kerak. <button class="btn sm" onclick="setView('calc')">Kalkulyatorni ochish</button></div>`:''}
-<div class="grid two"><div class="panel"><h2 class="panel-title">01. Aniqlangan vaziyat va ehtiyoj</h2><div class="report-summary"><p><b>Rahbarning maqsadi:</b> ${esc(c.priority||'Hali qayd etilmagan.')}</p><p><b>Qo‘shimcha izoh:</b> ${esc(c.notes||'Kiritilmagan.')}</p><p><b>Muammolar soni:</b> ${p.length} ta rahbar bilan qayd etilgan.</p></div>${p.length?p.map(q=>`<div class="insight"><b>${esc(q.title)}</b>${answers[q.id]?.note?`<div style="color:#697489;margin-top:6px">Rahbar javobi: ${esc(answers[q.id].note)}</div>`:''}</div>`).join(''):'<div class="inline-note">Muammolar hali belgilab chiqilmagan. SPIN → Problem bosqichidan boshlang.</div>'}</div>
-<div class="panel"><h2 class="panel-title">02. Tavsiya qilinadigan yo‘nalishlar</h2><p class="panel-sub">Bu CRM imkoniyati haqidagi qat'iy va'da emas, aniqlangan muammoga mos tekshirish rejasi.</p>${pr.map((r,i)=>`<div class="rec"><h4>${i+1}. ${esc(r.title)}</h4><p>${esc(r.why)}</p><em>30 kunlik sinov: ${esc(r.test)}</em></div>`).join('')}</div></div>
-<div class="section-head"><h2>03. Moliyaviy imkoniyat ssenariysi</h2><span>Oylik, taxminiy</span></div><div class="grid four">${stat('Tiklangan lidlardan bron',o.hasData?fmt(o.recoveredSales,1):'—','Javobsiz guruh')}${stat('Follow-up dan bron',o.hasData?fmt(o.extraFollowups,1):'—','Ilgari kontaktdagi sotilmaganlar')}${stat('Qo‘shimcha foyda',o.hasData?money(o.grossProfit):'—','Oyiga, kafolat emas','positive')}${stat('CRMdan keyingi oylik foyda',o.hasData?money(o.netCash):'—','Faqat foyda hissasi − tarif','positive')}</div>
-<div class="grid two" style="margin-top:17px"><div class="panel"><h2 class="panel-title">Pul oqimi ko‘rsatkichlari</h2><div class="breakdown"><div class="breakrow"><span>Potensial qo‘shimcha tushum</span><strong>${money(o.revenue)}</strong></div><div class="breakrow"><span>Qo‘shimcha foyda hissasi</span><strong>${money(o.grossProfit)}</strong></div><div class="breakrow"><span>Oylik CRM to‘lovi</span><strong>${money(o.fee)}</strong></div><div class="breakrow"><span>Joriy etish xarajati</span><strong>${money(o.setup)}</strong></div><div class="breakrow"><span>Birinchi oy hisobiy net natija</span><strong>${money(o.firstMonthNet)}</strong></div><div class="breakrow"><span>Oylik ROI</span><strong>${o.roi===null?'Tarif yo‘q':fmt(o.roi,1)+'%'}</strong></div><div class="breakrow"><span>Setup xarajati qoplanishi</span><strong>${o.setup===0?'Setup yo‘q':o.payback!==null?fmt(o.payback,1)+' oy':'Bu ssenariyda qoplanmaydi'}</strong></div></div></div><div class="panel"><h2 class="panel-title">Vaqt va ssenariy farazlari</h2><div class="breakdown"><div class="breakrow"><span>Javobsiz so‘rovlarning tiklanishi</span><strong>${fmt(pct(c.metrics.recoveryPct)*100,1)}%</strong></div><div class="breakrow"><span>Follow-up orqali qo‘shimcha sotuv</span><strong>${fmt(pct(c.metrics.followupPct)*100,1)}%</strong></div><div class="breakrow"><span>Mehnat vaqti qisqarishi</span><strong>${fmt(pct(c.metrics.timeSavingPct)*100,1)}%</strong></div><div class="breakrow"><span>Bo‘shashi mumkin bo‘lgan vaqt</span><strong>${fmt(o.workHours,1)} soat / oy</strong></div><div class="breakrow"><span>Vaqtning hisobiy qiymati</span><strong>${money(o.timeValue)}</strong></div></div><div class="formula">Vaqt qiymati naqd tejalish sifatida yoki ROI ichida hisoblanmadi. Barcha yaxshilanish foizlari suhbatdagi faraz bo‘lib, sinovda tekshirilishi kerak.</div></div></div>
-<div class="panel" style="margin-top:17px"><h2 class="panel-title">04. Rahbar bilan kelishiladigan keyingi qadam</h2><div class="grid three"><div class="insight green"><b>1. Bazaviy nuqtani o‘lchash</b><div>7 kun: yangi so‘rov, javob tezligi, follow-up va bronlar.</div></div><div class="insight green"><b>2. Kichik sinov</b><div>30 kun: 1–2 menejer bilan jarayon va mos funksiyalarni sinash.</div></div><div class="insight green"><b>3. Natijani taqqoslash</b><div>Konversiya, qolib ketgan vazifalar va vaqt sarfini boshlang‘ich holat bilan solishtirish.</div></div></div><p style="font-size:13px;line-height:1.7;margin-bottom:0"><b>Uchrashuvni yakunlash uchun savol:</b> “Shu uchta ko‘rsatkichdan qaysi biri yaxshilansa, tizimni joriy qilishga asos bo‘ladi? Sinov natijasini qaysi sanada birga ko‘ramiz?”</p></div>
-<div class="panel" style="margin-top:17px"><h2 class="panel-title">05. Rahbar profili va kirish bo‘yicha ichki qaydlar</h2><div class="grid two" style="font-size:13px;line-height:1.9"><div><b>Rahbar:</b> ${esc(c.manager||'—')}<br><b>Lavozim:</b> ${esc(c.title||'—')}<br><b>Telefon:</b> ${esc(c.contact||'—')}<br><b>Telegram:</b> ${esc(c.telegram||'—')}<br><b>Email:</b> ${esc(c.email||'—')}<br><b>Qaror roli:</b> ${esc(c.decisionRole||'—')}<br><b>Qarorga ta’sir qiluvchilar:</b> ${esc(c.decisionTeam||'—')}</div><div><b>Hudud:</b> ${esc(c.region||'—')}<br><b>Hozirgi vosita:</b> ${esc(c.currentTool||'—')}<br><b>Uchrashuv:</b> ${esc(c.meetingType||'—')} / ${esc(c.meetingStatus||'—')}<br><b>Rejalashtirilgan aloqa:</b> ${esc(c.nextDate||'—')}<br><b>Kirish checklist:</b> ${openingProgress()}/5<br><b>Keyingi harakat:</b> ${esc(c.nextStep||'—')}</div></div><div class="rule"></div><div><b>Rahbarning birinchi javobi:</b><p class="muted" style="white-space:pre-line">${esc(c.openingNotes||'Qayd yo‘q')}</p><b>Kelishilgan suhbat mavzusi:</b><p class="muted" style="white-space:pre-line">${esc(c.meetingAgenda||'Qayd yo‘q')}</p></div></div>
-<div class="panel" style="margin-top:17px"><h2 class="panel-title">06. Suhbatdan olingan qo‘shimcha dalillar</h2>${phases.map(ph=>{const aa=questions.filter(q=>q.phase===ph.id && answers[q.id]&&(answers[q.id].note||answers[q.id].status));if(!aa.length)return '';return `<h3 style="font-size:13px;margin:16px 0 8px">${ph.name} — ${ph.uz}</h3>${aa.map(q=>`<div style="font-size:12px;line-height:1.7;border-bottom:1px dashed #e6eaf0;padding:9px 0"><b>${esc(q.title)}</b><div class="muted">${esc(answers[q.id]?.note||(['problem'].includes(answers[q.id]?.status)?'Muammo borligi belgilangan':'Holat qayd etilgan'))}</div></div>`).join('')}`}).join('')||'<p class="muted">Hali qayd yo‘q.</p>'}</div>
-<div class="alert" style="margin-top:20px"><b>Hisob chegarasi:</b> Hisobotdagi qo‘shimcha sotuv va foyda kafolatlanmaydi. Bir sotuvning foyda hissasi haqiqiy xarajatlar bo‘yicha hisoblanishi lozim. CRM dasturi aynan qanday avtomatlashtirish va integratsiyalarni qo‘llashi joriy etishdan oldin tekshiriladi. Agar aniqlangan foizlar taxminiy bo‘lsa, mijozga ularni shunday ko‘rsating.</div><div class="actionsline no-print"><button class="btn" onclick="setView('spin')">← SPIN javoblari</button><button class="btn primary" onclick="printPublic()">▣ Taqdimot PDF</button></div>`}
+function setSelected(attr,value){document.querySelectorAll('button['+attr+']').forEach(el=>{const active=el.getAttribute(attr)===String(value);el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active))})}
 function render(){
- if(!current()){clients=[makeClient()];activeId=clients[0].id}
- const names={home:'Bosh sahifa',opening:'Kirish va rahbar',spin:'Ichki suhbat',calc:'Kalkulyator',report:'Ichki hisobot',present:'Taqdimot'};
- document.body.classList.toggle('presenting',view==='present');
- document.getElementById('crumb').textContent=names[view];
- document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
- document.getElementById('app').innerHTML=({home,opening,spin,calc,report,present}[view]||home)();bind();
+  const c=calculate(),six=calculate(state,6),twelve=calculate(state,12);
+  $('agents').value=state.agents;$('phones').value=state.phones;$('phoneCountRow').hidden=state.phoneType==='none';
+  setSelected('data-period',state.months);setSelected('data-support',state.supportFrequency);setSelected('data-phone',state.phoneType);
+  document.querySelectorAll('[data-compare]').forEach(el=>{const selected=Number(el.dataset.compare)===state.months;el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected))});
+  $('support-tier').textContent=state.agents<3?'1–2 agent uchun tarif belgilanmagan':state.agents===3?'3 agent uchun':state.agents<=5?'4–5 agent uchun':'6 va undan ko‘p agent uchun';
+  $('support-price').textContent=c.supportUsd===null?'Aniqlanadi':dollar(c.supportUsd);
+  $('selectedBadge').textContent=state.months+' oy';$('monthlySum').textContent=fmt(c.monthly);
+  const phoneDesc=state.phoneType==='none'?'':` + ${state.phones} raqam × ${fmt(PRICES[state.phoneType])}`;
+  $('monthlyDetail').textContent=`${state.agents} agent × 189 000${phoneDesc} so‘m`;
+  $('monthlyCrm').textContent=currency(c.crmMonthly);$('monthlyPhone').textContent=currency(c.phoneMonthly);
+  $('supportFreq').textContent=state.supportFrequency==='once'?'Bir martalik deb hisoblandi':'Har oy hisoblandi';
+  $('technicalMain').textContent=c.supportUsd===null?'Aniqlanadi':dollar(c.supportUsd)+(state.supportFrequency==='monthly'?' / oy':'');
+  $('sixPrice').textContent=fmt(six.uzsTotal);$('twelvePrice').textContent=fmt(twelve.uzsTotal);
+  $('sixUsd').textContent=six.technicalTotal===null?'USD tarifi belgilanmagan':`+ ${dollar(six.technicalTotal)} tex. xizmat`;
+  $('twelveUsd').textContent=twelve.technicalTotal===null?'USD tarifi belgilanmagan':`+ ${dollar(twelve.technicalTotal)} tex. xizmat`;
+  $('totalHeading').textContent=state.months+' oylik paket tafsiloti';
+  $('crmTotal').textContent=currency(c.crmTotal);$('phoneTotal').textContent=currency(c.phoneTotal);
+  $('uzsTotal').textContent=currency(c.uzsTotal);$('usdTotal').textContent=c.technicalTotal===null?'Aniqlashtiriladi':dollar(c.technicalTotal);
+  $('convertedRow').hidden=c.sumAll===null;$('convertedTotal').textContent=c.sumAll!==null?currency(c.sumAll):'—';
+  const notes=[];if(c.supportUsd===null)notes.push('1–2 agent uchun texnik xizmat narxi berilmagan. Hisobda bu xarajat yo‘q — yakuniy taklifdan oldin aniqlashtiring.');
+  if(state.supportFrequency==='once')notes.push('Texnik xizmat bir martalik deb hisoblandi. Agar u har oy olinadigan bo‘lsa, yuqorida «Har oy»ni tanlang.');
+  if(state.exchangeRate&&c.technicalTotal!==null)notes.push('USD → UZS hisoblash siz kiritgan kurs asosida.');
+  $('warning').hidden=notes.length===0;$('warning').textContent=notes.join(' ');
 }
-function bind(){
- const app=document.getElementById('app');
- app.querySelectorAll('[data-client]').forEach(el=>el.addEventListener('input',e=>{current()[e.target.dataset.client]=e.target.value;save();if(e.target.dataset.client==='openingTone'){const focus=document.activeElement;render();return}if(e.target.dataset.client==='name'){const node=app.querySelector('.client-item.active button');if(node)node.childNodes[0].textContent=e.target.value||'Nomsiz agentlik'}}));
- app.querySelectorAll('[data-opening-check]').forEach(el=>el.addEventListener('change',e=>{const c=current();c.kickoff ||= {};c.kickoff[e.target.dataset.openingCheck]=e.target.checked;save();el.closest('.opening-check')?.classList.toggle('checked',e.target.checked);const count=openingProgress();const t=app.querySelector('#openingProgressText');if(t)t.textContent=count+'/5 bajarildi';const bar=app.querySelector('#openingProgressBar');if(bar)bar.style.width=(count*20)+'%'}));
- const copyIntro=app.querySelector('#copyOpening');if(copyIntro)copyIntro.addEventListener('click',()=>{const t=app.querySelector('.opening-quote')?.textContent||'';if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(()=>{copyIntro.textContent='✓ Nusxalandi'}).catch(()=>window.prompt('Matnni nusxalash',t));else window.prompt('Matnni nusxalash',t)});
- app.querySelectorAll('[data-metric]').forEach(el=>{
-  el.addEventListener('input',e=>{const m=current().metrics||(current().metrics=initialMetrics());m[e.target.dataset.metric]=e.target.value;save();const live=document.getElementById('liveCalc');if(live)live.innerHTML=calcLive()});
-  // Rerender during blur cancels the next-step click; live result updates on input instead.
-
- });
- app.querySelectorAll('[data-answer-note]').forEach(el=>el.addEventListener('input',e=>{const id=e.target.dataset.answerNote;current().answers ||= {};current().answers[id] ||= {};current().answers[id].note=e.target.value;save()}));
- app.querySelectorAll('[data-answer-status]').forEach(el=>el.addEventListener('change',e=>{const id=e.target.dataset.answerStatus;current().answers ||= {};current().answers[id] ||= {};current().answers[id].status=e.target.value;save()}));
- app.querySelectorAll('[data-phase]').forEach(el=>el.addEventListener('click',()=>{view='spin';setPhase(el.dataset.phase)}));
- app.querySelectorAll('[data-switch]').forEach(el=>el.addEventListener('click',()=>{activeId=el.dataset.switch;save();render()}));
- app.querySelectorAll('[data-delete]').forEach(el=>el.addEventListener('click',()=>{const id=el.dataset.delete;if(!confirm('Ushbu agentlik auditi butunlay o‘chirilsinmi?'))return;clients=clients.filter(x=>x.id!==id);if(activeId===id)activeId=clients[0].id;save();render()}));
- const nbtn=document.getElementById('newClient');if(nbtn)nbtn.onclick=()=>{const name=prompt('Yangi agentlik nomi:','Yangi turagentlik');if(name===null)return;const c=makeClient(name.trim()||'Yangi turagentlik');clients.unshift(c);activeId=c.id;save();render()};
- const importBtn=document.getElementById('importInput');if(importBtn)importBtn.addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{if(f.size>1000000)throw Error('Fayl 1 MB dan katta');const obj=JSON.parse(await f.text());if(!Array.isArray(obj.clients)||!obj.clients.length||obj.clients.length>300||!obj.clients.every(x=>x&&typeof x.id==='string'&&typeof x.name==='string'))throw Error('JSON formati mos emas');if(!confirm('Hozirgi saqlangan agentliklar importdagilar bilan almashtirilsinmi?'))return;clients=obj.clients;activeId=clients.find(x=>x.id===obj.activeId)?.id||clients[0].id;save();render()}catch(err){alert('Import xatosi: '+err.message)}})
-}
-const demo={leads:600,sales:48,missPct:15,missedCount:90,ticket:8000000,profit:650000,recoveryPct:40,recoveryClosePct:8,followupPct:1.5,staff:5,hours:1.2,days:22,hourCost:45000,timeSavingPct:40,crmFee:1200000,setup:0};
-function download(content,file,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
-function init(){
- load();save();try{if(sessionStorage.getItem('toursales-presenting')==='1')view='present'}catch(e){}
- document.querySelectorAll('#nav button').forEach(el=>el.onclick=()=>setView(el.dataset.view));
- document.getElementById('demoBtn').onclick=()=>{if(!confirm('Joriy agentlikdagi kalkulyator ko‘rsatkichlari namuna raqamlari bilan almashtirilsinmi?'))return;current().metrics={...demo};save();calcStep=0;setView('calc')};
- document.getElementById('exportBtn').onclick=()=>download(JSON.stringify({version:3,exportedAt:new Date().toISOString(),clients,activeId},null,2),'toursales-audit-backup.json','application/json;charset=utf-8');
- document.getElementById('printBtn').onclick=printPublic;
- document.getElementById('shareBtn').onclick=openPresentation;
- render();
-}
-init();
+function readNumber(input,stateKey,min=1){state[stateKey]=capInt(input.value,min,999,state[stateKey]);render()}
+document.querySelectorAll('[data-step]').forEach(button=>button.addEventListener('click',()=>{const [key,by]=button.dataset.step.split(':');state[key]=Math.max(1,Math.min(999,state[key]+Number(by)));render()}));
+$('agents').addEventListener('change',event=>readNumber(event.target,'agents'));
+$('phones').addEventListener('change',event=>readNumber(event.target,'phones'));
+document.querySelectorAll('[data-period],[data-compare]').forEach(b=>b.addEventListener('click',()=>{state.months=Number(b.dataset.period||b.dataset.compare);render()}));
+document.querySelectorAll('[data-support]').forEach(b=>b.addEventListener('click',()=>{state.supportFrequency=b.dataset.support;render()}));
+document.querySelectorAll('[data-phone]').forEach(b=>b.addEventListener('click',()=>{state.phoneType=b.dataset.phone;render()}));
+$('fxRate').addEventListener('input',e=>{const raw=e.target.value.trim();const v=Number(raw);state.exchangeRate=raw&&Number.isFinite(v)&&v>0?v:null;render()});
+$('reset').addEventListener('click',()=>{Object.assign(state,{agents:3,months:6,supportFrequency:'once',phoneType:'none',phones:1,exchangeRate:null});$('fxRate').value='';render()});
+function quoteText(){const c=calculate(),p6=calculate(state,6),p12=calculate(state,12);return [
+  'OMON CRM — NARX HISOBI',`Agentlar soni: ${state.agents}`,`CRM: ${currency(c.crmMonthly)} / oy`,
+  `Telefoniya: ${state.phoneType==='none'?'Kerak emas':(state.phoneType==='personal'?'shaxsiy':'kompaniya')+' — '+state.phones+' ta raqam'}`,`Telefoniya narxi: ${currency(c.phoneMonthly)} / oy`,
+  `6 oy: ${currency(p6.uzsTotal)}${p6.technicalTotal===null?' + texnik xizmat aniqlashtiriladi':' + '+dollar(p6.technicalTotal)+' texnik xizmat'}`,
+  `12 oy: ${currency(p12.uzsTotal)}${p12.technicalTotal===null?' + texnik xizmat aniqlashtiriladi':' + '+dollar(p12.technicalTotal)+' texnik xizmat'}`,
+  `Tanlangan paket: ${state.months} oy`,`Texnik xizmat davri: ${state.supportFrequency==='once'?'bir martalik (taxmin)':'har oy'}`,
+  c.sumAll!==null?`Kiritilgan kurs: 1 USD = ${currency(state.exchangeRate)}; ekvivalent: ${currency(c.sumAll)}`:'So‘m va USD alohida hisoblangan.',
+  'Izoh: texnik xizmat davriyligi alohida tasdiqlanishi kerak.'
+].join('\n')}
+$('copy').addEventListener('click',async()=>{const t=quoteText();try{await navigator.clipboard.writeText(t);$('copy').textContent='✓ Nusxalandi';setTimeout(()=>$('copy').textContent='⧉ Hisobni nusxalash',1800)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.append(a);a.select();document.execCommand('copy');a.remove();$('copy').textContent='✓ Nusxalandi';setTimeout(()=>$('copy').textContent='⧉ Hisobni nusxalash',1800)}});
+$('print').addEventListener('click',()=>window.print());
+render();
 </script>
-</body></html>
+</body>
+</html>
