@@ -59,3 +59,11 @@ Mijoz logotipi endi hero ichida mustaqil oq/qora qutisiz, OMON CRM ko‘k gradie
 - Avvalgi saqlangan logotiplar sahifada avtomatik shaffoflashadi, qayta yuklash talab qilinmaydi.
 - Ba’zi logolarda qora fon tasvirning kerakli qismi bo‘lishi mumkin: bunday holatda checkboxni o‘chirib, original tasvirni saqlab qolish mumkin.
 - Kompaniya fotosi saqlangandagi tasvirning asl nusxasi buzilmaydi, shaffof effekt faqat KPdagi renderga qo‘llanadi.
+
+
+## Premium dinamik KP muqovasi
+
+- Har bir turagentlik uchun yagona premium OMON CRM ko‘k hero-dizayni: tepada OMON CRM va mijozning logosi yonma-yon; pastda katta sarlavha, o‘rtada OMON CRM markaziy belgisi, “SIZ UCHUN MAXSUS” va individual turagentlik nomi.
+- Shablon HTML/CSS asosida ishlaydi; turagentlik rasmi yoki nomi almashtirilsa avtomatik moslashadi. Ya’ni statik generatsiya qilingan rasm emas.
+- Qora *va silliq ko‘k* fonli yuklangan logolar uchun avtomatik shaffoflashtirish mavjud; kerak bo‘lsa tahrirlashdagi belgi orqali o‘chiriladi.
+- Telefon ekrani va PDFda muqova ixchamroq bo‘ladi. KP boshqa bo‘limlari va barcha narx formulalari o‘zgarmagan.
