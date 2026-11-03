@@ -48,3 +48,14 @@ Bitta `index.html` fayl, tashqi JS paketlari va backend talab qilinmaydi. Vercel
 - 03-bo‘lim: keng ekranda ikki teng ustunli, teng balandlikdagi narx kartalari; bir xil qator oraliqlari; 6+1 va 12+3 paketlari tekis bloklarda. Tor ekranda moslashuvchan bir ustun, A4 printda ixcham ikki ustun.
 - Inputlar bir xil o‘lchamda va mobilga moslashtirilgan.
 - Hisob formulalari (CRM, texnik xizmat, telefoniya va bonus) o‘zgarmagan.
+
+
+## Logotip fonini shaffoflashtirish
+
+Mijoz logotipi endi hero ichida mustaqil oq/qora qutisiz, OMON CRM ko‘k gradienti ustida ko‘rinadi. Avvalgi "HAMKOR TURAGENTLIK" yozuvi "SIZ UCHUN MAXSUS" deb o‘zgartirildi.
+
+- Yangi **Qora fonni olib tashlash** checkbox standart yoqilgan va brauzer xotirasiga yoziladi.
+- Algoritm logotipning 3+ burchagida qoramtir neytral fonni aniqlasa, faqat tasvirning **chetidan tutashgan** fon piksellarini shaffoflashtiradi. Oltin kvadrat ichidagi qora elementlar o‘zgarishsiz qoladi.
+- Avvalgi saqlangan logotiplar sahifada avtomatik shaffoflashadi, qayta yuklash talab qilinmaydi.
+- Ba’zi logolarda qora fon tasvirning kerakli qismi bo‘lishi mumkin: bunday holatda checkboxni o‘chirib, original tasvirni saqlab qolish mumkin.
+- Kompaniya fotosi saqlangandagi tasvirning asl nusxasi buzilmaydi, shaffof effekt faqat KPdagi renderga qo‘llanadi.
