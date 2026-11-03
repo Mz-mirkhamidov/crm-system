@@ -1,41 +1,22 @@
-# TourSales Insight — turagentlik diagnostika sayti
+# OMON CRM — Narx kalkulyatori (minimal versiya)
 
-SPIN usulidagi ichki suhbat yo‘riqnomasi, rahbar oldida ko‘rsatish uchun maxfiy qaydlarsiz alohida **taqdimot rejimi**, 4 bosqichli moliyaviy kalkulyator hamda PDF taqdimot.
+Endi faqat narx kalkulyatori mavjud. Oldingi SPIN, kirish, rahbar profili, savollar va taqdimot bo‘limlari sahifadan olib tashlangan.
 
-## Ishlash
+## Formulalar
 
-`index.html` faylini brauzerda oching yoki Vercel production manzilidan foydalaning. Vercel loyihasining root directory qiymati: `tools/turagent-spin-audit`. JavaScript bilan ishlaydigan mustaqil HTML, backend/kalit talab qilmaydi.
+- CRM oylik: agentlar × 189 000 so‘m.
+- CRM jami: oylik × 6 yoki 12.
+- Texnik xizmat: 3 agent uchun $200, 4–5 agent uchun $300, 6+ agent uchun $400.
+- **1–2 agent**: texnik xizmat tarifi berilmagan; «Aniqlashtiriladi» deb ko‘rsatiladi, hech qachon 0 deb taxmin qilinmaydi.
+- **Texnik xizmat davriyligi**: aniqlashtirilmagan. Interfeysda «bir martalik (taxmin)» / «har oy» tanlovi bor. $200/$300/$400 6 va 12 oylik hisobga faqat shu tanlov bo‘yicha kiritiladi.
+- Telefon xizmati: shaxsiy raqam uchun 42 000 so‘m/raqam/oy; kompaniya raqami uchun 110 000 so‘m/raqam/oy, yoki «kerak emas».
+- Paket jami (so‘m): (CRM oylik + telefoniya oylik) × oylar.
+- Texnik xizmat USDda alohida, ixtiyoriy qo‘lda kiritiladigan USD kursi bilan umumiy so‘m ekvivalentini olish mumkin. Kurs avtomatik olinmaydi.
 
-1. **Bosh sahifa:** agentlik, rahbar, sana va maqsadlarini yozing. Har bir mijoz uchun alohida profil.
-2. **Ichki suhbat:** SPIN bo‘yicha avval 16 ta asosiy savol (4×4), istasangiz qolganlarini oching. Javoblar, eslatmalar va muammo holatini saqlang. S1, S4, P1, I1, I4 kiritilgan sonlarni kalkulyator bilan bog‘laydi.
-3. **Kalkulyator:** 01 Hozirgi holat → 02 Yo‘qotishlar → 03 O‘sish farazlari → 04 Xarajat va natija. O‘zgartirilgan qiymatlar avtomatik saqlanadi, jonli hisob yangilanadi.
-4. **Rahbarga taqdimot:** navigatsiya, ichki SPIN savollar, javoblar, kontakt va eslatmalar yashiriladi. 4 sahifali ko‘rsatkichlar, biznes imkoniyatlari va pilot rejasi. “PDF” bilan barcha 4 sahifani chop eting.
-5. **Ichki hisobot:** faqat siz uchun suhbat javoblari va batafsil ma’lumotlar. Ekran ulashishda bunga o‘tmang.
+## Foydalanish
 
-Taqdimotdan chiqish uchun tasdiqlash so‘raladi. Ekran ulashishdan **oldin** taqdimot rejimini yoqing.
+`index.html` mustaqil HTML/CSS/JavaScript fayl, tashqi kutubxona, login yoki backend kerak emas. Kalkulyator ma’lumotlarni serverga yoki localStoragega saqlamaydi. Natijani nusxalash yoki PDF sifatida chop etish mumkin.
 
-## Metodika
+Vercel loyihasining Root Directory: `tools/turagent-spin-audit`; domen: https://toursales-insight.vercel.app
 
-- Javobsiz so‘rovlar aniq son sifatida kiritilsa foiz o‘rniga aniq son ishlatiladi.
-- Aloqa o‘rnatilgan so‘rovlar = jami so‘rovlar − javobsizlar.
-- Tiklangan bronlar = javobsiz × qayta bog‘lanish foizi × qayta bog‘langanlar konversiyasi.
-- Follow-up bronlar = (aloqa o‘rnatilgan − mavjud bronlar) × qo‘shimcha sotuv foizi.
-- Jami qo‘shimcha bronlar = tiklangan + follow-up bronlar; **bir-birini kesmaydigan guruhlar**.
-- Qo‘shimcha foyda hissasi = qo‘shimcha bronlar × bitta bronning foyda hissasi.
-- Oylik hisobiy sof natija = qo‘shimcha foyda hissasi − CRM oylik to‘lovi.
-- Birinchi oy natijasi = oylik sof natija − bir martalik sozlash xarajati.
-- Ssenariylar faraz foizlarini 60% / 100% / 130% koeffitsiyentga ko‘paytiradi; foizlar 100 dan oshmaydi.
-- Xodimlarning bo‘shashi mumkin bo‘lgan vaqtining pul ekvivalenti **ROIga qo‘shilmaydi**.
-
-**Muhim:** Hisob prognoz, natija kafolati emas. Xato yoki yetishmaydigan ma’lumotlar bo‘lsa natija yakuniy emas. Demo qiymatlarini mijoz faktlari bilan adashtirmang. Mijoz ma’lumotlari shu brauzerning `localStorage` xotirasida; zaxira uchun JSON eksport qiling. Ekran ulashishdan oldin taqdimot rejimiga o‘ting, chunki ichki ish rejimi maxfiy suhbat matnini saqlaydi.
-
-
-## Kirish va rahbar profili (v3)
-
-- `Kirish va rahbar` — SPIN'dan oldin alohida ish bosqichi. Tanishish, vaqt va agenda kelishish, savolga ruxsat, Situationga o'tish uchun 5 bosqichli checklist.
-- Rahbar F.I.Sh., lavozimi, telefon/Telegram/email, qaror roli va qarorga ta’sir qiluvchi shaxslar; agentlik nomi, shahar, sayt, yillik tajriba, jamoa soni, lid manbalari, hozirgi CRM; uchrashuv sanasi/vaqti/joyi/formati/holati; kelishuv va keyingi aloqa.
-- 3 ta tabiiy kirish nutqi (rasmiy, qisqa, samimiy), nutq tanlash va nusxa olish tugmasi. Nutqda mavjud rahbar nomidan foydalanadi.
-- Kirish qaydlari ichki hisobotga kiritiladi, ammo ommaviy taqdimot va PDFga chiqarilmaydi. Shaxsiy kontaktlar hech bir ommaviy slaydga chiqarilmaydi.
-- Oldingi `toursales-insight-v1` localStorage yozuvlari bilan mos: yangi maydonlar bo‘sh qoladi, oldingi agentlik/savollar/kalkulyator saqlanadi.
-
-**Shaxsiy ma’lumotlar:** sayt serverga avtomatik yubormaydi; kontaktlar va qaydlar faqat o‘sha brauzerning `localStorage` xotirasida va foydalanuvchi alohida eksport qilgan JSONda qoladi. Umumiy qurilmadan foydalanmang va JSON eksportni xavfsiz joyda saqlang. Bu foydalanuvchilararo avtorizatsiyali CRM tizimi emas.
+Narxlar taklif sifatida hisoblanadi; soliq, chegirma, valyuta konvertatsiyasi va qo‘shimcha xizmatlar shartnoma bo‘yicha tasdiqlanishi zarur.
