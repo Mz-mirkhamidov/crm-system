@@ -148,7 +148,7 @@ const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Mat
 const currency=n=>fmt(n)+' so‘m';
 const dollar=n=>'$'+fmt(n);
 function capInt(value,min,max,fallback){const n=Number(value);return Number.isFinite(n)&&n>=min?Math.min(max,Math.floor(n)):fallback}
-function getSupport(agents){if(agents<3)return null; if(agents===3)return 200; if(agents<=5)return 300;return 400}
+function getSupport(agents){if(agents<=3)return 200; if(agents<=5)return 300;return 400}
 function calculate(s=state,months=s.months){
   const crmMonthly=s.agents*PRICES.agent;
   const phoneMonthly=s.phoneType==='none'?0:s.phones*PRICES[s.phoneType];
@@ -164,7 +164,7 @@ function render(){
   $('agents').value=state.agents;$('phones').value=state.phones;$('phoneCountRow').hidden=state.phoneType==='none';
   setSelected('data-period',state.months);setSelected('data-support',state.supportFrequency);setSelected('data-phone',state.phoneType);
   document.querySelectorAll('[data-compare]').forEach(el=>{const selected=Number(el.dataset.compare)===state.months;el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected))});
-  $('support-tier').textContent=state.agents<3?'1–2 agent uchun tarif belgilanmagan':state.agents===3?'3 agent uchun':state.agents<=5?'4–5 agent uchun':'6 va undan ko‘p agent uchun';
+  $('support-tier').textContent=state.agents<=3?'1–3 agent uchun':state.agents<=5?'4–5 agent uchun':'6 va undan ko‘p agent uchun';
   $('support-price').textContent=c.supportUsd===null?'Aniqlanadi':dollar(c.supportUsd);
   $('selectedBadge').textContent=state.months+' oy';$('monthlySum').textContent=fmt(c.monthly);
   const phoneDesc=state.phoneType==='none'?'':` + ${state.phones} raqam × ${fmt(PRICES[state.phoneType])}`;
@@ -179,7 +179,7 @@ function render(){
   $('crmTotal').textContent=currency(c.crmTotal);$('phoneTotal').textContent=currency(c.phoneTotal);
   $('uzsTotal').textContent=currency(c.uzsTotal);$('usdTotal').textContent=c.technicalTotal===null?'Aniqlashtiriladi':dollar(c.technicalTotal);
   $('convertedRow').hidden=c.sumAll===null;$('convertedTotal').textContent=c.sumAll!==null?currency(c.sumAll):'—';
-  const notes=[];if(c.supportUsd===null)notes.push('1–2 agent uchun texnik xizmat narxi berilmagan. Hisobda bu xarajat yo‘q — yakuniy taklifdan oldin aniqlashtiring.');
+  const notes=[];
   if(state.supportFrequency==='once')notes.push('Texnik xizmat bir martalik deb hisoblandi. Agar u har oy olinadigan bo‘lsa, yuqorida «Har oy»ni tanlang.');
   if(state.exchangeRate&&c.technicalTotal!==null)notes.push('USD → UZS hisoblash siz kiritgan kurs asosida.');
   $('warning').hidden=notes.length===0;$('warning').textContent=notes.join(' ');
