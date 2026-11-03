@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
 <meta name="theme-color" content="#0649e6">
 <meta name="description" content="OMON CRM — Turagentliklar uchun tijorat taklifnomasi, biznes diagnostika va aniq narx kalkulyatori">
 <title>OMON CRM · Tijorat taklifnomasi</title>
@@ -75,6 +76,75 @@
 @media(max-width:620px){.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.seller-lock,.group-note,.mini-stat,.bonus-editor,.logo-input{grid-column:1/-1}}
 @media(max-width:450px){.client-logo{width:150px;min-height:103px;padding:10px}.client-logo-art{height:65px}.price-grid,.plans{grid-template-columns:1fr}.plan{min-height:145px}.price-row strong{white-space:normal}}
 @media print{.price-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.price-box{padding:11px}.price-row{font-size:10px;min-height:0;padding:5px 0}.price-row.total{font-size:11px;padding-top:8px}.price-row.total strong{font-size:13px}.price-box h4{font-size:11px;min-height:0;margin:0 0 6px}.plans{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:9px}.plan{min-height:92px;padding:10px}.plan .plan-term{font-size:12px;margin:4px 0}.plan b{font-size:13px}.plan .plan-gift{font-size:9px;padding:3px 6px}.client-logo{width:90px;min-height:66px;margin:6px auto 8px;border-radius:10px;padding:6px}.client-logo-art{height:44px}.client-logo-caption{font-size:6px}}
+
+/* 2026-11-03: hero background + frosted client identity card */
+:root,html{color-scheme:light}
+.proposal-hero{
+  position:relative; isolation:isolate; overflow:hidden;
+  color:#fff; text-align:center;
+  background:
+    radial-gradient(ellipse 52% 67% at 13% 9%,rgba(139,200,255,.32) 0%,rgba(139,200,255,0) 94%),
+    radial-gradient(ellipse 40% 44% at 85% 83%,rgba(57,127,252,.32) 0%,rgba(57,127,252,0) 100%),
+    linear-gradient(130deg,#1469f4 0%,#0850dc 33%,#0b36b1 68%,#081c72 100%);
+}
+.proposal-hero::before,.proposal-hero::after{
+  content:"";position:absolute;z-index:0;pointer-events:none;
+  border:0;opacity:1;filter:none;
+}
+.proposal-hero::before{
+  width:560px;height:560px;top:-405px;left:-365px;
+  border-radius:50%;border:100px solid rgba(255,255,255,.065);
+  background:radial-gradient(circle,rgba(255,255,255,.12),transparent 72%);
+}
+.proposal-hero::after{
+  width:520px;height:520px;right:-370px;bottom:-387px;
+  border-radius:50%;border:100px solid rgba(123,185,255,.10);
+  background:radial-gradient(circle,rgba(124,183,255,.16),transparent 75%);
+}
+.hero-brand,.proposal-hero h2,.hero-pill,.hero-sub,.client-logo{position:relative;z-index:2}
+.proposal-hero h2{color:#fff;text-shadow:0 3px 16px rgba(3,18,88,.20)}
+.proposal-hero .hero-sub{color:rgba(255,255,255,.91);text-shadow:0 2px 7px rgba(0,23,90,.09)}
+.client-logo{
+  width:184px;height:auto;min-height:126px;
+  margin:20px auto 17px;padding:13px 14px 11px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+  overflow:hidden;border-radius:23px;
+  background:linear-gradient(155deg,rgba(255,255,255,.28),rgba(255,255,255,.12));
+  border:1px solid rgba(255,255,255,.45);
+  -webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px);
+  box-shadow:0 15px 36px rgba(4,21,83,.20),inset 0 1px 0 rgba(255,255,255,.27);
+}
+.client-logo-art{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:85px;padding:9px;
+  border-radius:15px;
+  background:rgba(255,255,255,.97);
+  box-shadow:inset 0 1px 2px rgba(2,34,80,.045);
+}
+.client-logo-art img{
+  display:block;max-width:100%;max-height:100%;object-fit:contain;
+  filter:drop-shadow(0 2px 5px rgba(4,32,91,.08));
+}
+.client-logo-caption{
+  display:block;font-size:9px;font-weight:850;letter-spacing:1.15px;
+  color:rgba(255,255,255,.94);text-align:center;
+}
+@media(max-width:600px){
+  .client-logo{width:162px;min-height:111px;padding:10px 11px 9px;margin:17px auto 14px;border-radius:20px}
+  .client-logo-art{height:73px;border-radius:13px}
+  .client-logo-caption{font-size:8px}
+  .proposal-hero::before{top:-424px;left:-398px}
+  .proposal-hero::after{right:-397px;bottom:-425px}
+}
+@media print{
+  .proposal-hero{
+    background:linear-gradient(130deg,#115beb 0%,#083bb8 62%,#071f7a 100%)!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  .client-logo{width:92px;min-height:69px;margin:6px auto 8px;padding:5px 6px;border-radius:11px;gap:3px;background:rgba(255,255,255,.23)}
+  .client-logo-art{height:45px;border-radius:7px;padding:3px}
+  .client-logo-caption{font-size:6px;letter-spacing:.4px}
+}
 </style>
 </head>
 <body>
