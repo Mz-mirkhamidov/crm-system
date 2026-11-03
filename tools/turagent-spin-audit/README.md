@@ -9,7 +9,7 @@ Bu sahifada faqat narx kalkulyatori mavjud. SPIN, rahbar profili va taqdimot bo�
 - CRM obunasi: **189 000 so‘m / 1 agent / oy**.
 - Paketlar: **6 oy** va **12 oy** (bir vaqtda solishtiriladi).
 - Texnik xizmat (bir marta): **1–3 agent uchun $200**, **4–5 agent uchun $300**, **6 va ko‘p agent uchun $400**.
-- MyZvanki (shaxsiy raqam): **42 000 so‘m / raqam / oy**.
+- MyZvanki (shaxsiy raqam): **49 000 so‘m / raqam / oy**.
 - UzTel (kompaniya raqami): **110 000 so‘m / raqam / oy**.
 - Telefoniya ixtiyoriy, raqamlar soni tanlanadi.
 
