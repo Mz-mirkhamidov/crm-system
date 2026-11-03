@@ -1,38 +1,40 @@
-# OMON CRM — Tijorat taklifnomasi (KP) konstruktori
+# OMON CRM — Individual tijorat taklifnomasi (KP)
 
-Onlayn: https://toursales-insight.vercel.app
+**Production:** https://toursales-insight.vercel.app
 
-## Imkoniyatlar
-- OMON CRM ko‘k gradient brendi va foydalanuvchi taqdim etgan logo belgisiga mos jonli KP
-- Turagentlik nomi, rahbar, telefon, hudud, ijrochi, uchrashuv sanasi
-- Xodimlar, ish kunlari, kunlik lidlar va ishlanmagan lidlar
-- Qayta bog‘lanadigan lidlar %, issiq lead bron ehtimoli %, 1 ta bron sof foydasi
-- Hozirgi/maqsadli javob tezligi, tur qidirish vaqti va qidiruvlar soni
-- Natijalar: ishlanmay qolgan lidlar/oy, qo‘shimcha bronlar/oy, qo‘shimcha sof foyda imkoniyati/oy, tur qidirishda faol vaqt tejalishi/oy
-- 6 va 12 oylik CRM paketi, ixtiyoriy bonus oylar, MyZvanki yoki UzTel, bir martalik texnik xizmat
-- Yakuniy narxni yuqorida va batafsil tarkibda ko‘rsatish, taqdimot rejimi va PDFga chop etish
-- Lokal takliflar ro‘yxati, saqlash/o‘chirish, JSON eksport va matnni nusxalash
+## 2026-11-03 yangilanishi
 
-## Narxlar (UZS)
-- 1 CRM agent / oy = **189 000 so‘m**
-- MyZvanki shaxsiy raqami / oy = **49 000 so‘m**
-- UzTel kompaniya raqami / oy = **110 000 so‘m**
-- Bir martalik texnik xizmat: **1–3 agent = $200**, **4–5 agent = $300**, **6+ agent = $400**
+- **Telefoniya ixtiyoriy.** “Kerak emas” tanlansa, KPning narx, xizmat tarkibi, shartlar va ko‘chiriladigan matnida telefoniya qatorlari umuman ko‘rsatilmaydi.
+- **Turagentlik rasmi/logotipi** upload qilish mumkin: JPG/PNG/WebP, 8 MB gacha; fayl brauzerda 440 px dan oshmaydigan WebPga siqiladi va tayyor KPda chiqadi. Saqlangan taklif bilan birga localStorageda qoladi.
+- **Ijrochi doimiy:** Muzaffar Mirkhamidov, +998 77 177 13 19. Tahrirlash maydonlari olib tashlangan. Eski saqlangan takliflar ham yangi doimiy ijrochi ma’lumotiga moslashtiriladi.
+- **Avtomatik bonus:** 6 oy uchun to‘lov → 6 + 1 = **7 oy foydalanish**; 12 oy uchun to‘lov → 12 + 3 = **15 oy foydalanish**. Bonus CRMga ham, tanlangan bo‘lsa MyZvanki/UzTelga ham tatbiq etiladi. Bonus oylar uchun qo‘shimcha obuna to‘lovi olinmaydi. Bonusni qo‘lda o‘zgartirish maydoni yo‘q.
+- Yuqorida ko‘k rangli bonus banneri va 6+1 / 12+3 solishtirishlari; 04-bo‘limda mijoz nimani olayotgani: akkauntlar soni, bonusli foydalanish muddati, bir martalik sozlash, lidlar bazasi, menejer nazorati, hisobotlar, tur qidirish va tanlangan telefoniya.
 
-**Jami to‘lov (6/12 oy) = (agentlar × 189000 + telefoniya raqamlari × telefon tarifi) × paket oylari + texnik xizmat USD × USD/UZS kursi.**
+## Narxlar
 
-Texnik xizmat faqat bir marta qo‘shiladi. Kursni O‘zbekiston Markaziy banki JSON API dan olishga harakat qiladi; API ishlamasa 2026-11-03 uchun yozib qo‘yilgan 11 941,65 so‘mlik namunaviy kurs ishlatilishi va uning holati ekranda alohida ko‘rsatiladi. Kursni qo‘lda kiritish mumkin. Bunday holatda yakuniy shartnoma kursini tekshirish lozim. Kurs butunlay o‘chirib yuborilsa so‘m va dollar summalari **alohida** ko‘rsatiladi, noto‘g‘ri birlashtirilmaydi.
+- CRM akkaunt: **189 000 so‘m / agent / oy**
+- MyZvanki: **49 000 so‘m / raqam / oy**
+- UzTel: **110 000 so‘m / raqam / oy**
+- Texnik xizmat (bir marta): **1–3 agent $200**, **4–5 agent $300**, **6+ agent $400**
 
-## KPI formulasi
-- Yo‘qolgan lidlar / oy = ishlanmagan lidlar / kun × ish kunlari.
-- Qayta ishlangan lidlar / oy = yo‘qolgan lidlar / oy × qayta bog‘lanish ulushi.
-- Qo‘shimcha bronlar / oy = qayta ishlangan lidlar × issiq paytda bron ehtimoli.
-- Qo‘shimcha foyda prognozi = qo‘shimcha bronlar × bitta bronning sof foydasi.
-- Tur qidirishda faol ish vaqti tejalishi = max(hozirgi − maqsadli qidirish vaqti, 0) × bir kundagi qidirishlar soni × ish kunlari / 60.
+```
+Jami = CRM agentlar soni × 189 000 × (6 yoki 12 to‘lov oyi)
+     + ixtiyoriy telefoniya narxi × raqamlar soni × (6 yoki 12 to‘lov oyi)
+     + texnik xizmat USD × 1 USD kursi
+```
 
-**Muhim:** qo‘shimcha bronlar va foyda — foydalanuvchi kiritgan taxminlarga asoslangan ssenariy, kafolatlangan natija emas. Javob kechikishi ish soati tejalishi bilan adashtirilmaydi.
+Bonus oylar to‘lov oylariga ko‘paytirilmaydi. USD kursi Markaziy bank orqali avtomatik olishga uriniladi, olinmasa sahifada aniq ko‘rsatilgan namunaviy kurs yoki foydalanuvchi qo‘lda kiritgan kurs ishlatiladi.
 
-## Deploy
-Yagona mustaqil `index.html`; HTML/CSS/JS va inline PNG logotip. Vercel project root: `tools/turagent-spin-audit`. Backend talab qilinmaydi.
+## Lidlar va natijalar hisoblash
 
-Shaxsiy ma’lumotlar faqat foydalanuvchi brauzerining localStorage xotirasida saqlanadi. Serverga uzatilmaydi (USD kursini olish uchun rasmiy tashqi API bilan aloqa bundan mustasno). Saqlash qurilmalararo sinxron emas. Ekranni ulashishda **Mijozga ko‘rsatish** rejimini tanlang; chop etishda tahrir paneli yashiriladi.
+- Yo‘qolgan lidlar/oy = kunlik ishlanmay qolgan lidlar × ish kunlari
+- Qayta qamrab olinadigan lidlar = yo‘qolgan lidlar/oy × qayta ishlash ulushi
+- Qo‘shimcha bronlar ssenariysi = qayta qamrab olinadigan lidlar × bron ehtimoli
+- Qo‘shimcha sof foyda ssenariysi = qo‘shimcha bronlar × bron uchun o‘rtacha sof foyda
+- Tur qidirish vaqti tejalishi = max(hozirgi − maqsadli daqiqa, 0) × kundalik tur qidirishlar × ish kunlari / 60
+
+**Natijalar prognoz, kafolat emas.** 04-bo‘limdagi ba’zi integratsiyalar ulanish/shartnoma shartlariga bog‘liq. AI xizmati avtomatik qo‘shilgan deb hisoblanmaydi.
+
+## Ishlatish
+
+Bitta `index.html` fayl, tashqi JS paketlari va backend talab qilinmaydi. Vercel root: `tools/turagent-spin-audit`. Tahrirlash, mijozga taqdim etish, PDFga chop etish, taklifni saqlash/yuklash va JSON eksport ishlaydi. Shaxsiy ma’lumot va agentlik rasmi faqat joriy brauzerning localStorage xotirasida saqlanadi — umumiy qurilmalarda ehtiyot bo‘ling.
