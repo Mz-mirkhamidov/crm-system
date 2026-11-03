@@ -149,7 +149,7 @@
       <div class="field"><div class="f-title">Qo‘shimcha telefon xizmati <small>Oylik to‘lov</small></div>
         <div class="choices choice-3" role="group" aria-label="Telefon xizmati turi">
           <button type="button" class="option selected" data-phone="none" aria-pressed="true">Kerak emas</button>
-          <button type="button" class="option" data-phone="personal" aria-pressed="false">MyZvanki<br><span style="font-weight:500;font-size:11px">42 000 so‘m / raqam</span></button>
+          <button type="button" class="option" data-phone="personal" aria-pressed="false">MyZvanki<br><span style="font-weight:500;font-size:11px">49 000 so‘m / raqam</span></button>
           <button type="button" class="option" data-phone="company" aria-pressed="false">UzTel<br><span style="font-weight:500;font-size:11px">110 000 so‘m / raqam</span></button>
         </div>
         <div class="phone-num" id="phoneCountRow" hidden><label for="phones">Ulanadigan raqamlar soni</label><div class="stepper"><button type="button" data-step="phones:-1" aria-label="Raqamni kamaytirish">−</button><input id="phones" aria-label="Raqamlar soni" inputmode="numeric" type="number" min="1" max="999" value="1"><button type="button" data-step="phones:1" aria-label="Raqamni oshirish">+</button></div></div>
@@ -189,7 +189,7 @@
 </main>
 <script>
 'use strict';
-const PRICES=Object.freeze({agent:189000,personal:42000,company:110000});
+const PRICES=Object.freeze({agent:189000,personal:49000,company:110000});
 const $=id=>document.getElementById(id);
 const state={agents:3,months:6,phoneType:'none',phones:1,exchangeRate:11941.65,rateSource:'fallback',rateDate:'03.11.2026',manualRate:false};
 const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n)).replace(/\u00a0/g,' ');
