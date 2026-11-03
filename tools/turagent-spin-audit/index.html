@@ -319,6 +319,8 @@
 .price-row.selected-tier strong{font-size:20px;color:#074cc0}
 @media(max-width:760px){.hero-partner{gap:6px}.hero-partner-art{flex:0 1 56px;max-width:56px}.hero-partner-art img{max-height:45px}.hero-partner-name{font-size:clamp(11px,2.7vw,15px)}}
 @media print{.hero-partner-art{flex:0 1 65px;max-width:65px}.hero-partner-art img{max-height:35px}.hero-partner-name{font-size:11px}.price-row.selected-tier{padding:6px;margin-bottom:5px}.price-row.selected-tier strong{font-size:13px}}
+.client-data-row{display:block;margin-top:5px;line-height:1.5}
+.identity-grid:has(>#clientIdentityBox[hidden]){grid-template-columns:1fr}
 </style>
 </head>
 <body>
@@ -392,20 +394,20 @@
     <p class="hero-sub">Sizning turagentligingiz uchun individual raqamli yechim</p>
    </div>
    <div class="proposal-content">
-    <div class="identity-grid"><div class="identity-box"><h3>IJROCHI</h3><div class="data"><strong>Omon CRM</strong><br><span id="pManager">Sotuv menejeri: —</span><br><span id="pManagerPhone">Telefon: —</span></div></div><div class="identity-box"><h3>MIJOZ</h3><div class="data"><strong id="pAgency">Turagentlik: —</strong><br><span id="pOwner">Rahbar: —</span><br><span id="pContact">Aloqa: —</span><br><span id="pDate">Sana: —</span></div></div></div>
+    <div class="identity-grid"><div class="identity-box"><h3>IJROCHI</h3><div class="data"><strong>Omon CRM</strong><div class="client-data-row" id="pManager">Sotuv menejeri: Muzaffar Mirkhamidov</div><div class="client-data-row" id="pManagerPhone">Telefon: +998 77 177 13 19</div></div></div><div class="identity-box" id="clientIdentityBox"><h3>MIJOZ</h3><div class="data"><div class="client-data-row" id="pAgencyRow"><strong id="pAgency">Turagentlik</strong></div><div class="client-data-row" id="pOwnerRow"><span id="pOwner"></span></div><div class="client-data-row" id="pContactRow"><span id="pContact"></span></div><div class="client-data-row" id="pDateRow"><span id="pDate"></span></div></div></div></div>
     <div class="bonus-ribbon"><div><small>MAXSUS TAKLIF · BONUS OYLAR</small><strong id="pBonusTop">6 OY + 1 OY BONUS = 7 OY FOYDALANISH</strong><small id="pBonusDetail">CRM obunasiga va tanlangan telefon xizmatiga ham amal qiladi</small></div><span class="gift">🎁 BEPUL</span></div><div class="headline-box"><div><div class="kicker">SIZ UCHUN TAYYORLANGAN TAKLIF · JAMI INVESTITSIYA</div><div class="amount" id="pGrand">— so‘m</div><div class="small" id="pGrandNote">CRM + telefoniya + bir martalik texnik xizmat</div></div><div class="duration"><strong id="pTerm">6 + 1 oy</strong><span>foydalanish muddati</span></div></div>
-    <div class="section-title"><span class="glyph">▦</span><h3>01. TURAGENTLIK HOLATI</h3></div>
-    <div class="metrics-grid"><div class="metric"><strong class="val" id="mEmployees">—</strong><div class="label">Xodimlar soni</div></div><div class="metric"><strong class="val" id="mLeads">—</strong><div class="label">Kunlik o‘rtacha lidlar</div></div><div class="metric"><strong class="val" id="mMissed">—</strong><div class="label">Ishlanmay qolgan lidlar / kun</div></div><div class="metric"><strong class="val" id="mResponse">—</strong><div class="label">Mijozga javob berish vaqti</div></div></div>
-    <div class="section-title"><span class="glyph">↗</span><h3>02. QO‘SHIMCHA SOTUV IMKONIYATI</h3></div>
-    <div class="segment-grid"><div class="segment"><b id="kLost">—</b><span>Ishlanmay qolgan lidlar / oy</span><small id="kLostFormula">Kunlik × ish kunlari</small></div><div class="segment"><b id="kBookings">—</b><span>Qo‘shimcha bronlar / oy</span><small id="kBookingsFormula">Qamrov × bron ehtimoli</small></div><div class="segment"><b id="kProfit">—</b><span>Qo‘shimcha foyda imkoniyati / oy</span><small>Prognoz · kafolat emas</small></div></div>
+    <div class="section-title" id="kpStatusTitle"><span class="glyph">▦</span><h3><span id="kpStatusNumber">01.</span> TURAGENTLIK HOLATI</h3></div>
+    <div class="metrics-grid" id="kpStatusGrid"><div class="metric" id="kpEmployeesCard"><strong class="val" id="mEmployees">—</strong><div class="label">Xodimlar soni</div></div><div class="metric" id="kpLeadsCard"><strong class="val" id="mLeads">—</strong><div class="label">Kunlik o‘rtacha lidlar</div></div><div class="metric" id="kpMissedCard"><strong class="val" id="mMissed">—</strong><div class="label">Ishlanmay qolgan lidlar / kun</div></div><div class="metric" id="kpResponseCard"><strong class="val" id="mResponse">—</strong><div class="label">Mijozga javob berish vaqti</div></div></div>
+    <div class="section-title" id="kpOpportunityTitle"><span class="glyph">↗</span><h3><span id="kpOpportunityNumber">02.</span> QO‘SHIMCHA SOTUV IMKONIYATI</h3></div>
+    <div class="segment-grid" id="kpOpportunityGrid"><div class="segment" id="kpLostCard"><b id="kLost">—</b><span>Ishlanmay qolgan lidlar / oy</span><small id="kLostFormula">Kunlik × ish kunlari</small></div><div class="segment" id="kpBookingsCard"><b id="kBookings">—</b><span>Qo‘shimcha bronlar / oy</span><small id="kBookingsFormula">Qamrov × bron ehtimoli</small></div><div class="segment" id="kpProfitCard"><b id="kProfit">—</b><span>Qo‘shimcha foyda imkoniyati / oy</span><small>Prognoz · kafolat emas</small></div></div>
     <p class="hint" id="kExplanation">Natija — qayta aloqa ulushi, bron ehtimoli va har bir bron sof foydasi bo‘yicha ssenariy. Haqiqiy natijalar farq qilishi mumkin.</p>
-    <div class="signal"><span id="kReply">Javob vaqti: —</span><span id="kSearch">Tur qidirish: —</span><span id="kTime">Faol ish vaqti tejalishi: —</span></div>
-    <div class="section-title"><span class="glyph">▤</span><h3>03. NARX HISOB-KITOBI</h3></div>
+    <div class="signal" id="kpTimeSignals"><span id="kReply">Javob vaqti: —</span><span id="kSearch">Tur qidirish: —</span><span id="kTime">Faol ish vaqti tejalishi: —</span></div>
+    <div class="section-title" id="kpPriceTitle"><span class="glyph">▤</span><h3><span id="kpPriceNumber">03.</span> NARX HISOB-KITOBI</h3></div>
     <div class="price-grid"><div class="price-box"><h4 id="pPricingHeading">CRM obunasi</h4><div class="price-row"><span id="pCrmCalcLabel">189 000 × 3 agent / oy</span><strong id="pCrmCalcValue">567 000 so‘m / oy</strong></div><div class="price-row"><span id="pCrmLabel">567 000 × 6 oy</span><strong id="pCrmMonthly">3 402 000 so‘m</strong></div><div class="price-row" id="pPhoneRow" hidden><span id="pPhoneLabel">Qo‘shimcha telefoniya / oy</span><strong id="pPhoneMonthly">0 so‘m</strong></div><div class="price-row"><span id="pCrmAllLabel">6 oy to‘lov + 1 oy bonus</span><strong id="pCrmAll">7 oy foydalanish</strong></div><div class="price-row" id="pPhoneAllRow" hidden><span id="pPhoneAllLabel">Telefoniya (6 oy)</span><strong id="pPhoneAll">0 so‘m</strong></div><div class="price-row total"><span id="pRecurringLabel">CRM obunasi jami</span><strong id="pRecurring">3 402 000 so‘m</strong></div></div>
     <div class="price-box"><h4>Texnik xizmat va yakuniy narx</h4><div class="price-row selected-tier"><span id="pSupportTier">1–3 agent uchun · 1 marta</span><strong id="pSupportUsd">$200</strong></div><div class="price-row"><span id="pFxLabel">1 USD = 11 941,65 so‘m</span><strong id="pSupportUzs">2 388 330 so‘m</strong></div><div class="price-row total"><span id="pAllInLabel">CRM + texnik xizmat jami</span><strong id="pAllIn">5 790 330 so‘m</strong></div></div></div>
     <div class="plans"><div class="plan" id="plan6"><span>6 oy to‘lov</span><strong class="plan-term">6 OY + 1 OY BONUS</strong><b id="pSix">—</b><span class="plan-gift">7 oy foydalanish</span></div><div class="plan" id="plan12"><span>12 oy to‘lov</span><strong class="plan-term">12 OY + 3 OY BONUS</strong><b id="pTwelve">—</b><span class="plan-gift">15 oy foydalanish</span></div></div>
     <div class="final-bar"><div><span>UMUMIY YAKUNIY SUMMA</span><strong id="pFinal">—</strong><small id="pBonus">Tanlangan muddat uchun jami to‘lov</small></div><span>To‘liq taklif</span></div>
-    <div class="section-title"><span class="glyph">✦</span><h3>04. TAKLIF TARKIBI — SIZ NIMA OLASIZ?</h3></div>
+    <div class="section-title" id="kpOfferTitle"><span class="glyph">✦</span><h3><span id="kpOfferNumber">04.</span> TAKLIF TARKIBI — SIZ NIMA OLASIZ?</h3></div>
     <div class="offer-included">
       <div class="included-stat"><strong id="includedAccounts">3 ta akkaunt</strong><span>Omon CRM orqali ishlaydigan xodimlar</span></div>
       <div class="included-stat"><strong id="includedDuration">7 oy</strong><span>CRMdan foydalanish (bonus bilan)</span></div>
@@ -421,7 +423,7 @@
       <div class="deliverable" id="includedTelephonyCard" hidden><span class="di">☎</span><div><strong id="includedTelephonyTitle">Ulangan telefoniya</strong><p id="includedTelephonyBody">Qo‘ng‘iroqlar CRM orqali; bonus oylar ham qo‘shiladi.</p></div></div>
     </div>
     <p class="hint">Alohida AI xizmatlari va boshqa integratsiyalar taklif tarkibiga faqat kelishilgan shartlar asosida kiritiladi.</p>
-    <div class="section-title"><span class="glyph">✓</span><h3>05. TAKLIF SHARTLARI</h3></div>
+    <div class="section-title" id="kpTermsTitle"><span class="glyph">✓</span><h3><span id="kpTermsNumber">05.</span> TAKLIF SHARTLARI</h3></div>
     <div class="conditions"><p id="conditionTerm">• CRM obunasi 6 oyga hisoblangan, o‘rnatish va texnik xizmat bir martalik.</p><p id="conditionPhones">• Telefoniya zarur bo‘lsa qo‘shimcha to‘lov asosida ulanadi.</p><p id="conditionRate">• Texnik xizmat USD narxidan ko‘rsatilgan kurs bo‘yicha so‘mga aylantiriladi.</p><p id="conditionValidity">• Taklif amal qilish muddati individual.</p><p>• Sotuv prognozlari kiritilgan taxminlarga tayanadi; sotuv yoki foyda natijasi kafolatlanmaydi.</p></div>
     <div class="proposal-footer">OMON CRM — biznesingizni raqamlar bilan boshqaring</div>
    </div>
@@ -466,6 +468,48 @@ function analysis(s=state){
 function put(id,text){$(id).textContent=text}
 function valOr(v,suffix=''){return blank(v)?'—':v+suffix}
 function phoneName(type){return type==='personal'?'MyZvanki (shaxsiy raqam)':type==='company'?'UzTel (kompaniya raqami)':'Telefoniya ulanmagan'}
+/* Omit unanswered fields from the customer-facing KP and renumber visible sections. */
+function kpVisibility(stateValues=state,results=analysis(stateValues)){
+ const has=v=>!blank(v)&&String(v).trim()!=='';
+ const status={employees:has(stateValues.employees),leads:has(stateValues.leads),missed:has(stateValues.missed),response:has(stateValues.responseNow)};
+ const opportunity={
+   lost:!results.invalid&&results.lost!==null,
+   bookings:!results.invalid&&results.bookings!==null,
+   profit:!results.invalid&&results.moneyPotential!==null,
+   reply:has(stateValues.responseNow)&&has(stateValues.responseAfter),
+   search:has(stateValues.searchNow)&&has(stateValues.searchAfter),
+   time:results.timeSaved!==null
+ };
+ return {status,opportunity,statusVisible:Object.values(status).some(Boolean),opportunityVisible:Object.values(opportunity).some(Boolean)};
+}
+function renderOptionalKp(a){
+ const v=kpVisibility(state,a),s=v.status,o=v.opportunity;
+ $('kpEmployeesCard').hidden=!s.employees;$('kpLeadsCard').hidden=!s.leads;
+ $('kpMissedCard').hidden=!s.missed;$('kpResponseCard').hidden=!s.response;
+ $('kpStatusGrid').hidden=!v.statusVisible;
+ $('kpLostCard').hidden=!o.lost;$('kpBookingsCard').hidden=!o.bookings;
+ $('kpProfitCard').hidden=!o.profit;
+ $('kpOpportunityGrid').hidden=!(o.lost||o.bookings||o.profit);
+ $('kReply').hidden=!o.reply;$('kSearch').hidden=!o.search;$('kTime').hidden=!o.time;
+ $('kpTimeSignals').hidden=!(o.reply||o.search||o.time);
+ $('kExplanation').hidden=!(o.bookings||o.profit);
+ $('clientIdentityBox').hidden=!(state.agency.trim()||state.owner.trim()||state.contact.trim());
+ $('pAgencyRow').hidden=!state.agency.trim();$('pOwnerRow').hidden=!state.owner.trim();
+ $('pContactRow').hidden=!state.contact.trim();$('pDateRow').hidden=!state.date.trim();
+ const sections=[
+  {title:'kpStatusTitle',number:'kpStatusNumber',visible:v.statusVisible},
+  {title:'kpOpportunityTitle',number:'kpOpportunityNumber',visible:v.opportunityVisible},
+  {title:'kpPriceTitle',number:'kpPriceNumber',visible:true},
+  {title:'kpOfferTitle',number:'kpOfferNumber',visible:true},
+  {title:'kpTermsTitle',number:'kpTermsNumber',visible:true}
+ ];
+ let counter=1;
+ for(const section of sections){
+  $(section.title).hidden=!section.visible;
+  if(section.visible)put(section.number,String(counter++).padStart(2,'0')+'.');
+ }
+}
+
 function display(){
  const q=quote(),q6=quote(state,6),q12=quote(state,12),a=analysis(),name=state.agency.trim()||'TURAGENTLIK';
  const hasPhone=q.phoneType!=='none',bonus=extraMonths(q.months),accessible=q.months+bonus;
@@ -505,6 +549,7 @@ function display(){
  if(hasPhone)put('conditionPhones','• '+phoneName(q.phoneType)+' — '+q.phones+' raqam, '+money(q.phoneMonthly)+'/oy; '+q.months+' oy to‘lov + '+bonus+' oy BONUS = '+accessible+' oy foydalanish.');
  put('conditionRate','• Texnik xizmat — $'+q.supportUsd+' (bir martalik). '+(q.supportUzs!==null?'Kurs '+fxfmt(Number(state.fx))+' so‘m, ekvivalent '+money(q.supportUzs)+'. ':'')+'Valyuta kursi va yakuniy shartlar to‘lovda tasdiqlanadi.');
  put('conditionValidity','• Taklif sanasi '+valOr(state.date)+'; amal qilish muddati '+parseIntBound(state.validDays,1,60)+' kun.');
+ renderOptionalKp(a);
 }
 
 let logoRenderToken=0,logoCacheOriginal='',logoCacheProcessed='';
@@ -686,23 +731,38 @@ function refreshSaved(){const cur=stored(),sel=$('savedSelect');sel.replaceChild
 function saveQuote(){state=normalized(state);if(!state.agency.trim()){toast('Avval turagentlik nomini kiriting');$('agency').focus();return}const items=stored();const id=selectedId||('kp-'+Date.now());const updated=new Date().toISOString();const record={id,agency:state.agency.trim(),updated,data:{...state},rateMeta:{...rateMeta}};const idx=items.findIndex(x=>x.id===id);if(idx>=0)items[idx]=record;else items.unshift(record);items.sort((a,b)=>b.updated.localeCompare(a.updated));try{localStorage.setItem('omon-kp-v1',JSON.stringify({saved:items.slice(0,80)}));selectedId=id;refreshSaved();rememberCurrent();toast('Tijorat taklifi saqlandi')}catch(e){toast('Saqlash uchun brauzer xotirasi mavjud emas')}}
 function exportQuote(){const data={version:2,exportedAt:new Date().toISOString(),...normalized(state)};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='omon-kp-'+(state.agency.trim().replace(/[^\w\-]+/g,'-').slice(0,32)||'taklif')+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
 function quoteText(){
- const q=quote(),a=analysis(),v=state,b=extraMonths(q.months),hasPhone=q.phoneType!=='none';
- return ['OMON CRM — TIJORAT TAKLIFNOMASI',
- 'Turagentlik: '+(v.agency||'—'),'Rahbar: '+(v.owner||'—'),'Sotuv menejeri: '+SELLER.name+' · '+SELLER.phone,'Sana: '+(v.date||'—'),
- 'Xodimlar: '+(v.employees||'—')+', CRM agentlari: '+q.agents,
- 'Kunlik lidlar: '+(v.leads||'—')+', ishlanmay qolgan: '+(v.missed||'—'),
- 'Ishlanmay qolgan lidlar / oy: '+(a.lost===null?'—':fmt(a.lost)),
- 'Qo‘shimcha bronlar prognozi / oy: '+(a.bookings===null?'—':fxfmt(a.bookings)),
- 'Qo‘shimcha foyda prognozi / oy: '+(a.moneyPotential===null?'—':money(a.moneyPotential)),
- 'CRM / oy: '+money(q.crmMonthly),
- 'CRM '+q.months+' oy uchun: '+money(q.crmTotal),
- q.months+' oy to‘lov + '+b+' oy BONUS = '+(q.months+b)+' oy foydalanish',
- ...(hasPhone?[phoneName(q.phoneType)+' / oy: '+money(q.phoneMonthly), 'Telefoniya '+q.months+' oy to‘lov + '+b+' oy bonus: '+money(q.phoneTotal)]:[]),
- 'Texnik xizmat (1 marta): $'+q.supportUsd+' = '+(q.supportUzs===null?'kurs aniqlanmagan':money(q.supportUzs)),
- '6 oylik jami (7 oy foydalanish): '+(quote(state,6).total===null?'—':money(quote(state,6).total)),
- '12 oylik jami (15 oy foydalanish): '+(quote(state,12).total===null?'—':money(quote(state,12).total)),
- 'TANLANGAN PAKET JAMI: '+(q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total)),
- 'Izoh: qo‘shimcha bron va foyda prognoz bo‘lib, kafolat emas.'].join('\n');
+ const q=quote(),a=analysis(),v=state,b=extraMonths(q.months),hasPhone=q.phoneType!=='none',kp=kpVisibility(v,a);
+ const lines=['OMON CRM — TIJORAT TAKLIFNOMASI'];
+ if(v.agency.trim())lines.push('Turagentlik: '+v.agency.trim());
+ if(v.owner.trim())lines.push('Rahbar: '+v.owner.trim());
+ if(v.contact.trim())lines.push('Mijoz telefoni: '+v.contact.trim());
+ if(v.date.trim())lines.push('Sana: '+v.date.trim());
+ lines.push('Sotuv menejeri: '+SELLER.name+' · '+SELLER.phone);
+ if(kp.status.employees)lines.push('Xodimlar: '+v.employees);
+ if(kp.status.leads)lines.push('Kunlik lidlar: '+v.leads);
+ if(kp.status.missed)lines.push('Kuniga ishlanmay qolgan lidlar: '+v.missed);
+ if(kp.status.response)lines.push('Mijozga javob berish: '+v.responseNow+' daqiqa');
+ if(kp.opportunity.lost)lines.push('Ishlanmay qolgan lidlar / oy: '+fmt(a.lost));
+ if(kp.opportunity.bookings)lines.push('Qo‘shimcha bronlar prognozi / oy: '+fxfmt(a.bookings));
+ if(kp.opportunity.profit)lines.push('Qo‘shimcha foyda prognozi / oy: '+money(a.moneyPotential));
+ if(kp.opportunity.reply)lines.push('Javob berish tezligi: '+v.responseNow+' → '+v.responseAfter+' daq.');
+ if(kp.opportunity.search)lines.push('Tur qidirish tezligi: '+v.searchNow+' → '+v.searchAfter+' daq.');
+ if(kp.opportunity.time)lines.push('Tur qidirishda tejaladigan faol vaqt: '+fxfmt(a.timeSaved)+' soat/oy');
+ lines.push(
+  'CRM agentlari: '+q.agents,
+  'CRM / oy: '+money(q.crmMonthly),
+  'CRM '+q.months+' oy uchun: '+money(q.crmTotal),
+  q.months+' oy to‘lov + '+b+' oy BONUS = '+(q.months+b)+' oy foydalanish'
+ );
+ if(hasPhone)lines.push(phoneName(q.phoneType)+' / oy: '+money(q.phoneMonthly),'Telefoniya '+q.months+' oy to‘lov + '+b+' oy bonus: '+money(q.phoneTotal));
+ lines.push('Texnik xizmat (1 marta): $'+q.supportUsd+(q.supportUzs===null?'': ' = '+money(q.supportUzs)));
+ for(const m of [6,12]){
+  const p=quote(state,m),total=p.total===null?money(p.recurring)+' + $'+p.supportUsd:money(p.total);
+  lines.push(m+' oylik jami ('+(m+extraMonths(m))+' oy foydalanish): '+total);
+ }
+ lines.push('TANLANGAN PAKET JAMI: '+(q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total)));
+ if(kp.opportunity.bookings||kp.opportunity.profit)lines.push('Izoh: qo‘shimcha bron va foyda prognoz bo‘lib, kafolat emas.');
+ return lines.join('\n');
 }
 async function copyQuote(){const t=quoteText();try{await navigator.clipboard.writeText(t)}catch(e){const box=document.createElement('textarea');box.value=t;document.body.append(box);box.select();document.execCommand('copy');box.remove()}toast('Taklif nusxalandi')}
 let loadingRate=false;
