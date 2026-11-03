@@ -1,21 +1,36 @@
-# OMON CRM — Narx kalkulyatori (minimal versiya)
+# OMON CRM — Narx kalkulyatori
 
-Endi faqat narx kalkulyatori mavjud. Oldingi SPIN, kirish, rahbar profili, savollar va taqdimot bo‘limlari sahifadan olib tashlangan.
+Vercel production: https://toursales-insight.vercel.app
 
-## Formulalar
+Bu sahifada faqat narx kalkulyatori mavjud. SPIN, rahbar profili va taqdimot bo‘limlari yo‘q.
 
-- CRM oylik: agentlar × 189 000 so‘m.
-- CRM jami: oylik × 6 yoki 12.
-- Texnik xizmat: **1–3 agent uchun $200**, **4–5 agent uchun $300**, **6+ agent uchun $400**.
-- **Texnik xizmat davriyligi**: aniqlashtirilmagan. Interfeysda «bir martalik (taxmin)» / «har oy» tanlovi bor. $200/$300/$400 6 va 12 oylik hisobga faqat shu tanlov bo‘yicha kiritiladi.
-- Telefon xizmati: shaxsiy raqam uchun 42 000 so‘m/raqam/oy; kompaniya raqami uchun 110 000 so‘m/raqam/oy, yoki «kerak emas».
-- Paket jami (so‘m): (CRM oylik + telefoniya oylik) × oylar.
-- Texnik xizmat USDda alohida, ixtiyoriy qo‘lda kiritiladigan USD kursi bilan umumiy so‘m ekvivalentini olish mumkin. Kurs avtomatik olinmaydi.
+## Tariflar
 
-## Foydalanish
+- CRM obunasi: **189 000 so‘m / 1 agent / oy**.
+- Paketlar: **6 oy** va **12 oy** (bir vaqtda solishtiriladi).
+- Texnik xizmat (bir marta): **1–3 agent uchun $200**, **4–5 agent uchun $300**, **6 va ko‘p agent uchun $400**.
+- MyZvanki (shaxsiy raqam): **42 000 so‘m / raqam / oy**.
+- UzTel (kompaniya raqami): **110 000 so‘m / raqam / oy**.
+- Telefoniya ixtiyoriy, raqamlar soni tanlanadi.
 
-`index.html` mustaqil HTML/CSS/JavaScript fayl, tashqi kutubxona, login yoki backend kerak emas. Kalkulyator ma’lumotlarni serverga yoki localStoragega saqlamaydi. Natijani nusxalash yoki PDF sifatida chop etish mumkin.
+## Formula
 
-Vercel loyihasining Root Directory: `tools/turagent-spin-audit`; domen: https://toursales-insight.vercel.app
+```
+CRM oylik = agentlar × 189000
+Telefoniya oylik = raqamlar × (42000 yoki 110000) [agar tanlangan bo‘lsa]
+Texnik xizmat (UZS) = round(texnik xizmat USD × USD/UZS kurs)
+6 oylik jami = (CRM oylik + telefoniya oylik) × 6 + texnik xizmat (UZS)
+12 oylik jami = (CRM oylik + telefoniya oylik) × 12 + texnik xizmat (UZS)
+```
 
-Narxlar taklif sifatida hisoblanadi; soliq, chegirma, valyuta konvertatsiyasi va qo‘shimcha xizmatlar shartnoma bo‘yicha tasdiqlanishi zarur.
+Texnik xizmat **6/12 oylik hisobda bir martagina** qo‘shiladi. So‘mdagi jami eng yuqoridagi ajratilgan blokda ko‘rinadi. CRM oylik, jami CRM, telefoniya oylik/jami va texnik xizmat alohida ko‘rsatiladi. PDF / chop etish va hisobni nusxalash mumkin.
+
+## USD kursi
+
+Sahifa ishga tushganda birinchi navbatda O‘zbekiston Respublikasi Markaziy banki JSON API dan USD kursini oladi: `https://cbu.uz/uz/arkhiv-kursov-valyut/json/USD/`. Agar ishlamasa, CBU kursini qayta tarqatuvchi ochiq API dan foydalanadi; ulanish bo‘lmasa **03.11.2026 dagi 11 941,65 so‘m** namunaviy kursi qoldiriladi, bu sana ko‘rsatiladi. Kursni qo‘lda o‘zgartirish va yangilash mumkin. Yakuniy summa kurs va shartnoma shartlariga bog‘liq.
+
+## Ishga tushirish
+
+`index.html` mustaqil HTML/CSS/JS bo‘lib, Node.js, backend yoki login talab qilmaydi. Vercel Root Directory: `tools/turagent-spin-audit`.
+
+Foydalanuvchi kiritgan raqamlar serverga saqlanmaydi. Telefon xizmati va CRM obunasi uchun soliq/qo‘shimcha xarajatlar hisobga kiritilmagan.
