@@ -126,7 +126,8 @@
 (()=>{'use strict';
 const PRICE=Object.freeze({agent:189000,personal:49000,company:110000});
 const fallbackRate=11941.65;
-const DEFAULTS=Object.freeze({agency:'',owner:'',contact:'',city:'',manager:'',managerPhone:'',date:new Date().toISOString().slice(0,10),validDays:'7',employees:'3',workDays:'26',leads:'',missed:'',recovery:'',conversion:'',profit:'',responseNow:'',responseAfter:'',searchNow:'',searchAfter:'',searches:'',agents:'3',months:'6',phoneType:'none',phones:'1',fx:String(fallbackRate),bonus:'0'});
+const SELLER=Object.freeze({name:'Muzaffar Mirkhamidov',phone:'+998 77 177 13 19'});
+const DEFAULTS=Object.freeze({agency:'',agencyImage:'',owner:'',contact:'',city:'',manager:SELLER.name,managerPhone:SELLER.phone,date:new Date().toISOString().slice(0,10),validDays:'7',employees:'3',workDays:'26',leads:'',missed:'',recovery:'',conversion:'',profit:'',responseNow:'',responseAfter:'',searchNow:'',searchAfter:'',searches:'',agents:'3',months:'6',phoneType:'none',phones:'1',fx:String(fallbackRate),bonus:'1'});
 const $=id=>document.getElementById(id),money=n=>fmt(n)+' so‘m',fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n)).replace(/\u00a0/g,' '),fxfmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n).replace(/\u00a0/g,' ');
 const blank=v=>v===''||v===null||v===undefined,num=v=>{const n=Number(v);return blank(v)||!Number.isFinite(n)?null:Math.max(0,n)},parseIntBound=(v,min=0,max=999)=>Math.min(max,Math.max(min,Math.floor(Number(v)||0)));
 let state={...DEFAULTS},selectedId=null,rateMeta={kind:'fallback',date:'03.11.2026',manual:false};
@@ -135,6 +136,8 @@ function stored(){const v=readStorage();return Array.isArray(v.saved)?v.saved:[]
 function rememberCurrent(){try{localStorage.setItem('omon-kp-draft-v1',JSON.stringify({state,selectedId,rateMeta}))}catch(e){}}
 function toast(message){const t=$('toast');t.textContent=message;t.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.hidden=true,2700)}
 function getSupport(a){return a<=3?200:a<=5?300:400}
+function extraMonths(months){return Number(months)===12?3:1}
+function normalized(obj){const s={...DEFAULTS,...obj};s.manager=SELLER.name;s.managerPhone=SELLER.phone;s.bonus=String(extraMonths(s.months));return s}
 function quote(s=state,months=Number(s.months)){
  const agents=Math.max(1,parseIntBound(s.agents,1)),m=[6,12].includes(months)?months:6;
  const rate=num(s.fx),phoneType=['personal','company'].includes(s.phoneType)?s.phoneType:'none',phones=phoneType==='none'?0:parseIntBound(s.phones);
@@ -157,34 +160,95 @@ function put(id,text){$(id).textContent=text}
 function valOr(v,suffix=''){return blank(v)?'—':v+suffix}
 function phoneName(type){return type==='personal'?'MyZvanki (shaxsiy raqam)':type==='company'?'UzTel (kompaniya raqami)':'Telefoniya ulanmagan'}
 function display(){
- const q=quote(),q6=quote(state,6),q12=quote(state,12),a=analysis();const agency=state.agency.trim()||'TURAGENTLIK';
- put('heroAgency','OMON CRM × '+agency.toUpperCase());put('pAgency',state.agency.trim()||'Turagentlik: —');put('pOwner','Rahbar: '+valOr(state.owner));put('pContact','Telefon: '+valOr(state.contact));put('pDate','Sana: '+valOr(state.date));put('pManager','Sotuv menejeri: '+valOr(state.manager));put('pManagerPhone','Telefon: '+valOr(state.managerPhone));
- put('pTerm',q.months+' oy');put('pGrand',q.total!==null?money(q.total):money(q.recurring)+' + $'+q.supportUsd);put('pGrandNote','CRM + '+(q.phoneType==='none'?'telefoniyasiz':'telefon xizmati')+' + bir martalik $'+q.supportUsd+' texnik xizmat');
+ const q=quote(),q6=quote(state,6),q12=quote(state,12),a=analysis(),name=state.agency.trim()||'TURAGENTLIK';
+ const hasPhone=q.phoneType!=='none',bonus=extraMonths(q.months),accessible=q.months+bonus;
+ put('heroAgency','OMON CRM × '+name.toUpperCase());put('pAgency',state.agency.trim()||'Turagentlik: —');put('pOwner','Rahbar: '+valOr(state.owner));put('pContact','Telefon: '+valOr(state.contact));put('pDate','Sana: '+valOr(state.date));
+ put('pManager','Sotuv menejeri: '+SELLER.name);put('pManagerPhone','Telefon: '+SELLER.phone);
+ put('pTerm',q.months+' + '+bonus+' oy');put('pGrand',q.total!==null?money(q.total):money(q.recurring)+' + $'+q.supportUsd);
+ put('pGrandNote','CRM obunasi'+(hasPhone?' + '+(q.phoneType==='personal'?'MyZvanki':'UzTel'):'')+' + bir martalik $'+q.supportUsd+' texnik xizmat');
+ put('pBonusTop',q.months+' OY + '+bonus+' OY BONUS = '+accessible+' OY FOYDALANISH');
+ put('pBonusDetail',hasPhone?'CRM va '+phoneName(q.phoneType)+' uchun bonus oylar bepul':'CRM obunasi uchun bonus oy bepul');
+ put('bonusInfo','🎁 '+q.months+' oy to‘lov + '+bonus+' oy bonus = jami '+accessible+' oy foydalanish'+(hasPhone?' (CRM va telefoniya)':' (CRM)'));
+ put('includedAccounts',q.agents+' ta akkaunt');put('includedDuration',accessible+' oy');put('includedSetup','1 marta · $'+q.supportUsd);
+ $('includedPhoneBlock').hidden=!hasPhone;$('includedTelephonyCard').hidden=!hasPhone;
+ if(hasPhone){put('includedPhone',q.phones+' ta raqam');put('includedPhoneDetail',phoneName(q.phoneType)+' · '+accessible+' oy foydalanish');put('includedTelephonyTitle',phoneName(q.phoneType));put('includedTelephonyBody',q.phones+' ta raqam; '+q.months+' oy to‘lov va '+bonus+' oy bonus. CRM bilan qo‘ng‘iroq nazorati.')}
  put('mEmployees',valOr(state.employees));put('mLeads',valOr(state.leads));put('mMissed',valOr(state.missed));put('mResponse',blank(state.responseNow)?'—':state.responseNow+' daq.');
  put('kLost',a.invalid?'Xatolik':a.lost===null?'—':fmt(a.lost)+' ta');put('kBookings',a.invalid?'—':a.bookings===null?'—':fxfmt(a.bookings)+' ta');put('kProfit',a.invalid?'—':a.moneyPotential===null?'—':money(a.moneyPotential));
- put('kLostFormula',a.invalid?'Ishlanmay qolgan lidlar kunlik jami liddan ko‘p':`${valOr(state.missed)} × ${valOr(state.workDays)} ish kuni`);
- put('kBookingsFormula',`Qayta ishlash: ${valOr(state.recovery,'%')} · bron: ${valOr(state.conversion,'%')}`);
+ put('kLostFormula',a.invalid?'Ishlanmay qolgan lidlar kunlik jami liddan ko‘p':valOr(state.missed)+' × '+valOr(state.workDays)+' ish kuni');
+ put('kBookingsFormula','Qayta ishlash: '+valOr(state.recovery,'%')+' · bron: '+valOr(state.conversion,'%'));
  put('kExplanation',a.invalid?'Kunlik ishlanmay qolgan lidlar kunlik jami liddan katta bo‘lishi mumkin emas. Ma’lumotlarni tuzating.':'Ko‘rsatkichlar ssenariy: yo‘qolgan lidlarning qayta ishlanishi mumkin bo‘lgan ulushi × issiq bog‘lanishdagi bron ehtimoli. Qo‘shimcha bron va foyda kafolatlanmaydi.');
- const respNow=num(state.responseNow),respAfter=num(state.responseAfter);const searchNow=num(state.searchNow),searchAfter=num(state.searchAfter);
- put('kReply',respNow!==null&&respAfter!==null?`Javob tezligi: ${fmt(respNow)} → ${fmt(respAfter)} daq.`:'Javob tezligi: —');
- put('kSearch',searchNow!==null&&searchAfter!==null?`Tur qidirish: ${fmt(searchNow)} → ${fmt(searchAfter)} daq.`:'Tur qidirish: —');
- put('kTime',a.timeSaved!==null?`Faol ish vaqti: ${fxfmt(a.timeSaved)} soat / oy`:'Faol ish vaqti tejalishi: —');
- put('pCrmLabel',`CRM · ${q.agents} agent / oy`);put('pCrmMonthly',money(q.crmMonthly));put('pPhoneLabel',phoneName(q.phoneType)+' / oy');put('pPhoneMonthly',money(q.phoneMonthly));put('pCrmAllLabel',`CRM obunasi (${q.months} oy)`);put('pCrmAll',money(q.crmTotal));put('pPhoneAllLabel',`Telefoniya (${q.months} oy)`);put('pPhoneAll',money(q.phoneTotal));put('pRecurring',money(q.recurring));
- put('pSupportUsd','$'+q.supportUsd);put('pFxLabel',`1 USD = ${num(state.fx)>0?fxfmt(Number(state.fx)):'—'} so‘m`);put('pSupportUzs',q.supportUzs===null?'Kurs kiritilmagan':money(q.supportUzs));put('pAllIn',q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total));put('pSix',q6.total===null?money(q6.recurring)+' + $'+q6.supportUsd:money(q6.total));put('pTwelve',q12.total===null?money(q12.recurring)+' + $'+q12.supportUsd:money(q12.total));
+ const respNow=num(state.responseNow),respAfter=num(state.responseAfter),searchNow=num(state.searchNow),searchAfter=num(state.searchAfter);
+ put('kReply',respNow!==null&&respAfter!==null?'Javob tezligi: '+fmt(respNow)+' → '+fmt(respAfter)+' daq.':'Javob tezligi: —');
+ put('kSearch',searchNow!==null&&searchAfter!==null?'Tur qidirish: '+fmt(searchNow)+' → '+fmt(searchAfter)+' daq.':'Tur qidirish: —');
+ put('kTime',a.timeSaved!==null?'Faol ish vaqti: '+fxfmt(a.timeSaved)+' soat / oy':'Faol ish vaqti tejalishi: —');
+ $('pPhoneRow').hidden=!hasPhone;$('pPhoneAllRow').hidden=!hasPhone;
+ put('pPricingHeading',hasPhone?'CRM va '+(q.phoneType==='personal'?'MyZvanki':'UzTel'):'CRM obunasi');
+ put('pRecurringLabel',hasPhone?'CRM + telefoniya (to‘lov davri)':'CRM obunasi jami');
+ put('pCrmLabel','CRM · '+q.agents+' agent / oy');put('pCrmMonthly',money(q.crmMonthly));
+ if(hasPhone){put('pPhoneLabel',phoneName(q.phoneType)+' / oy');put('pPhoneMonthly',money(q.phoneMonthly));put('pPhoneAllLabel',phoneName(q.phoneType)+' ('+q.months+' oy)');put('pPhoneAll',money(q.phoneTotal))}
+ put('pCrmAllLabel','CRM obunasi ('+q.months+' oy)');put('pCrmAll',money(q.crmTotal));put('pRecurring',money(q.recurring));
+ put('pSupportUsd','$'+q.supportUsd);put('pFxLabel','1 USD = '+(num(state.fx)>0?fxfmt(Number(state.fx)):'—')+' so‘m');
+ put('pSupportUzs',q.supportUzs===null?'Kurs kiritilmagan':money(q.supportUzs));put('pAllIn',q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total));
+ put('pSix',q6.total===null?money(q6.recurring)+' + $'+q6.supportUsd:money(q6.total));put('pTwelve',q12.total===null?money(q12.recurring)+' + $'+q12.supportUsd:money(q12.total));
  $('plan6').classList.toggle('active',q.months===6);$('plan12').classList.toggle('active',q.months===12);
- put('pFinal',q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total));put('pBonus',parseIntBound(state.bonus,0,12)>0?`${q.months} oy to‘lov → ${q.months+parseIntBound(state.bonus,0,12)} oy foydalanish (bonus ${parseIntBound(state.bonus,0,12)} oy)`:`${q.months} oylik paket · umumiy to‘lov`);
+ put('pFinal',q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total));put('pBonus',q.months+' oy to‘lov + '+bonus+' oy BONUS = '+accessible+' oy foydalanish');
  put('instantQuote',q.total!==null?'Jami: '+money(q.total)+' · CRM: '+money(q.crmMonthly)+'/oy':'Jami: '+money(q.recurring)+' + $'+q.supportUsd);
- put('conditionTerm',`• CRM — ${q.agents} akkaunt uchun ${q.months} oylik obuna.`+(parseIntBound(state.bonus,0,12)>0?` Qo‘shimcha ${parseIntBound(state.bonus,0,12)} oy bonus bilan jami ${q.months+parseIntBound(state.bonus,0,12)} oy foydalanish.`:''));
- put('conditionPhones','• '+(q.phoneType==='none'?'Telefoniya ushbu taklifga kiritilmagan.':phoneName(q.phoneType)+' — '+q.phones+' raqam, '+money(q.phoneMonthly)+'/oy; '+q.months+' oy uchun '+money(q.phoneTotal)+'.'));
+ put('conditionTerm','• '+q.agents+' akkaunt uchun '+q.months+' oy to‘lov + '+bonus+' oy BONUS = '+accessible+' oy CRM foydalanish. Bonus oylar bepul.');
+ $('conditionPhones').hidden=!hasPhone;
+ if(hasPhone)put('conditionPhones','• '+phoneName(q.phoneType)+' — '+q.phones+' raqam, '+money(q.phoneMonthly)+'/oy; '+q.months+' oy to‘lov + '+bonus+' oy BONUS = '+accessible+' oy foydalanish.');
  put('conditionRate','• Texnik xizmat — $'+q.supportUsd+' (bir martalik). '+(q.supportUzs!==null?'Kurs '+fxfmt(Number(state.fx))+' so‘m, ekvivalent '+money(q.supportUzs)+'. ':'')+'Valyuta kursi va yakuniy shartlar to‘lovda tasdiqlanadi.');
- put('conditionValidity',`• Taklif sanasi ${valOr(state.date)}; amal qilish muddati ${parseIntBound(state.validDays,1,60)} kun.`);
+ put('conditionValidity','• Taklif sanasi '+valOr(state.date)+'; amal qilish muddati '+parseIntBound(state.validDays,1,60)+' kun.');
 }
-function fill(){for(const el of document.querySelectorAll('[data-key]')){el.value=state[el.dataset.key]??''}const disabled=state.phoneType==='none';$('phones').disabled=disabled;display()}
-function readForm(){for(const el of document.querySelectorAll('[data-key]'))state[el.dataset.key]=el.value;const dis=state.phoneType==='none';$('phones').disabled=dis;display();rememberCurrent()}
+
+function paintAgencyImage(){
+ const data=state.agencyImage||'',ok=typeof data==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(data);
+ $('agencyImagePreview').hidden=!ok;$('clientLogo').hidden=!ok;
+ if(ok){$('agencyThumb').src=data;$('clientLogoImg').src=data}else{$('agencyThumb').removeAttribute('src');$('clientLogoImg').removeAttribute('src')}
+}
+$('agencyImageFile').addEventListener('change',e=>{
+ const file=e.target.files&&e.target.files[0];if(!file)return;
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>8*1024*1024){toast('JPG, PNG yoki WebP rasm tanlang (8 MB gacha)');e.target.value='';return}
+ const reader=new FileReader();
+ reader.onerror=()=>toast('Rasm o‘qilmadi');
+ reader.onload=()=>{
+  const img=new Image();img.onerror=()=>toast('Rasm ochilmadi');
+  img.onload=()=>{
+    const max=440,scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+    const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    const context=canvas.getContext('2d');if(!context){toast('Rasmni qayta ishlashda xatolik');return}
+    context.drawImage(img,0,0,canvas.width,canvas.height);
+    const encoded=canvas.toDataURL('image/webp',.70);
+    if(encoded.length>260000){toast('Rasm juda katta. Kichikroq rasmdan foydalaning');return}
+    state.agencyImage=encoded;paintAgencyImage();rememberCurrent();toast('Turagentlik rasmi qo‘shildi');
+  };img.src=reader.result;
+ };reader.readAsDataURL(file);
+ e.target.value='';
+});
+$('removeAgencyImage').addEventListener('click',()=>{state.agencyImage='';paintAgencyImage();rememberCurrent();toast('Turagentlik rasmi olib tashlandi')});
+function fill(){state=normalized(state);for(const el of document.querySelectorAll('[data-key]')){el.value=state[el.dataset.key]??''}const disabled=state.phoneType==='none';$('phones').disabled=disabled;display();paintAgencyImage()}
+function readForm(){for(const el of document.querySelectorAll('[data-key]'))state[el.dataset.key]=el.value;state=normalized(state);const dis=state.phoneType==='none';$('phones').disabled=dis;display();rememberCurrent()}
 function refreshSaved(){const cur=stored(),sel=$('savedSelect');sel.replaceChildren(new Option('— Taklif tanlang —',''));for(const item of cur){sel.add(new Option((item.agency||'Nomsiz turagentlik')+' · '+(item.updated||'').slice(0,10),item.id))}sel.value=selectedId||''}
-function saveQuote(){if(!state.agency.trim()){toast('Avval turagentlik nomini kiriting');$('agency').focus();return}const items=stored();const id=selectedId||('kp-'+Date.now());const updated=new Date().toISOString();const record={id,agency:state.agency.trim(),updated,data:{...state},rateMeta:{...rateMeta}};const idx=items.findIndex(x=>x.id===id);if(idx>=0)items[idx]=record;else items.unshift(record);items.sort((a,b)=>b.updated.localeCompare(a.updated));try{localStorage.setItem('omon-kp-v1',JSON.stringify({saved:items.slice(0,80)}));selectedId=id;refreshSaved();rememberCurrent();toast('Tijorat taklifi saqlandi')}catch(e){toast('Saqlash uchun brauzer xotirasi mavjud emas')}}
-function exportQuote(){const data={version:1,exportedAt:new Date().toISOString(),...state};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='omon-kp-'+(state.agency.trim().replace(/[^\w\-]+/g,'-').slice(0,32)||'taklif')+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
-function quoteText(){const q=quote(),a=analysis(),v=state;return ['OMON CRM — TIJORAT TAKLIFNOMASI',`Turagentlik: ${v.agency||'—'}`,`Rahbar: ${v.owner||'—'}`,`Sana: ${v.date||'—'}`,`Xodimlar: ${v.employees||'—'}, CRM agentlari: ${q.agents}`,`Kunlik lidlar: ${v.leads||'—'}, ishlanmay qolgan: ${v.missed||'—'}`,`Ishlanmay qolgan lidlar / oy: ${a.lost===null?'—':fmt(a.lost)}`,`Qo‘shimcha bronlar prognozi / oy: ${a.bookings===null?'—':fxfmt(a.bookings)}`,`Qo‘shimcha foyda ssenariysi / oy: ${a.moneyPotential===null?'—':money(a.moneyPotential)}`,`CRM / oy: ${money(q.crmMonthly)}`,`${q.months} oylik CRM: ${money(q.crmTotal)}`,`${phoneName(q.phoneType)} / oy: ${money(q.phoneMonthly)}`,`Telefoniya ${q.months} oy: ${money(q.phoneTotal)}`,`Texnik xizmat (1 marta): $${q.supportUsd} = ${q.supportUzs===null?'kurs aniqlanmagan':money(q.supportUzs)}`,`6 oylik jami: ${quote(state,6).total===null?'—':money(quote(state,6).total)}`,`12 oylik jami: ${quote(state,12).total===null?'—':money(quote(state,12).total)}`,`TANLANGAN PAKET JAMI: ${q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total)}`,`Izoh: qo‘shimcha bron va foyda prognoz bo‘lib, kafolat emas.`].join('\n')}
+function saveQuote(){state=normalized(state);if(!state.agency.trim()){toast('Avval turagentlik nomini kiriting');$('agency').focus();return}const items=stored();const id=selectedId||('kp-'+Date.now());const updated=new Date().toISOString();const record={id,agency:state.agency.trim(),updated,data:{...state},rateMeta:{...rateMeta}};const idx=items.findIndex(x=>x.id===id);if(idx>=0)items[idx]=record;else items.unshift(record);items.sort((a,b)=>b.updated.localeCompare(a.updated));try{localStorage.setItem('omon-kp-v1',JSON.stringify({saved:items.slice(0,80)}));selectedId=id;refreshSaved();rememberCurrent();toast('Tijorat taklifi saqlandi')}catch(e){toast('Saqlash uchun brauzer xotirasi mavjud emas')}}
+function exportQuote(){const data={version:2,exportedAt:new Date().toISOString(),...normalized(state)};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='omon-kp-'+(state.agency.trim().replace(/[^\w\-]+/g,'-').slice(0,32)||'taklif')+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+function quoteText(){
+ const q=quote(),a=analysis(),v=state,b=extraMonths(q.months),hasPhone=q.phoneType!=='none';
+ return ['OMON CRM — TIJORAT TAKLIFNOMASI',
+ 'Turagentlik: '+(v.agency||'—'),'Rahbar: '+(v.owner||'—'),'Sotuv menejeri: '+SELLER.name+' · '+SELLER.phone,'Sana: '+(v.date||'—'),
+ 'Xodimlar: '+(v.employees||'—')+', CRM agentlari: '+q.agents,
+ 'Kunlik lidlar: '+(v.leads||'—')+', ishlanmay qolgan: '+(v.missed||'—'),
+ 'Ishlanmay qolgan lidlar / oy: '+(a.lost===null?'—':fmt(a.lost)),
+ 'Qo‘shimcha bronlar prognozi / oy: '+(a.bookings===null?'—':fxfmt(a.bookings)),
+ 'Qo‘shimcha foyda prognozi / oy: '+(a.moneyPotential===null?'—':money(a.moneyPotential)),
+ 'CRM / oy: '+money(q.crmMonthly),
+ 'CRM '+q.months+' oy uchun: '+money(q.crmTotal),
+ q.months+' oy to‘lov + '+b+' oy BONUS = '+(q.months+b)+' oy foydalanish',
+ ...(hasPhone?[phoneName(q.phoneType)+' / oy: '+money(q.phoneMonthly), 'Telefoniya '+q.months+' oy to‘lov + '+b+' oy bonus: '+money(q.phoneTotal)]:[]),
+ 'Texnik xizmat (1 marta): $'+q.supportUsd+' = '+(q.supportUzs===null?'kurs aniqlanmagan':money(q.supportUzs)),
+ '6 oylik jami (7 oy foydalanish): '+(quote(state,6).total===null?'—':money(quote(state,6).total)),
+ '12 oylik jami (15 oy foydalanish): '+(quote(state,12).total===null?'—':money(quote(state,12).total)),
+ 'TANLANGAN PAKET JAMI: '+(q.total===null?money(q.recurring)+' + $'+q.supportUsd:money(q.total)),
+ 'Izoh: qo‘shimcha bron va foyda prognoz bo‘lib, kafolat emas.'].join('\n');
+}
 async function copyQuote(){const t=quoteText();try{await navigator.clipboard.writeText(t)}catch(e){const box=document.createElement('textarea');box.value=t;document.body.append(box);box.select();document.execCommand('copy');box.remove()}toast('Taklif nusxalandi')}
 let loadingRate=false;
 async function updateRate(){if(loadingRate)return;loadingRate=true;put('fxStatus','Markaziy bank kursi tekshirilmoqda…');try{const response=await fetch('https://cbu.uz/uz/arkhiv-kursov-valyut/json/USD/',{cache:'no-store'});if(!response.ok)throw Error('Kurs servisi javob bermadi');const raw=await response.json();const obj=Array.isArray(raw)?raw[0]:raw;const rate=Number(String(obj?.Rate||'').replace(',','.'));if(!Number.isFinite(rate)||rate<1000||rate>50000)throw Error('Kurs ma’lumoti noto‘g‘ri');if(!rateMeta.manual){state.fx=String(rate);rateMeta={kind:'official',date:obj.Date||'so‘nggi',manual:false};$('fx').value=state.fx;display();rememberCurrent()}put('fxStatus','Markaziy bank kursi: '+fxfmt(rate)+' so‘m · '+(obj.Date||''))}catch(e){put('fxStatus',rateMeta.manual?'Kurs qo‘lda kiritilgan':`Tarmoq kursi olinmadi; ${fxfmt(Number(state.fx))} so‘m namunaviy kurs (03.11.2026). Qo‘lda yangilang.`)}finally{loadingRate=false}}
@@ -192,10 +256,10 @@ $('refreshRate').addEventListener('click',()=>{rateMeta.manual=false;updateRate(
 for(const el of document.querySelectorAll('[data-key]'))el.addEventListener('input',()=>{if(el.id==='fx'){rateMeta.manual=true;rateMeta.kind='manual';put('fxStatus','USD kursi qo‘lda kiritilgan — '+(Number(el.value)>0?fxfmt(Number(el.value))+' so‘m':'Iltimos, kurs kiriting'))}readForm()});
 $('viewToggle').addEventListener('click',()=>{const presenting=document.body.classList.toggle('view-only');$('viewToggle').textContent=presenting?'✎ Tahrirga qaytish':'◉ Mijozga ko‘rsatish';try{sessionStorage.setItem('omon-kp-present',presenting?'1':'0')}catch(e){}window.scrollTo({top:0,behavior:'instant'})});
 $('printQuote').addEventListener('click',()=>window.print());$('copyQuote').addEventListener('click',copyQuote);$('saveQuote').addEventListener('click',saveQuote);$('exportQuote').addEventListener('click',exportQuote);
-$('newQuote').addEventListener('click',()=>{if(!confirm('Yangi taklif ochilsinmi? Joriy saqlanmagan o‘zgarishlar yo‘qoladi.'))return;state={...DEFAULTS};selectedId=null;fill();refreshSaved();rememberCurrent();toast('Yangi taklif ochildi')});
+$('newQuote').addEventListener('click',()=>{if(!confirm('Yangi taklif ochilsinmi? Joriy saqlanmagan o‘zgarishlar yo‘qoladi.'))return;state=normalized(DEFAULTS);selectedId=null;fill();refreshSaved();rememberCurrent();toast('Yangi taklif ochildi')});
 $('deleteQuote').addEventListener('click',()=>{if(!selectedId){toast('Saqlangan taklif tanlanmagan');return}if(!confirm('Ushbu saqlangan taklif o‘chirilsinmi?'))return;const arr=stored().filter(x=>x.id!==selectedId);try{localStorage.setItem('omon-kp-v1',JSON.stringify({saved:arr}));selectedId=null;refreshSaved();toast('Taklif o‘chirildi')}catch(e){toast('O‘chirishda xatolik')}});
-$('savedSelect').addEventListener('change',e=>{const item=stored().find(x=>x.id===e.target.value);if(!item)return;selectedId=item.id;state={...DEFAULTS,...item.data};rateMeta=item.rateMeta||{kind:'manual',date:'',manual:true};fill();rememberCurrent();toast('Taklif ochildi')});
-try{const existing=JSON.parse(localStorage.getItem('omon-kp-draft-v1')||'null');if(existing&&existing.state){state={...DEFAULTS,...existing.state};selectedId=existing.selectedId||null;rateMeta=existing.rateMeta||rateMeta}}catch(e){}
+$('savedSelect').addEventListener('change',e=>{const item=stored().find(x=>x.id===e.target.value);if(!item)return;selectedId=item.id;state=normalized(item.data||{});rateMeta=item.rateMeta||{kind:'manual',date:'',manual:true};fill();rememberCurrent();toast('Taklif ochildi')});
+try{const existing=JSON.parse(localStorage.getItem('omon-kp-draft-v1')||'null');if(existing&&existing.state){state=normalized(existing.state);selectedId=existing.selectedId||null;rateMeta=existing.rateMeta||rateMeta}}catch(e){}
 fill();refreshSaved();try{if(sessionStorage.getItem('omon-kp-present')==='1'){document.body.classList.add('view-only');$('viewToggle').textContent='✎ Tahrirga qaytish'}}catch(e){}
 if(!rateMeta.manual)updateRate();else put('fxStatus','USD kursi qo‘lda kiritilgan — '+fxfmt(Number(state.fx))+' so‘m');
 })();
